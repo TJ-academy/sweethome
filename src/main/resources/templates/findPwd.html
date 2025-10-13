@@ -1,15 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>비밀번호 찾기</title>
+
+<script>
+function isValidEmail(email) {
+    // 이메일 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+//인증 코드 전송
+function sendVerificationCode() {
+    const email = document.getElementById("email").value;
+
+ 	// 이메일 형식이 올바른지 확인
+    if (!isValidEmail(email)) {
+        alert("올바른 이메일 주소를 입력해주세요.");
+        return;
+    }
+ 	
+ 	// 이메일 중복 확인
+    fetch("/user/checkEmailDuplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "email=" + encodeURIComponent(email)
+    })
+    .then(res => res.text())
+    .then(status => {
+        if (status === "ok") {
+        	document.getElementById("verificationResult").innerText = "존재하지 않는 이메일입니다.";
+            return;
+        }
+        
+        //이메일 인증 요청
+        document.getElementById("verificationResult").innerText = "인증 코드 보내는 중..";
+        
+        return fetch("/user/mailConfirm", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "email=" + encodeURIComponent(email)
+        });
+    })
+	.then(res => res.text())
+	.then(msg => {
+		document.getElementById("verificationResult").innerText = msg;
+	});
+}
+
+//인증 코드 확인 함수
+function verifyCode() {
+    const code = document.getElementById("emailCode").value;
+
+    fetch("/user/verifyEmailCode?inputCode=" + code, {
+        method: "POST"
+    })
+    .then(res => res.text())
+    .then(msg => {
+        document.getElementById("verificationResult").innerText = msg;
+        
+        if (msg === "인증이 완료되었습니다.") {
+            //비밀번호 재설정 페이지로..
+            window.location.href = "/user/resetPassword?email=" + encodeURIComponent(document.getElementById("email").value);
+        }
+    });
+}
+</script>
+
 </head>
 <body>
+<a href="/">Home</a>
 
-<form action="/user/findPwd" method="post">
-	<label for="email">이메일:</label><br>
-	<input type="email" id="email" name="email" required>
-	<button type="submit">인증 코드 전송</button>
-</form>
+<label for="email">이메일:</label><br>
+<input type="email" id="email" name="email" required>
+
+<button type="button" id="emailBtn"
+	th:disabled="${kakaouser != null}"
+	onclick="sendVerificationCode()"
+>인증 코드 전송</button>
+
+<input type="text" id="emailCode" 
+	placeholder="인증 코드 입력"
+	th:value="${kakaouser != null} ? '인증완료' : ''" 
+	th:disabled="${kakaouser != null}"
+>
+<button type="button" id="codeBtn"
+	onclick="verifyCode()"
+	th:disabled="${kakaouser != null}"
+>코드 확인</button>
+
+<!-- 인증 상태 표시 -->
+<p id="verificationResult"></p>
+
 </body>
 </html>
