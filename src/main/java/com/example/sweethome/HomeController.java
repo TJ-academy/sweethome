@@ -13,6 +13,9 @@ public class HomeController {
 	@GetMapping("/")
 	public String basic(HttpSession session, Model model) {
 		User userProfile = (User) session.getAttribute("userProfile");
+		if(session.getAttribute("kakaouser") != null) {
+	    	session.removeAttribute("kakaouser");
+	    }
 	    if (userProfile != null) {
 	        model.addAttribute("userProfile", userProfile);
 	    }

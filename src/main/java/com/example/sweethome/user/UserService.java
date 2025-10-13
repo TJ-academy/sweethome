@@ -35,6 +35,15 @@ public class UserService {
     	String encryptedPassword = encryptPassword(rawPwd);
         return user.get().getPassword().equals(encryptedPassword);
     }
+    
+    //비밀번호 재설정 함수
+    public void updatePassword(String email, String newPassword) {
+    	Optional<User> user = userRepository.findByEmail(email);
+
+        String encryptedPassword = encryptPassword(newPassword);
+        user.get().setPassword(encryptedPassword);
+        userRepository.save(user.get());
+    }
 
     //비밀번호 암호화 함수
     private String encryptPassword(String password) {

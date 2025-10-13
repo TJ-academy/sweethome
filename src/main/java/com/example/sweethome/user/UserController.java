@@ -107,11 +107,43 @@ public class UserController {
 	    return exists ? "duplicate" : "ok";
 	}
 	
-	//비밀번호 찾기
+	//비밀번호 찾기 페이지 로딩
 	@GetMapping("/findPwd")
 	public String findPwd() {
-		
 		return "findPwd"; 
+	}
+	
+	//비밀번호 재설정 페이지 로딩
+	@GetMapping("/resetPassword")
+	public String resetPassword(@RequestParam("email") String email, 
+			Model model) {
+		model.addAttribute("email", email);
+		return "resetPassword"; 
+	}
+	
+	//비밀번호 재설정
+	@PostMapping("/resetPassword")
+	public String resetPassword(@RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model) {
+		
+		if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("email", email);  // 다시 form에 유지
+            return "resetPassword";
+        }
+
+        // 비밀번호 업데이트 처리
+        try {
+            service.updatePassword(email, password);
+            model.addAttribute("success", "비밀번호가 성공적으로 변경되었습니다.");
+            return "redirect:/user/login";
+        } catch (Exception e) {
+            model.addAttribute("error", "비밀번호 변경 중 오류가 발생했습니다.");
+            model.addAttribute("email", email);
+            return "resetPassword";
+        }
 	}
 	
 	@GetMapping("/cancelJoin")
