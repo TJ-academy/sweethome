@@ -1,6 +1,5 @@
 package com.example.sweethome.user;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,15 +8,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.sweethome.email.EmailPostDto;
 import com.example.sweethome.email.EmailService;
 import com.example.sweethome.kakao.dto.KakaoProfile;
 
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +44,7 @@ public class UserController {
     	+ "&redirect_uri="+redirect_uri;
     	//+ "&prompt=login"; 
     	model.addAttribute("location", location); 
+    	model.addAttribute("message", " ");
     	return "login"; 
     }
     
@@ -63,22 +61,6 @@ public class UserController {
             model.addAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
             return "login"; 
         }
-    }
-    
-    @GetMapping("/kakao/logout")
-    public String kakaoLogout(Model model) {
-    	String location = 
-    			"https://kauth.kakao.com/oauth/logout?client_id=" 
-    + client_id 
-    + "&logout_redirect_uri=" + logout_redirect_uri;
-    	model.addAttribute("location", location);
-    	return "redirect:" + location;
-    }
-    
-    @GetMapping("/logout-complete")
-    public String logoutComplete() {
-    	System.out.println("로그아웃되었습니다.");
-    	return "redirect:/";
     }
     
     @GetMapping("/logout")
@@ -98,7 +80,15 @@ public class UserController {
 
 	@PostMapping("/join")
 	public String insertUser(@ModelAttribute User user, 
+			HttpSession session,
 			Model model) {
+		Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+
+	    if (emailVerified == null || !emailVerified) {
+	        model.addAttribute("message", "이메일 인증을 완료해주세요.");
+	        return "join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
+	    }
+	    
 		// nickname 이 비어 있으면 username 으로 설정
 	    if (user.getNickname() == null || user.getNickname().trim().isEmpty()) {
 	        user.setNickname(user.getUsername());
@@ -109,15 +99,20 @@ public class UserController {
 		return "login"; 
 	}
 	
-	@PostMapping("/mailConfirm")
-	public String mailConfirm(@RequestBody EmailPostDto emailDto) {
-        try {
-            return emailService.sendEmail(emailDto.getEmail());
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace(); // 또는 로깅
-            return "메일 전송 실패";
-        }
-    }
+	//이미 있는 이메일인지 아닌지 확인
+	@ResponseBody
+	@PostMapping("/checkEmailDuplicate")
+	public String checkEmailDuplicate(@RequestParam("email") String email) {
+	    boolean exists = repo.existsByEmail(email);
+	    return exists ? "duplicate" : "ok";
+	}
+	
+	//비밀번호 찾기
+	@GetMapping("/findPwd")
+	public String findPwd() {
+		
+		return "findPwd"; 
+	}
 	
 	@GetMapping("/cancelJoin")
 	public String cancelJoin(HttpSession session) {
