@@ -10,6 +10,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +52,8 @@ public class EmailService {
 
         createCode(); //인증 코드 생성
         String setFrom = "theGoodSweetHome@gmail.com"; //email-config에 설정한 자신의 이메일 주소(보내는 사람)
-        String toEmail = "9yeosong@naver.com"; //받는 사람
+        //String toEmail = "9yeosong@naver.com"; //받는 사람
+        String toEmail = email; //받는 사람
         String title = "CODEBOX 회원가입 인증 번호"; //제목
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -61,27 +63,21 @@ public class EmailService {
 		message.setText(setContext(authNum), "utf-8", "html");
 		
 		return message;
-		 
-//        try {
-//            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, false, "UTF-8");
-//            mimeMessageHelper.setTo(email); // 메일 수신자
-//            mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-//            mimeMessageHelper.setText(emailMessage.getMessage(), false); // 메일 본문 내용, HTML 여부
-//            emailSender.send(message);
-//            log.info("Success!!");
-//        } catch (MessagingException e) {
-//            log.info("fail!!");
-//            throw new RuntimeException(e);
-//        }
+
     }
 
     //실제 메일 전송
-    public String sendEmail(String toEmail) throws MessagingException, UnsupportedEncodingException {
+    public String sendEmail(String toEmail, 
+    		HttpSession session) 
+    				throws MessagingException, UnsupportedEncodingException {
     
         //메일전송에 필요한 정보 설정
         MimeMessage emailForm = createEmailForm(toEmail);
         //실제 메일 전송
         emailSender.send(emailForm);
+        
+        session.setAttribute("emailCode", authNum);  // 인증 코드 저장
+        session.setAttribute("emailVerified", false); // 초기 인증 상태 false
 
         return authNum; //인증 코드 반환
     }
