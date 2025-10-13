@@ -3,6 +3,7 @@ package com.example.sweethome.user;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,12 @@ public class UserService {
     
     //로그인 함수
     public boolean loginUser(String email, String rawPwd) {
-    	User user = userRepository.findByEmail(email).orElse(null);
+    	Optional<User> user = userRepository.findByEmail(email);
     	
-    	if(user == null) return false;
+    	if(user.get() == null) return false;
         
     	String encryptedPassword = encryptPassword(rawPwd);
-        return user.getPassword().equals(encryptedPassword);
+        return user.get().getPassword().equals(encryptedPassword);
     }
 
     //비밀번호 암호화 함수

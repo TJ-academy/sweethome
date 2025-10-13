@@ -17,6 +17,8 @@
 	
 		<!-- 에러 메시지 출력 -->
 		<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+		<!-- 회원가입 완료 메시지 출력 -->
+		<p th:if="${message}" th:text="${message}" style="color:blue;"></p>
 	
 		<div class="container" style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin-top:20px; width:100%;">
 	    	<button type="submit" style="width:100px; height:30px;">LOGIN</button>

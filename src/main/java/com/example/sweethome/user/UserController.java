@@ -97,14 +97,16 @@ public class UserController {
 	}
 
 	@PostMapping("/join")
-	public String insertUser(@ModelAttribute User user) {
+	public String insertUser(@ModelAttribute User user, 
+			Model model) {
 		// nickname 이 비어 있으면 username 으로 설정
 	    if (user.getNickname() == null || user.getNickname().trim().isEmpty()) {
 	        user.setNickname(user.getUsername());
 	    }
 	    
 		service.insertUser(user);
-		return "redirect:/user/login";
+		model.addAttribute("message", "회원가입이 완료되었습니다.");
+		return "login"; 
 	}
 	
 	@PostMapping("/mailConfirm")

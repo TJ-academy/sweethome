@@ -37,14 +37,14 @@ public class KakaoLoginController {
 		
 		//이메일로 회원 검색
 		Optional<User> isUser = userRepo.findByEmail(userInfo.getKakaoAccount().getEmail());
-		System.out.println(userInfo);
+		//System.out.println(userInfo);
 		//회원이 아니라면 회원가입
 		if (isUser.isEmpty()) {
 			session.setAttribute("kakaouser", userInfo);
 			return "redirect:/user/join";
 		} else {
 			//회원이면 home.html로 이동
-			session.setAttribute("userProfile", isUser);
+			session.setAttribute("userProfile", isUser.get());
 	        return "redirect:/";
 		}
 		
