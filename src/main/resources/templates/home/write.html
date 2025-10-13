@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>숙소 등록</title>
+    <!-- Bootstrap & jQuery -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- Summernote -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
+    <!-- Daum 주소 API -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Summernote 활성화
+            $('#description').summernote({
+                height: 300,
+                width: 800,
+                placeholder: '숙소에 대한 상세 설명을 입력하세요.'
+            });
+        });
+
+        // 주소 검색 함수
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 도로명 주소 선택 시
+                    let addr = data.roadAddress;
+                    // 지번 주소 선택 시
+                    if (data.userSelectedType === 'J') {
+                        addr = data.jibunAddress;
+                    }
+                    // 입력창에 주소 채워넣기
+                    document.getElementById("address").value = addr;
+                    // 상세주소 입력칸으로 포커스 이동
+                    document.getElementById("detailAddress").focus();
+                }
+            }).open();
+        }
+    </script>
+</head>
+<body>
+	<!-- localhost/naraeTest/write -->
+    <h2>숙소 등록</h2>
+    <form method="post" enctype="multipart/form-data">
+    	<!-- 호스트 아이디 (세션) -->
+    	<input type="hidden" name="hostId" th:value="${session.userId}">
+        <!-- 제목 -->
+        <div>
+            <label for="title">제목</label><br>
+            <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+        </div>
+
+        <!-- 상세 설명 -->
+        <div>
+            <label for="description">상세 설명</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <!-- 지역 -->
+        <div>
+            <label for="location">지역</label><br>
+            <select name="location" id="location">
+                <option value="서울">서울</option>
+                <option value="경기">경기</option>
+                <option value="인천">인천</option>
+                <option value="대전">대전</option>
+                <option value="세종">세종</option>
+                <option value="충남">충남</option>
+                <option value="충북">충북</option>
+                <option value="광주">광주</option>
+                <option value="전남">전남</option>
+                <option value="전북">전북</option>
+                <option value="대구">대구</option>
+                <option value="경북">경북</option>
+                <option value="부산">부산</option>
+                <option value="울산">울산</option>
+                <option value="경남">경남</option>
+                <option value="강원">강원</option>
+                <option value="제주">제주</option>
+            </select>
+        </div>
+        <!-- 집주소 -->
+        <div>
+            <label for="address">주소</label><br>
+            <input type="text" id="address" name="address" placeholder="주소를 입력하세요" readonly>
+            <button type="button" onclick="execDaumPostcode()">주소 검색</button>
+            <label for="detailAddress">상세주소</label>
+            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소를 입력하세요">
+        </div>
+        <!-- 요금 -->
+        <div>
+	        <label for="cost">요금</label><br>
+        	기본요금: <input type="number" name="costBasic"><br>
+        	주말요금: <input type="number" name="costExpen">
+        </div>
+        <!-- 숙소타입 -->
+        <div>
+	        <label for="homeType">숙소타입</label><br>
+	        <select name="homeType">
+	        	<option value="펜션">펜션</option>
+	        	<option value="단독주택">단독주택</option>
+	        	<option value="아파트">아파트</option>
+	        	<option value="호텔">호텔</option>
+	        	<option value="모텔">모텔</option>
+	        	<option value="빌라">빌라</option>   	
+	        </select>
+        </div>
+        <!-- 썸네일 -->
+        <div>
+        	<label for="thumbnail">썸네일</label><br>
+    		<input type="file" name="thumbnail">
+        </div>
+        <!-- 최대인원 (성인/아동) -->
+        <div>
+        	<label for="maxPeople">최대인원</label><br>
+        	<input type="number" name="maxPeople">
+        </div>
+        <!-- 방갯수 -->
+        <div>
+        	<label for="room">방갯수</label><br>
+        	<input type="number" name="room">
+        </div>
+        <!-- 체크인 시간 -->
+        <div>
+        	<label for="checkIn">체크인 시간</label><br>
+        	<input type="time" name="checkIn">
+        </div>     
+        <!-- 체크아웃 시간 -->
+        <div>
+        	<label for="checkout">체크아웃 시간</label><br>
+        	<input type="time" name="checkout">
+        </div>        
+        <!-- 숙소 사진 (최대 10장) -->
+        <div>
+        	<label for="homeImg">숙소 사진(최대 10장)</label>
+        	<input type="file" name="imgOne">
+        	<input type="file" name="imgTwo">
+        	<input type="file" name="imgThree">
+        	<input type="file" name="imgFour">
+        	<input type="file" name="imgFive">
+        	<input type="file" name="imgSix">
+        	<input type="file" name="imgSeven">
+        	<input type="file" name="imgEight">
+        	<input type="file" name="imgNine">
+        	<input type="file" name="imgTen">
+        </div>
+        <!-- 등록 버튼 -->
+        <button type="submit">등록</button>
+    </form>
+</body>
+</html>
