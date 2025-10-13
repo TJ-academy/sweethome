@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>홈 스윗 홈</title>
+</head>
+<body>
+
+<!-- 로그인 안 된 경우 -->
+<div th:if="${userProfile == null}">
+	<a href="/user/join">회원가입</a><br>
+	<a href="/user/login">로그인</a><br>
+</div>
+
+<!-- 로그인 된 경우 -->
+<div th:if="${userProfile != null}">
+	<p th:text="${userProfile.nickname} + '님 환영합니다.'"></p>
+	<a href="/user/logout">로그아웃</a><br>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+
+<script>
+let emailVerified 
+function autoHyphenPhone(target) {
+    target.value = target.value
+        .replace(/[^0-9]/g, '')  //숫자 외 문자 제거
+        .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);  //전화번호 형식
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInput = document.getElementById('phone');
+    
+    phoneInput.addEventListener('input', () => {
+        autoHyphenPhone(phoneInput);
+    });
+});
+</script>
+</head>
+<body>
+<h1>회원가입</h1>
+<form th:action="@{/user/join}" method="post">
+    <label for="email">이메일:</label><br>
+	<input type="email" id="email" name="email" 
+		th:value="${kakaouser != null ? kakaouser.kakaoAccount.email : ''}" 
+		th:readonly="${kakaouser != null}"
+	required>
+	<button type="button" 
+		th:disabled="${kakaouser != null}"
+		onclick="sendVerificationCode()"
+	>이메일 인증</button>
+	
+	<!-- 인증 코드 입력 -->
+	<input type="text" id="emailCode" 
+		placeholder="인증 코드 입력"
+		th:value="${kakaouser != null} ? '인증완료' : ''" 
+		th:disabled="${kakaouser != null}"
+	>
+	<button type="button" 
+		onclick="verifyCode()"
+		th:disabled="${kakaouser != null}"
+	>코드 확인</button>
+	
+	<!-- 인증 상태 표시 -->
+	<p id="verificationResult"></p>
+
+    <label for="password">비밀번호:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <label for="username">이름:</label><br>
+    <input type="text" id="username" name="username" required><br><br>
+
+    <label for="nickname">닉네임:</label><br>
+    <input type="text" id="nickname" name="nickname" th:value="${kakaouser != null ? kakaouser.kakaoAccount.profile.nickname : ''}"><br><br>
+
+    <label for="profileImg">프로필 이미지 URL:</label><br>
+    <input type="text" id="profileImg" name="profileImg" th:value="${kakaouser != null ? kakaouser.kakaoAccount.profile.thumbnailImageUrl : ''}"><br><br>
+
+    <label for="phone">전화번호:</label><br>
+    <input type="text" id="phone" name="phone" required><br><br>
+
+    <label for="birthday">생년월일:</label><br>
+    <input type="date" id="birthday" name="birthday" required><br><br>
+
+    <button type="submit">가입하기</button>
+</form>
+<a th:href="@{/user/cancelJoin}">Home</a>
+
+</body>
+</html>

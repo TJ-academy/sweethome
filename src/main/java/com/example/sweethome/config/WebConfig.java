@@ -1,4 +1,4 @@
-package com.example.sweethome;
+package com.example.sweethome.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
