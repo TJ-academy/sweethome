@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
@@ -34,7 +35,10 @@ public class User {
 	private String password;
 	private String username;
 	private String nickname;
-	private String profileImg;
+	
+    @Column(length = 100, columnDefinition = "varchar(100) default '-'")
+	private String profileImg = "-";
+    
 	private String phone;
 	
     @DateTimeFormat(pattern = "yyyy-MM-dd")
