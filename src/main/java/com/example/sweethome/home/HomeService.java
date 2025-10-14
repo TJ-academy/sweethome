@@ -60,6 +60,7 @@ public class HomeService {
                 .thumbnail(thumbnailUrl) // 저장된 파일 경로 사용
                 .maxPeople(dto.getMaxPeople())
                 .room(dto.getRoom())
+                .bath(dto.getBath())
                 // 시간 문자열 ("HH:mm") -> 시간 정수 (int)로 변환
                 .checkIn(convertTimeToInt(dto.getCheckIn()))
                 .checkOut(convertTimeToInt(dto.getCheckOut()))

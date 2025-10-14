@@ -46,6 +46,9 @@ public class HomeWriteDTO {
 
     // room (방 갯수)
     private int room;
+    
+	// bath (욕실 갯수)
+    private Integer bath;
 
     // checkIn (체크인 시간, 폼에서 time으로 받으면 String으로 들어옴. 
     // Home 엔티티의 int checkIn으로 변환 필요. 예: "15:00" -> 15)
