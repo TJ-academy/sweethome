@@ -1,5 +1,9 @@
 package com.example.sweethome.home;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -60,4 +64,19 @@ public class HomePhoto {
 
     @Column(length = 100)
     private String imgTen;
+    
+    // --- 이미지 리스트를 반환하는 커스텀 Getter 추가 ---
+    /**
+     * imgOne부터 imgTen까지의 필드를 List<String>으로 반환합니다.
+     * null 값은 제외합니다.
+     * @return null이 아닌 이미지 URL 목록
+     */
+    public List<String> getImages() {
+        return Arrays.asList(
+            this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive,
+            this.imgSix, this.imgSeven, this.imgEight, this.imgNine, this.imgTen
+        ).stream()
+         .filter(img -> img != null && !img.trim().isEmpty()) // null 또는 빈 문자열 제외
+         .collect(Collectors.toList());
+    }
 }

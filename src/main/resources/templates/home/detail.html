@@ -1,10 +1,423 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title th:text="|${home.title} 상세 정보|">숙소 상세 정보</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	line-height: 1.6;
+	margin: 0;
+	padding: 20px;
+	background-color: #f4f4f4;
+}
+
+.container {
+	max-width: 1200px;
+	margin: auto;
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.gallery {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.main-img, .sub-img {
+	flex: 1;
+	min-width: 200px;
+	max-height: 300px;
+	overflow: hidden;
+}
+
+.main-img img, .sub-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 5px;
+}
+
+.main-img {
+	flex-basis: 50%;
+}
+
+.info-section {
+	display: flex;
+	justify-content: space-between;
+	gap: 40px;
+}
+
+.description-box, .booking-box {
+	flex: 1;
+}
+
+.booking-box {
+	border: 1px solid #ddd;
+	padding: 20px;
+	border-radius: 8px;
+}
+
+.price {
+	font-size: 2em;
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+.host-info {
+	display: flex;
+	align-items: center;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #eee;
+}
+
+.host-img {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-right: 10px;
+	object-fit: cover;
+}
+
+.map-section {
+	margin-top: 40px;
+}
+
+.review-card {
+	border-bottom: 1px solid #eee;
+	padding: 15px 0;
+}
+
+.facility-group {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+}
+
+.policy-item {
+	flex: 1;
+	padding: 0 10px;
+}
+</style>
 </head>
 <body>
+
+	<div class="container">
+
+		<h1 th:text="${home.title}">숙소 제목</h1>
+
+		<!-- 상단 요약: 최대 인원 / 침실 수 -->
+		<p>
+			<span th:text="|최대 인원: ${home.maxPeople}명|">최대 인원: 10명</span> <span
+				th:text="| · 침실 ${home.room}개|"> · 침실 3개</span>
+		</p>
+
+		<!-- 평점/후기 (추가 모델 속성) -->
+		<p th:if="${rating != null}">
+			<span class="rating" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★
+				4.9 · 후기 12개</span>
+		</p>
+
+<!-- 갤러리: 대표 + 서브 이미지들 -->
+<div class="gallery">
+    <div class="main-img">
+        <img th:src="${homePhoto.imgOne != null ? homePhoto.imgOne : '/images/default_main_image.jpg'}" 
+             src="/images/sample_main.jpg" alt="메인 숙소 이미지">
+    </div>
+
+    <th:block th:each="image, iterStat : ${homePhoto.images}">
+        <div class="sub-img" th:if="${iterStat.index > 0}">
+            <img th:src="${image}" 
+                 src="/images/sample_sub.jpg" alt="서브 숙소 이미지">
+        </div>
+    </th:block>
+
+    </div>
+    
+		<div class="info-section">
+
+
+			<div class="description-box">
+				<h2>숙소 설명</h2>
+
+				<div id="original-description" style="display:none;" th:utext="${home.description}">
+					<p>숙소 설명 원본이 들어갑니다.</p>
+				</div>
+				
+				<div id="short-description">
+					</div>
+
+				<button id="toggle-button" onclick="toggleDescription()" style="display: none;">더 보기</button>
+
+				<div class="host-info" th:if="${home.host != null}">
+					<img class="host-img" th:src="${home.host.profileImg}"
+						src="/images/host_default.jpg" alt="호스트 이미지">
+					<div>
+						<p th:text="|호스트: ${home.host.username}|">호스트: 홍길동 님</p>
+						<p th:if="${hostMemberSince != null}"
+							th:text="|호스트 활동 기간: ${hostMemberSince}년|">호스트 활동 기간: 3년</p>
+					</div>
+				</div>
+			</div>
+
+			<form th:action="@{/reserve}" method="get" class="booking-box">
+				<input type="hidden" name="homeId" th:value="${home.idx}" />
+
+				<div class="price">
+					<span
+						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">720,000원</span>
+					<span> · 1박 기준</span>
+				</div>
+
+				<div class="dates">
+					<label for="startDate">체크인</label> <input type="date"
+						id="startDate" name="startDate"
+						th:value="${startDate != null} ? ${#temporals.format(startDate,'yyyy-MM-dd')} : ''"
+						th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" /> <label
+						for="endDate">체크아웃</label> <input type="date" id="endDate"
+						name="endDate"
+						th:value="${endDate != null} ? ${#temporals.format(endDate,'yyyy-MM-dd')} : ''"
+						th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
+				</div>
+
+				<select name="guests" id="guests">
+					<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
+						th:value="${guest}" th:text="|게스트 ${guest}명|">게스트 2명</option>
+				</select>
+
+				<button type="submit">예약하기</button>
+				<p>예약 확정 전에는 요금이 청구되지 않습니다.</p>
+			</form>
+
+
+			<!-- 
+        <div class="booking-box">
+            <div class="price">
+                <span th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">720,000원</span>
+                <span> · 1박 기준</span>
+            </div>
+
+            //날짜 선택: 추가 모델 속성(LocalDate) checkInDate / checkOutDate
+            <div class="dates" th:if="${checkInDate != null and checkOutDate != null}">
+                <label for="check-in">체크인</label>
+                <input type="date" id="check-in"
+                       th:value="${#temporals.format(checkInDate, 'yyyy-MM-dd')}">
+                
+                <label for="check-out">체크아웃</label>
+                <input type="date" id="check-out"
+                       th:value="${#temporals.format(checkOutDate, 'yyyy-MM-dd')}">
+            </div>
+         
+
+			//엔티티의 시간 필드도 별도 표기/
+			<p>
+				체크인: <span th:text="${home.checkIn} + '시'">15시</span> / 체크아웃: <span
+					th:text="${home.checkOut} + '시'">11시</span>
+			</p>
+
+			// 게스트 선택 
+			<select>
+				<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
+					th:value="${guest}" th:text="|게스트 ${guest}명|">게스트 2명</option>
+			</select>
+			<button>예약하기</button>
+			<p>예약 확정 전에는 요금이 청구되지 않습니다.</p>
+		</div>
+		
+		-->
+
+	</div>
+
+	<!-- 숙박 장소: rooms 컬렉션(추가 모델) 우선 사용, 없으면 home.room 개수로 대체 -->
+	<div class="bedroom-section">
+		<h2>숙박 장소</h2>
+
+		<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
+			<div th:text="|침실 ${iterStat.count}|">침실 1</div>
+			<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
+		</div>
+
+		<div th:if="${rooms == null}">
+			<div th:text="|침실 ${home.room}개|">침실 3개</div>
+		</div>
+	</div>
+
+	<!-- 위치 -->
+	<div class="map-section">
+		<h2>위치</h2>
+		<p th:text="${home.location}">대한민국, 경상북도 포항시</p>
+	</div>
+
+	<!-- 리뷰 섹션: rating/reviewCount/latestReviews 추가 모델 속성 -->
+	<div class="review-section">
+		<h2>★ 4.9 · 후기 12개</h2>
+
+		<div class="review-card">
+			<p>박*근</p>
+			<p>호스트 활동 기간 3년</p>
+			<p>모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
+			<button>더보기</button>
+		</div>
+	</div>
+
+	<!-- 
+    <div class="review-section" th:if="${rating != null}">
+        <h2 th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
+        
+        <div th:each="review : ${latestReviews}" class="review-card" th:if="${latestReviews != null}">
+            <p th:text="${review.userName}">박*근</p>
+            <p th:text="${review.userMemberSinceText}">호스트 활동 기간 3년</p>
+            <p th:text="${review.comment}">모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
+            <button>더보기</button>
+        </div>
+    </div>
+     -->
+
+	<!-- 편의시설: hashtag 플래그 + 사이트 옵션 그룹 -->
+	<div class="amenities-section">
+		<h2>숙소 편의시설</h2>
+		<ul>
+			<li th:if="${hashtag != null and hashtag.wifi}">와이파이</li>
+			<li th:if="${hashtag != null and hashtag.tv}">TV</li>
+			<li th:if="${hashtag != null and hashtag.kitchen}">주방</li>
+			<li th:if="${hashtag != null and hashtag.freePark}">무료 주차</li>
+			<li th:if="${hashtag != null and hashtag.selfCheckin}">셀프 체크인</li>
+			<li th:if="${hashtag != null and hashtag.coldWarm}">냉난방</li>
+			<li th:if="${hashtag != null and hashtag.petFriendly}">반려동물 동반</li>
+			<li th:if="${hashtag != null and hashtag.barrierFree}">장애물 없는 시설</li>
+			<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
+		</ul>
+
+		<div th:if="${optionsByGroup != null}">
+			<div th:each="entry : ${optionsByGroup}">
+				<h3 th:text="${entry.key}">옵션 그룹</h3>
+				<ul>
+					<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
+				</ul>
+			</div>
+		</div>
+
+		<button>더 보기</button>
+	</div>
+
+	<!-- 알아두어야 할 사항: safety / 취소정책(추가 모델) -->
+	<div class="rules-section">
+		<h2>알아두어야 할 사항</h2>
+		<div class="facility-group">
+			<div class="policy-item">
+				<h3>숙소 이용 규칙</h3>
+				<p th:text="|체크인 시간: ${home.checkIn}시|">체크인 시간: 15시</p>
+				<p th:text="|체크아웃 시간: ${home.checkOut}시|">체크아웃 시간: 11시</p>
+				<p th:text="|게스트 정원: ${home.maxPeople}명|">게스트 정원: 10명</p>
+				<button>더 보기</button>
+			</div>
+
+			<div class="policy-item">
+				<h3>안전 및 공간</h3>
+				<p>일산화탄소 경보기 없음</p>
+				<p>부지 내 실내 보안 카메라</p>
+				<p>화재경보기</p>
+				<button>더 보기</button>
+			</div>
+
+			<div class="policy-item">
+				<h3>환불 정책</h3>
+				<p>24시간 무료 취소 가능...</p>
+				<button>더 보기</button>
+			</div>
+
+			<!-- 
+            <div class="policy-item" th:if="${safety != null}">
+                <h3>안전 및 공간</h3>
+                <p th:text="|일산화탄소 경보기: ${safety.coDetector}|">일산화탄소 경보기 없음</p>
+                <p th:text="|부지 내 실내 보안 카메라: ${safety.indoorCamera}|">부지 내 실내 보안 카메라</p>
+                <p th:text="|화재경보기: ${safety.fireDetector}|">화재경보기</p>
+                <button>더 보기</button>
+            </div>
+
+            <div class="policy-item" th:if="${cancellationPolicy != null}">
+                <h3>환불 정책</h3>
+                <p th:text="${cancellationPolicy.summary}">24시간 무료 취소 가능...</p>
+                <button>더 보기</button>
+            </div>
+             -->
+		</div>
+	</div>
+
+	</div>
+
+<script>
+    const MAX_LENGTH = 300; // 최대 길이 설정
+
+    // 페이지 로드 시 실행되는 함수
+    document.addEventListener('DOMContentLoaded', function() {
+        // 원본 HTML 설명 내용 (th:utext로 가져온 내용)
+        const originalDescElement = document.getElementById('original-description');
+        const originalContent = originalDescElement ? originalDescElement.innerHTML.trim() : "";
+        
+        // 순수 텍스트 내용 (길이 체크를 위해)
+        const plainTextContent = new DOMParser().parseFromString(originalContent, 'text/html').documentElement.textContent;
+
+        const shortDescElement = document.getElementById('short-description');
+        const toggleButton = document.getElementById('toggle-button');
+        
+        // 원본 내용을 데이터 속성에 저장하여 HTML 태그 정보를 유지
+        originalDescElement.setAttribute('data-full-content', originalContent);
+
+
+        if (plainTextContent.length > MAX_LENGTH) {
+            // 300자가 넘는 경우: 자르고 "더 보기" 버튼 표시
+
+            // 텍스트를 300자까지 자르고 ...을 붙여줍니다.
+            const shortText = plainTextContent.substring(0, MAX_LENGTH) + '...';
+
+            // HTML에 자른 텍스트를 표시
+            shortDescElement.innerHTML = shortText;
+            
+            // 버튼 표시
+            toggleButton.style.display = 'block';
+
+            // 상태를 "short"으로 설정
+            shortDescElement.setAttribute('data-current-state', 'short');
+        } else {
+            // 300자 이하인 경우: 전체 내용 표시 및 버튼 숨김
+            shortDescElement.innerHTML = originalContent;
+            toggleButton.style.display = 'none';
+        }
+    });
+
+    // "더 보기/닫기" 토글 함수
+    function toggleDescription() {
+        const shortDescElement = document.getElementById('short-description');
+        const originalDescElement = document.getElementById('original-description');
+        const toggleButton = document.getElementById('toggle-button');
+        
+        const currentState = shortDescElement.getAttribute('data-current-state');
+        const fullContent = originalDescElement.getAttribute('data-full-content');
+        
+        // 순수 텍스트 내용
+        const plainTextContent = new DOMParser().parseFromString(fullContent, 'text/html').documentElement.textContent;
+        const shortText = plainTextContent.substring(0, MAX_LENGTH) + '...';
+
+        if (currentState === 'short') {
+            // 현재 짧은 내용 -> 전체 내용으로 변경
+            shortDescElement.innerHTML = fullContent;
+            toggleButton.textContent = '닫기';
+            shortDescElement.setAttribute('data-current-state', 'full');
+        } else {
+            // 현재 전체 내용 -> 짧은 내용으로 변경
+            shortDescElement.innerHTML = shortText;
+            toggleButton.textContent = '더 보기';
+            shortDescElement.setAttribute('data-current-state', 'short');
+        }
+    }
+	</script>
 
 </body>
 </html>
