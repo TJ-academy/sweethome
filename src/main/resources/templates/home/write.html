@@ -20,21 +20,23 @@
                 width: 800,
                 placeholder: '숙소에 대한 상세 설명을 입력하세요.'
             });
+            
+            // 오류 메시지가 있다면 표시
+            var errorMessage = "[[${error}]]"; 
+            if (errorMessage && errorMessage !== "") {
+                alert(errorMessage);
+            }
         });
 
         // 주소 검색 함수
         function execDaumPostcode() {
             new daum.Postcode({
                 oncomplete: function(data) {
-                    // 도로명 주소 선택 시
                     let addr = data.roadAddress;
-                    // 지번 주소 선택 시
                     if (data.userSelectedType === 'J') {
                         addr = data.jibunAddress;
                     }
-                    // 입력창에 주소 채워넣기
                     document.getElementById("address").value = addr;
-                    // 상세주소 입력칸으로 포커스 이동
                     document.getElementById("detailAddress").focus();
                 }
             }).open();
@@ -42,27 +44,31 @@
     </script>
 </head>
 <body>
-	<!-- localhost/naraeTest/write -->
     <h2>숙소 등록</h2>
-    <form method="post" enctype="multipart/form-data">
-    	<!-- 호스트 아이디 (세션) -->
-    	<input type="hidden" name="hostId" th:value="${session.userId}">
+    <!-- th:object를 사용하여 DTO 바인딩을 명시하고, POST 요청 시 DTO 필드에 맞게 데이터를 보냅니다. -->
+    <form method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
+        
+        <!-- **[핵심 수정]** hostId는 DTO의 필드이므로 th:field를 사용합니다. -->
+        <!-- hostId는 GET 요청에서 Model에 담겨온 hostId 값을 초기값으로 가집니다. -->
+        <!-- Model에 hostId가 직접 담겨 있으므로, th:field의 value를 수동으로 설정해야 합니다. -->
+    	<input type="hidden" name="hostId" th:value="${hostId}"> 
+        
         <!-- 제목 -->
         <div>
             <label for="title">제목</label><br>
-            <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+            <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요" required>
         </div>
 
         <!-- 상세 설명 -->
         <div>
             <label for="description">상세 설명</label>
-            <textarea id="description" name="description"></textarea>
+            <textarea id="description" th:field="*{description}"></textarea>
         </div>
 
         <!-- 지역 -->
         <div>
             <label for="location">지역</label><br>
-            <select name="location" id="location">
+            <select th:field="*{location}" id="location">
                 <option value="서울">서울</option>
                 <option value="경기">경기</option>
                 <option value="인천">인천</option>
@@ -85,30 +91,31 @@
         <!-- 집주소 -->
         <div>
             <label for="address">주소</label><br>
-            <input type="text" id="address" name="address" placeholder="주소를 입력하세요" readonly>
+            <!-- th:field를 사용하려면 name="address" 대신 th:field="*{address}"를 사용해야 합니다. -->
+            <input type="text" id="address" th:field="*{address}" placeholder="주소를 입력하세요" readonly>
             <button type="button" onclick="execDaumPostcode()">주소 검색</button>
             <label for="detailAddress">상세주소</label>
-            <input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소를 입력하세요">
+            <input type="text" id="detailAddress" th:field="*{detailAddress}" placeholder="상세주소를 입력하세요">
         </div>
         <!-- 요금 -->
         <div>
 	        <label for="cost">요금</label><br>
-        	기본요금: <input type="number" name="costBasic"><br>
-        	주말요금: <input type="number" name="costExpen">
+        	기본요금: <input type="number" th:field="*{costBasic}"><br>
+        	주말요금: <input type="number" th:field="*{costExpen}">
         </div>
         <!-- 숙소타입 -->
         <div>
 	        <label for="homeType">숙소타입</label><br>
-	        <select name="homeType">
-	        	<option value="펜션">펜션</option>
-	        	<option value="단독주택">단독주택</option>
-	        	<option value="아파트">아파트</option>
-	        	<option value="호텔">호텔</option>
-	        	<option value="모텔">모텔</option>
-	        	<option value="빌라">빌라</option>   	
+	        <select th:field="*{homeType}">
+	        	<option value="PENSION">펜션</option>
+	        	<option value="DETACHED_HOUSE">단독주택</option>
+	        	<option value="APARTMENT">아파트</option>
+	        	<option value="HOTEL">호텔</option>
+	        	<option value="MOTEL">모텔</option>
+	        	<option value="VILLA">빌라</option>   	
 	        </select>
         </div>
-        <!-- 썸네일 -->
+        <!-- 썸네일 (파일 필드는 th:field 사용 불가) -->
         <div>
         	<label for="thumbnail">썸네일</label><br>
     		<input type="file" name="thumbnail">
@@ -116,22 +123,22 @@
         <!-- 최대인원 (성인/아동) -->
         <div>
         	<label for="maxPeople">최대인원</label><br>
-        	<input type="number" name="maxPeople">
+        	<input type="number" th:field="*{maxPeople}">
         </div>
         <!-- 방갯수 -->
         <div>
         	<label for="room">방갯수</label><br>
-        	<input type="number" name="room">
+        	<input type="number" th:field="*{room}">
         </div>
         <!-- 체크인 시간 -->
         <div>
         	<label for="checkIn">체크인 시간</label><br>
-        	<input type="time" name="checkIn">
+        	<input type="time" th:field="*{checkIn}">
         </div>     
         <!-- 체크아웃 시간 -->
         <div>
         	<label for="checkout">체크아웃 시간</label><br>
-        	<input type="time" name="checkout">
+        	<input type="time" th:field="*{checkOut}">
         </div>        
         <!-- 숙소 사진 (최대 10장) -->
         <div>

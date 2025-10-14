@@ -2,5 +2,5 @@ package com.example.sweethome.home;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface HomeRepository extends JpaRepository<Home, Integer> {
+public interface HomePhotoRepository extends JpaRepository<HomePhoto, Integer> {
 }
