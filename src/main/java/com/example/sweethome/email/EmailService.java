@@ -76,8 +76,9 @@ public class EmailService {
         //실제 메일 전송
         emailSender.send(emailForm);
         
-        session.setAttribute("emailCode", authNum);  // 인증 코드 저장
-        session.setAttribute("emailVerified", false); // 초기 인증 상태 false
+        session.setAttribute("emailCode", authNum);  //인증 코드 저장
+        session.setAttribute("emailVerified", false); //초기 인증 상태 false
+        session.setAttribute("emailCodeTime", System.currentTimeMillis()); //현재 시간 저장
 
         return authNum; //인증 코드 반환
     }
@@ -86,6 +87,6 @@ public class EmailService {
     public String setContext(String code) {
         Context context = new Context();
         context.setVariable("code", code);
-        return templateEngine.process("mail", context); //mail.html
+        return templateEngine.process("login/mail", context); //mail.html
     }
 }
