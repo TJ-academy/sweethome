@@ -32,9 +32,29 @@ public class EmailController {
     public String verifyEmailCode(@RequestParam("inputCode") String inputCode, 
     		HttpSession session) {
         String code = (String) session.getAttribute("emailCode");
+        Long codeTime = (Long) session.getAttribute("emailCodeTime");
+        
+        if (code == null || codeTime == null) {
+            return "인증 코드가 존재하지 않습니다. 다시 요청해주세요.";
+        }
+        
+        long currentTime = System.currentTimeMillis();
+        long timeElapsed = currentTime - codeTime;
 
-        if (code != null && code.equals(inputCode)) {
-            session.setAttribute("emailVerified", true); // 인증 성공
+        //10분안에 입력해야 함.
+        if (timeElapsed > 10 * 60 * 1000L) {
+        	//만료되었으면 세션에서 삭제
+            session.removeAttribute("emailCode");
+            session.removeAttribute("emailCodeTime");
+            return "인증 코드가 만료되었습니다. 다시 요청해주세요.";
+        }
+
+        if (code.equals(inputCode)) {
+        	//인증 성공
+            session.setAttribute("emailVerified", true);
+            session.removeAttribute("emailCode");
+            session.removeAttribute("emailCodeTime");
+            
             return "인증이 완료되었습니다.";
         } else {
             return "코드가 일치하지 않습니다.";

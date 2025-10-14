@@ -45,7 +45,7 @@ public class UserController {
     	//+ "&prompt=login"; 
     	model.addAttribute("location", location); 
     	model.addAttribute("message", " ");
-    	return "login"; 
+    	return "login/login"; 
     }
     
     @PostMapping("/login")
@@ -58,8 +58,8 @@ public class UserController {
             session.setAttribute("userProfile", user.get());
             return "redirect:/";
         } else {
-            model.addAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
-            return "login"; 
+            model.addAttribute("error", "이메일 또는 비밀번호가 일치하지 않습니다.");
+            return "login/login"; 
         }
     }
     
@@ -72,10 +72,12 @@ public class UserController {
 	@GetMapping("/join")
 	public String createForm(HttpSession session, Model model) {
 		KakaoProfile kakaouser = (KakaoProfile) session.getAttribute("kakaouser");
+		session.setAttribute("emailVerified", false);
 	    if(kakaouser != null) {
+	    	session.setAttribute("emailVerified", true);
 	    	model.addAttribute("kakaouser", kakaouser);
 	    }
-		return "join";
+		return "login/join";
 	}
 
 	@PostMapping("/join")
@@ -83,20 +85,27 @@ public class UserController {
 			HttpSession session,
 			Model model) {
 		Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+		Boolean nicknameVerified = (Boolean) session.getAttribute("nicknameVerified");
+		String verifiedNickname = (String) session.getAttribute("verifiedNickname");
+		model.addAttribute("user", user);
 
 	    if (emailVerified == null || !emailVerified) {
 	        model.addAttribute("message", "이메일 인증을 완료해주세요.");
-	        return "join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
+	        return "login/join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
 	    }
 	    
-		// nickname 이 비어 있으면 username 으로 설정
-	    if (user.getNickname() == null || user.getNickname().trim().isEmpty()) {
-	        user.setNickname(user.getUsername());
+	    if (nicknameVerified == null || !nicknameVerified || 
+	            !user.getNickname().equals(verifiedNickname)) {
+	        model.addAttribute("message", "닉네임 중복 확인을 완료해주세요.");
+	        return "login/join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
 	    }
 	    
 		service.insertUser(user);
+		session.removeAttribute("emailVerified");
+		session.removeAttribute("nicknameVerified");
+		session.removeAttribute("verifiedNickname");
 		model.addAttribute("message", "회원가입이 완료되었습니다.");
-		return "login"; 
+		return "login/login"; 
 	}
 	
 	//이미 있는 이메일인지 아닌지 확인
@@ -107,10 +116,27 @@ public class UserController {
 	    return exists ? "duplicate" : "ok";
 	}
 	
+	//이미 있는 닉네임인지 아닌지 확인
+	@ResponseBody
+	@PostMapping("/checkNicknameDuplicate")
+	public String checkNicknameDuplicate(@RequestParam("nickname") String nickname,
+			HttpSession session) {
+	    boolean exists = repo.existsByNickname(nickname);
+
+	    if (!exists) {
+	        session.setAttribute("nicknameVerified", true);
+	        session.setAttribute("verifiedNickname", nickname);  //닉네임 바뀌었는지 추적
+	        return "ok";
+	    } else {
+	        session.setAttribute("nicknameVerified", false);
+	        return "duplicate";
+	    }
+	}
+	
 	//비밀번호 찾기 페이지 로딩
 	@GetMapping("/findPwd")
 	public String findPwd() {
-		return "findPwd"; 
+		return "login/findPwd"; 
 	}
 	
 	//비밀번호 재설정 페이지 로딩
@@ -118,7 +144,7 @@ public class UserController {
 	public String resetPassword(@RequestParam("email") String email, 
 			Model model) {
 		model.addAttribute("email", email);
-		return "resetPassword"; 
+		return "login/resetPassword"; 
 	}
 	
 	//비밀번호 재설정
@@ -131,7 +157,7 @@ public class UserController {
 		if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
             model.addAttribute("email", email);  // 다시 form에 유지
-            return "resetPassword";
+            return "login/resetPassword";
         }
 
         // 비밀번호 업데이트 처리
@@ -142,7 +168,7 @@ public class UserController {
         } catch (Exception e) {
             model.addAttribute("error", "비밀번호 변경 중 오류가 발생했습니다.");
             model.addAttribute("email", email);
-            return "resetPassword";
+            return "login/resetPassword";
         }
 	}
 	

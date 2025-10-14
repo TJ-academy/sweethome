@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원탈퇴</title>
+</head>
+<body>
+<h1>정말로 탈퇴하시겠습니까?</h1>
+<form th:action="@{/mypage/delete}" method="post">
+    <label for="email">이메일:</label>
+	<input type="email" id="email" name="email" th:value="${email}" required><br>
+
+    <label for="password">비밀번호:</label>
+    <input type="password" id="password" name="password" required><br>
+
+	<!-- 에러 메시지 출력 -->
+	<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+	<div class="container" style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin-top:20px; width:100%;">
+    	<button type="submit" style="width:100px; height:30px;">탈퇴하기</button>
+    </div>
+</form>
+<div class="container" style="display: flex; justify-content: center; align-content: center; align-items: center; flex-direction: column; margin-top:20px; width:100%;">
+	<button type="button" onclick="history.back()">뒤로가기</button>
+</div>
+</body>
+</html>

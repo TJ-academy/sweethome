@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+
+<script>
+function isValidEmail(email) {
+    // 이메일 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+//인증 코드 전송
+function sendVerificationCode() {
+    const email = document.getElementById("email").value;
+    const emailResult = document.getElementById("verificationResult")
+    
+ 	// 이메일 형식이 올바른지 확인
+    if (!isValidEmail(email)) {
+        alert("올바른 이메일 주소를 입력해주세요.");
+        return;
+    }
+ 	
+ 	// 이메일 중복 확인
+    fetch("/user/checkEmailDuplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "email=" + encodeURIComponent(email)
+    })
+    .then(res => res.text())
+    .then(status => {
+        if (status === "duplicate") {
+            alert("이미 존재하는 이메일입니다.");
+            return;
+        }
+        
+        //이메일 보내는 중~
+        emailResult.innerText = "인증 코드 보내는 중..";
+        document.getElementById("emailBtn").disabled = true;
+        
+		//중복이 아니면 이메일 인증 요청
+        return fetch("/user/mailConfirm", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "email=" + encodeURIComponent(email)
+        });
+    })
+	.then(res => res.text())
+	.then(msg => {   //이메일 보내기 완료
+		emailResult.innerText = msg;
+		if(msg === "메일이 전송되었습니다."){
+			emailResult.style.color = "blue";
+			document.getElementById("emailCode").disabled = false;
+	        document.getElementById("codeBtn").disabled = false;
+		} else {
+			emailResult.style.color = "red";
+		}
+		document.getElementById("emailBtn").disabled = false;
+	})
+	.catch(err => {
+		emailResult.innerText = "오류가 발생했습니다. 다시 시도해주세요.";
+		emailResult.style.color = "red";
+        console.error(err);
+    });
+}
+
+//인증 코드 확인 함수
+function verifyCode() {
+    const code = document.getElementById("emailCode").value;
+
+    fetch("/user/verifyEmailCode?inputCode=" + code, {
+        method: "POST"
+    })
+    .then(res => res.text())
+    .then(msg => {
+    	emailResult.innerText = msg;
+    	emailResult.style.color = "red";
+        if (msg === "인증이 완료되었습니다.") {
+        	emailResult.style.color = "blue";
+            document.getElementById("email").readonly = true;
+            document.getElementById("emailBtn").disabled = true;
+            document.getElementById("emailCode").disabled = true;
+            document.getElementById("codeBtn").disabled = true;
+            document.getElementById("joinBtn").disabled = false;
+        }
+    });
+}
+
+let nicknameChecked = false; // 중복 확인 여부 상태 저장
+
+function nicknameDupli() {
+    const nickname = document.getElementById("nickname").value;
+    if (!nickname.trim()) {
+        alert("닉네임을 입력해주세요.");
+        return;
+    }
+
+    fetch("/user/checkNicknameDuplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "nickname=" + encodeURIComponent(nickname)
+    })
+    .then(res => res.text())
+    .then(result => {
+        const nresult = document.getElementById("nicknameResult");
+        if (result === "duplicate") {
+            nresult.innerText = "이미 사용 중인 닉네임입니다.";
+            nresult.style.color = "red";
+            nicknameChecked = false;
+        } else {
+            nresult.innerText = "사용 가능한 닉네임입니다.";
+            nresult.style.color = "blue";
+            nicknameChecked = true;
+            document.getElementById("nicknameBtn").disabled = true;
+        }
+        updateJoinButtonState();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("닉네임 중복 확인 중 오류가 발생했습니다.");
+        nicknameChecked = false;
+        updateJoinButtonState();
+    });
+}
+
+function autoHyphenPhone(target) {
+    target.value = target.value
+        .replace(/[^0-9]/g, '')  //숫자 외 문자 제거
+        .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);  //전화번호 형식
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	//전화번호 하이픈 처리
+    const phoneInput = document.getElementById('phone');
+    
+    phoneInput.addEventListener('input', () => {
+        autoHyphenPhone(phoneInput);
+    });
+    
+    //닉네임 변경 시 중복확인 상태 초기화
+    const nicknameInput = document.getElementById("nickname");
+    nicknameInput.addEventListener("input", () => {
+        nicknameChecked = false;
+        document.getElementById("nicknameResult").innerText = "닉네임 중복 확인이 필요합니다.";
+        document.getElementById("nicknameResult").style.color = "gray";
+        document.getElementById("nicknameBtn").disabled = false;
+        updateJoinButtonState();
+    });
+});
+
+//가입하기 버튼 활성화 여부
+function updateJoinButtonState() {
+    const emailVerified = document.getElementById("email").readOnly; // 인증 후 readOnly 상태
+    const joinBtn = document.getElementById("joinBtn");
+
+    joinBtn.disabled = !(emailVerified && nicknameChecked);
+}
+</script>
+</head>
+<body>
+<h1>회원가입</h1>
+<form th:action="@{/user/join}" method="post">
+    <label for="email">이메일:</label><br>
+	<input type="email" id="email" name="email" 
+		th:value="${user != null ? user.email : (kakaouser != null ? kakaouser.kakaoAccount.email : '')}" 
+		th:readonly="${kakaouser != null or session.emailVerified == true}"
+	required>
+	<button type="button" id="emailBtn"
+		th:disabled="${kakaouser != null}"
+		onclick="sendVerificationCode()"
+	>이메일 인증</button>
+	
+	<!-- 인증 코드 입력 -->
+	<input type="text" id="emailCode" 
+		placeholder="인증 코드 입력"
+		th:value="${kakaouser != null} ? '인증완료' : ''" 
+		disabled
+	>
+	<button type="button" id="codeBtn"
+		onclick="verifyCode()"
+		disabled
+	>코드 확인</button>
+	
+	<!-- 인증 상태 표시 -->
+	<p id="verificationResult" 
+	th:text="${kakaouser != null} ? '인증이 완료되었습니다.' : ''"></p>
+
+    <label for="password">비밀번호:</label><br>
+    <input type="password" id="password" name="password" 
+    th:value="${user != null ? user.password : ''}"
+    required><br><br>
+
+    <label for="username">이름:</label><br>
+    <input type="text" id="username" name="username" 
+    th:value="${user != null ? user.username : ''}"
+    required><br><br>
+
+    <label for="nickname">닉네임:</label><br>
+    <input type="text" id="nickname" name="nickname" 
+    th:value="${user != null ? user.nickname : (kakaouser != null ? kakaouser.kakaoAccount.profile.nickname : '')}" 
+    required>
+    <button type="button" id="nicknameBtn"
+		onclick="nicknameDupli()"
+	>닉네임 중복 확인</button>
+	
+	<p id="nicknameResult"></p>
+
+    <label for="profileImg">프로필 이미지 URL:</label><br>
+    <input type="text" id="profileImg" name="profileImg" 
+    th:value="${user != null ? user.profileImg : (kakaouser != null ? kakaouser.kakaoAccount.profile.thumbnailImageUrl : '')}">
+    <br><br>
+
+    <label for="phone">전화번호:</label><br>
+    <input type="text" id="phone" name="phone" 
+    th:value="${user != null ? user.phone : ''}"
+    required><br><br>
+
+    <label for="birthday">생년월일:</label><br>
+    <input type="date" id="birthday" name="birthday" 
+    th:value="${user != null ? user.birthday : ''}"
+    required><br><br>
+
+    <button type="submit" id="joinBtn" disabled>가입하기</button>
+</form>
+<a th:href="@{/user/cancelJoin}">Home</a>
+
+</body>
+</html>
