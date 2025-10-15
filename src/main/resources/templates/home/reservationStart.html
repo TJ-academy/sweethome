@@ -86,36 +86,44 @@
     <div class="container">
 
         <!-- 예약 요청 폼 -->
-        <div class="form-container">
-            <h2>예약 요청</h2>
-
-            <!-- 1. 결제 시기 선택 -->
-            <div>
-                <p>1. 결제 시기 선택</p>
-                <input type="radio" id="now" name="payment-time" value="now" checked>
-                <label for="now">지금 결제</label><br>
-                <input type="radio" id="later" name="payment-time" value="later">
-                <label for="later">나중에 결제</label>
-            </div>
-
-            <!-- 2. 결제 수단 추가 -->
-            <div>
-                <p>2. 결제 수단 추가</p>
-                <input type="text" id="payment-method" name="payment-method" placeholder="결제 수단 입력">
-            </div>
-
-            <!-- 3. 호스트에게 보낼 메시지 작성 -->
-            <div>
-                <p>3. 호스트에게 보낼 메시지 작성</p>
-                <textarea id="host-message" name="host-message" rows="4" placeholder="메시지를 작성하세요."></textarea>
-            </div>
-
-            <!-- 4. 예약 내용 확인 -->
-            <div>
-                <p>4. 예약 내용 확인</p>
-                <button>예약 요청</button>
-            </div>
+<div class="form-container">
+    <h2>예약 요청</h2>
+    
+    <form th:action="@{/home/reservationFinish}" method="post">
+        
+        <input type="hidden" name="reservedHomeId" th:value="${homeId}" /> 
+        <input type="hidden" name="adult" th:value="${adults}" /> 
+        <input type="hidden" name="child" th:value="${children}" />
+        <input type="hidden" name="startDate" th:value="${checkIn}" />
+        <input type="hidden" name="endDate" th:value="${checkOut}" />
+        <input type="hidden" name="totalMoney" th:value="${totalPrice}" />
+        
+        <div>
+            <p>1. 결제 시기 선택</p>
+            <input type="radio" id="now" name="payby" value="KAKAOPAY" checked>
+            <label for="now">지금 결제 (카카오페이)</label><br>
+            <input type="radio" id="later" name="payby" value="TRANSFER">
+            <label for="later">나중에 결제 (계좌이체)</label>
         </div>
+
+        <div>
+            <p>2. 결제 수단 추가</p>
+            <input type="text" id="bank" name="bank" placeholder="은행명 (계좌이체 시 필수)">
+            <input type="text" id="account" name="account" placeholder="계좌번호 (계좌이체 시 필수)">
+        </div>
+
+        <div>
+            <p>3. 호스트에게 보낼 메시지 작성</p>
+            <textarea id="host-message" name="message" rows="4" placeholder="메시지를 작성하세요."></textarea>
+        </div>
+
+        <div>
+            <p>4. 예약 내용 확인</p>
+            <button type="submit">예약 요청</button>
+        </div>
+        
+    </form>
+</div>
 
         <!-- 예약 상세 정보 -->
         <div class="summary-container">
