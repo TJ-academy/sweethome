@@ -109,7 +109,7 @@ public class UserController {
 	}
 	
 	//이미 있는 이메일인지 아닌지 확인
-	@ResponseBody
+	@ResponseBody   //json 리턴
 	@PostMapping("/checkEmailDuplicate")
 	public String checkEmailDuplicate(@RequestParam("email") String email) {
 	    boolean exists = repo.existsByEmail(email);
