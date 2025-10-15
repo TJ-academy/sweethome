@@ -75,6 +75,9 @@ public class Reservation {
 
     // account (Long) -> 계좌
     private Long account;
+    
+   // totalMoney (int) -> 총 결제금액
+    private int totalMoney;
 
     // startDate (date) -> 입실일자
     private LocalDate startDate;

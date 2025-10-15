@@ -73,6 +73,9 @@ public class Home {
     
 	// bath (int) - 욕실 개수
     private Integer bath;
+    
+    // bet (int) - 침대 개수
+    private Integer bed;
 
     // checkIn (int) - 체크인 시간 (시간 정수 값)
     private int checkIn;
