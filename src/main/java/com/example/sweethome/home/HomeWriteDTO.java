@@ -2,6 +2,7 @@ package com.example.sweethome.home;
 
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 /**
  * 숙소 등록 폼(write.html)에서 전송되는 데이터를 받기 위한 DTO
@@ -33,22 +34,25 @@ public class HomeWriteDTO {
     private String detailAddress; 
 
     // costBasic (기본 요금)
-    private int costBasic;
+    private Integer costBasic;
 
     // costExpen (주말 요금)
-    private int costExpen;
+    private Integer costExpen;
 
     // homeType (Enum 타입의 String 값)
     private String homeType; 
     
     // maxPeople (최대 인원)
-    private int maxPeople;
+    private Integer maxPeople;
 
     // room (방 갯수)
     private int room;
     
 	// bath (욕실 갯수)
     private Integer bath;
+    
+    // bed (침대 갯수)
+    private Integer bed;
 
     // checkIn (체크인 시간, 폼에서 time으로 받으면 String으로 들어옴. 
     // Home 엔티티의 int checkIn으로 변환 필요. 예: "15:00" -> 15)
@@ -56,6 +60,10 @@ public class HomeWriteDTO {
 
     // checkout (체크아웃 시간, Home 엔티티의 int checkOut으로 변환 필요)
     private String checkOut;
+    
+    // 이름 변경: Thymeleaf 템플릿에서 'selectedOptions'를 찾고 있으므로 필드명을 일치시킴.
+    // name="selectedOptions"로 전송된 여러 개의 optionId 값을 List로 받음.
+    private List<Integer> selectedOptions;
     
     // ======================================================================
     // 2. 파일 업로드 필드 (MultipartFile)
