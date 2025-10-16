@@ -29,6 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
        registry.addInterceptor(loginInterceptor())
                .addPathPatterns("/**")  // 모든 경로에 대해 인터셉터 적용
                .excludePathPatterns("/", "/user/login", "/user/join", "/user/resetPassword", "/user/findPwd", "/user/checkEmailDuplicate", "/user/checkNicknameDuplicate",
+            		   "/kakao_login_medium_narrow.png",
             		   "/home/detail/**", "/img/home/**");  // 로그인하지 않아도 접근 가능한 경로
    }
 }

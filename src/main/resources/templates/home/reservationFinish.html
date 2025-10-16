@@ -1,12 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>예약 완료</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 36px;
+            color: #333;
+        }
+        .header p {
+            font-size: 18px;
+            color: #555;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .details h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .details p {
+            font-size: 16px;
+            color: #555;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .summary .item {
+            width: 48%;
+        }
+        .summary h4 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .summary p {
+            font-size: 16px;
+            color: #555;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-예약접수가 완료되었어요.
-집주인이 예약을 완료하면 톡 보내드릴 거예요.
-내 예약함 가기
+
+    <div class="container">
+        <!-- 예약 완료 헤더 -->
+        <div class="header">
+            <h1>예약이 완료되었습니다!</h1>
+            <p>숙소 예약을 성공적으로 마쳤습니다. 아래 정보를 확인해주세요.</p>
+        </div>
+<!-- 
+        예약 정보 세부사항
+        <div class="details">
+            <h3>예약 세부사항</h3>
+            <p><strong>숙소 이름:</strong> <span th:text="${reservation.home.title}">숙소 이름</span></p>
+            <p><strong>예약 날짜:</strong> <span th:text="${reservation.checkInDate}">2025-12-01</span> ~ <span th:text="${reservation.checkOutDate}">2025-12-05</span></p>
+            <p><strong>예약자:</strong> <span th:text="${reservation.user.name}">홍길동</span></p>
+            <p><strong>총 금액:</strong> <span th:text="${#numbers.formatInteger(reservation.totalPrice, 3, 'COMMA')}">720,000원</span></p>
+        </div>
+
+        예약 요약
+        <div class="summary">
+            <div class="item">
+                <h4>체크인 시간</h4>
+                <p th:text="${reservation.checkInTime}">15:00</p>
+            </div>
+            <div class="item">
+                <h4>체크아웃 시간</h4>
+                <p th:text="${reservation.checkOutTime}">12:00</p>
+            </div>
+        </div>
+ -->
+        <!-- 예약 완료 후 버튼 -->
+        <div class="footer">
+            <p>더 궁금한 사항이 있으시면 고객센터로 문의해 주세요.</p>
+            <a href="/" class="button">홈으로 돌아가기</a>
+        </div>
+    </div>
+
 </body>
 </html>
