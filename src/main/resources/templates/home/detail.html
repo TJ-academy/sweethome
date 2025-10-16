@@ -3,6 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="|${home.title} 상세 정보|">숙소 상세 정보</title>
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
+<script type="text/javascript">
+    // 카카오 지도 API가 로드된 후 실행되는 코드
+    kakao.maps.load(function() {
+    	/*
+        var geocoder = new kakao.maps.services.Geocoder();
+        
+     // Thymeleaf에서 전달된 home.address 값을 JavaScript 변수로 사용
+        var address = /*[[${home.address}]] '';  // home.address 값을 Thymeleaf에서 가져오기
+        
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                var mapContainer = document.getElementById('map');
+                var mapOption = {
+                    center: coords,
+                    level: 3
+                };
+                var map = new kakao.maps.Map(mapContainer, mapOption);
+                var marker = new kakao.maps.Marker({
+                    position: coords
+                });
+                marker.setMap(map);
+            }
+        });
+        */
+        
+    	var address = /*[[${home.address}]]*/ '서울특별시 중구 을지로 79'; // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
+
+    	var geocoder = new kakao.maps.services.Geocoder();
+    	geocoder.addressSearch(address, function(result, status) {
+    	    if (status === kakao.maps.services.Status.OK) {
+    	        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+    	        var mapContainer = document.getElementById('map');
+    	        var mapOption = {
+    	            center: coords,
+    	            level: 3
+    	        };
+    	        var map = new kakao.maps.Map(mapContainer, mapOption);
+    	        var marker = new kakao.maps.Marker({
+    	            position: coords
+    	        });
+    	        marker.setMap(map);
+    	    }
+    	});
+
+    });
+</script>
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -85,10 +133,10 @@ body {
 	object-fit: cover;
 }
 
-.map-section {
-	margin-top: 40px;
-}
-
+#map {
+            width: 100%;
+            height: 400px;
+        }
 .review-card {
 	border-bottom: 1px solid #eee;
 	padding: 15px 0;
@@ -230,14 +278,20 @@ body {
 
 		<div th:if="${rooms == null}">
 			<div th:text="|침실 ${home.room}개|">침실 3개</div>
+			<div th:text="${home.address}"></div>
 		</div>
 	</div>
-
+<!-- 
 	<div class="map-section">
 		<h2>위치</h2>
-		<p th:text="${home.location}">대한민국, 경상북도 포항시</p>
+		<p th:text="${home.address}">대한민국, 경상북도 포항시</p>
 	</div>
+-->
 
+    <!-- 지도를 표시할 div -->
+    <div id="map"></div>
+
+    
 	<div class="review-section">
 		<h2>★ 4.9 · 후기 12개</h2>
 
