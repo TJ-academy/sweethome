@@ -1,7 +1,7 @@
 package com.example.sweethome.user;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -43,9 +43,11 @@ public class User {
 	
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date birthday;
+    private LocalDate birthday;
 	
+    //UTC 기준
+    //프론트에선 변수명 뒤에 .toLocaleString() 붙이면 현지시간으로 출력됨.
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime joinAt;
+    private Instant joinAt;
 }

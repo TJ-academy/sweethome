@@ -30,7 +30,7 @@ public class UserService {
     public boolean loginUser(String email, String rawPwd) {
     	Optional<User> user = userRepository.findByEmail(email);
     	
-    	if(user.get() == null) return false;
+    	if(user.isEmpty()) return false;
         
     	String encryptedPassword = encryptPassword(rawPwd);
         return user.get().getPassword().equals(encryptedPassword);
