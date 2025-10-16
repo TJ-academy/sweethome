@@ -1,214 +1,199 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>숙소 등록 | Sweet Home</title>
+<meta charset="UTF-8">
+<title>숙소 등록</title>
 
-    <!-- Bootstrap CSS & JS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<!-- Bootstrap & jQuery -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-    <!-- Summernote -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
+<!-- Summernote -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
 
-    <!-- Daum 주소 API -->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<!-- Daum 주소 API -->
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    <style>
-        /* 옵션 체크박스 스타일 */
-        .option-checkbox { display: none; }
-        .option-label {
-            display: inline-block;
-            padding: 6px 12px;
-            margin: 3px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            cursor: pointer;
-            background-color: #fff;
-            color: #333;
-            transition: 0.2s;
+<script>
+$(document).ready(function() {
+    // Summernote 활성화
+    $('#description').summernote({
+        height: 300,
+        width: 800,
+        placeholder: '숙소에 대한 상세 설명을 입력하세요.'
+    });
+
+    // 오류 메시지가 있다면 표시
+    var errorMessage = "[[${error}]]";
+    if (errorMessage && errorMessage !== "") {
+        // alert() 대신 사용자 지정 모달 또는 div로 메시지를 표시해야 합니다.
+        // 현재는 alert()을 유지하지만, 실제 서비스에서는 사용자 지정 UI를 사용해야 합니다.
+        alert(errorMessage);
+    }
+});
+
+// 주소 검색 함수
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            let addr = data.roadAddress;
+            if (data.userSelectedType === 'J') {
+                addr = data.jibunAddress;
+            }
+            document.getElementById("address").value = addr;
+            document.getElementById("detailAddress").focus();
         }
-        .option-checkbox:checked + .option-label {
-            background-color: #337ab7;
-            color: #fff;
-            border-color: #2e6da4;
-        }
-    </style>
-
-    <script>
-        $(document).ready(function() {
-            $('#description').summernote({
-                height: 300,
-                placeholder: '숙소의 특징, 장점 등을 자세히 설명해주세요.'
-            });
-        });
-
-        function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    var addr = data.roadAddress;
-                    if (data.userSelectedType === 'J') {
-                        addr = data.jibunAddress;
-                    }
-                    document.getElementById("address").value = addr;
-                    document.getElementById("detailAddress").focus();
-                }
-            }).open();
-        }
-    </script>
+    }).open();
+}
+</script>
 </head>
+
 <body>
-<div class="container" style="margin-top: 30px; margin-bottom: 50px;">
-    <h2>숙소 등록</h2>
+<h2>숙소 등록</h2>
 
-    <form th:action="@{/home/write}" method="post" th:object="${homeWriteDTO}" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
+<input type="hidden" name="hostId" th:value="${hostId}">
 
-        <!-- Host ID (세션에서 가져온 값) -->
-        <input type="hidden" th:field="*{hostId}" th:value="${hostId}">
-
-        <!-- 숙소 이름 -->
-        <div class="form-group">
-            <label for="title">숙소 이름 <span style="color:red">*</span></label>
-            <input type="text" id="title" th:field="*{title}" class="form-control" required placeholder="예: 아늑한 바닷가 민박">
-        </div>
-
-        <!-- 숙소 설명 -->
-        <div class="form-group">
-            <label for="description">숙소 설명 <span style="color:red">*</span></label>
-            <textarea id="description" th:field="*{description}" class="form-control"></textarea>
-        </div>
-
-        <!-- 요금 및 인원 -->
-        <div class="form-group">
-            <label>요금 및 최대인원</label>
-            <div class="row">
-                <div class="col-sm-4">
-                    <input type="number" id="costBasic" th:field="*{costBasic}" class="form-control" placeholder="기본 1박 요금" min="10000" required>
-                </div>
-                <div class="col-sm-4">
-                    <input type="number" id="costExpen" th:field="*{costExpen}" class="form-control" placeholder="주말/성수기 요금" min="10000" required>
-                </div>
-                <div class="col-sm-4">
-                    <input type="number" id="maxPeople" th:field="*{maxPeople}" class="form-control" placeholder="최대 인원" min="1" required>
-                </div>
-            </div>
-        </div>
-
-        <!-- 숙소 구조 -->
-        <div class="form-group">
-            <label>숙소 구조</label>
-            <div class="row">
-                <div class="col-sm-3">
-                    <label>숙소 유형</label>
-                    <select id="homeType" th:field="*{homeType}" class="form-control" required>
-                        <option value="">-- 선택 --</option>
-                        <option value="APARTMENT">아파트</option>
-                        <option value="HOUSE">주택</option>
-                        <option value="CONDO">콘도</option>
-                        <option value="VILLA">빌라</option>
-                        <option value="OTHERS">기타</option>
-                    </select>
-                </div>
-                <div class="col-sm-3">
-                    <label>방 개수</label>
-                    <input type="number" id="room" th:field="*{room}" class="form-control" min="1">
-                </div>
-                <div class="col-sm-3">
-                    <label>욕실 개수</label>
-                    <input type="number" id="bath" th:field="*{bath}" class="form-control" min="0">
-                </div>
-                <div class="col-sm-3">
-                    <label>침대 개수</label>
-                    <input type="number" id="bed" th:field="*{bed}" class="form-control" min="0">
-                </div>
-            </div>
-        </div>
-		<!-- 지역 선택 -->
-		<div class="form-group">
-		    <label for="location">지역 <span style="color:red">*</span></label>
-		    <select th:field="*{location}" id="location" class="form-control" required>
-		        <option value="">-- 선택 --</option>
-		        <option value="서울">서울</option>
-		        <option value="경기">경기</option>
-		        <option value="인천">인천</option>
-		        <option value="대전">대전</option>
-		        <option value="세종">세종</option>
-		        <option value="충남">충남</option>
-		        <option value="충북">충북</option>
-		        <option value="광주">광주</option>
-		        <option value="전남">전남</option>
-		        <option value="전북">전북</option>
-		        <option value="대구">대구</option>
-		        <option value="경북">경북</option>
-		        <option value="부산">부산</option>
-		        <option value="울산">울산</option>
-		        <option value="경남">경남</option>
-		        <option value="강원">강원</option>
-		        <option value="제주">제주</option>
-		    </select>
-		</div>
-        <!-- 주소 -->
-        <div class="form-group">
-            <label>주소 <span style="color:red">*</span></label>
-            <div class="input-group">
-                <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="도로명 주소" required>
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" onclick="execDaumPostcode()">주소 검색</button>
-                </span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>상세 주소</label>
-            <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control" placeholder="동/층/호수 등">
-        </div>
-
-        <!-- 체크인/체크아웃 -->
-        <div class="form-group row">
-            <div class="col-sm-6">
-                <label>체크인 시간</label>
-                <input type="time" id="checkIn" th:field="*{checkIn}" class="form-control">
-            </div>
-            <div class="col-sm-6">
-                <label>체크아웃 시간</label>
-                <input type="time" id="checkOut" th:field="*{checkOut}" class="form-control">
-            </div>
-        </div>
-
-        <!-- 옵션 체크박스 -->
-        <div class="form-group">
-            <label>편의시설 / 옵션</label>
-            <div id="options-container">
-                <div th:each="groupEntry : ${groupedOptions.entrySet()}" class="mb-3">
-                    <strong th:text="${groupEntry.key}">옵션 그룹</strong>
-                    <div>
-                        <div th:each="option : ${groupEntry.value}" style="display:inline-block;">
-                            <input type="checkbox" class="option-checkbox" th:id="${'option-' + option.optionId}" 
-                                   name="selectedOptions" th:value="${option.optionId}" 
-                                   th:checked="${homeWriteDTO.selectedOptions != null and homeWriteDTO.selectedOptions.contains(option.optionId)}"/>
-                            <label th:for="${'option-' + option.optionId}" class="option-label">[[${option.optionName}]]</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 이미지 업로드 -->
-        <div class="form-group">
-            <label>썸네일 이미지</label>
-            <input type="file" name="thumbnail" class="form-control">
-        </div>
-        <div class="form-group">
-            <label>추가 이미지 (최대 10장)</label>
-            <input type="file" name="images" class="form-control" multiple accept="image/*">
-            <small class="text-muted">Shift 또는 Ctrl로 최대 10개 선택 가능</small>
-        </div>
-
-        <!-- 제출 -->
-        <button type="submit" class="btn btn-primary btn-lg btn-block">숙소 등록 완료</button>
-    </form>
+<!-- 제목 -->
+<div>
+<label for="title">제목</label><br>
+<input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요" required>
 </div>
+
+<!-- 상세 설명 -->
+<div>
+<label for="description">상세 설명</label>
+<textarea id="description" th:field="*{description}"></textarea>
+</div>
+
+<!-- 지역 -->
+<div>
+<label for="location">지역</label><br>
+<select th:field="*{location}" id="location">
+    <option value="서울">서울</option>
+    <option value="경기">경기</option>
+    <option value="인천">인천</option>
+    <option value="대전">대전</option>
+    <option value="세종">세종</option>
+    <option value="충남">충남</option>
+    <option value="충북">충북</option>
+    <option value="광주">광주</option>
+    <option value="전남">전남</option>
+    <option value="전북">전북</option>
+    <option value="대구">대구</option>
+    <option value="경북">경북</option>
+    <option value="부산">부산</option>
+    <option value="울산">울산</option>
+    <option value="경남">경남</option>
+    <option value="강원">강원</option>
+    <option value="제주">제주</option>
+</select>
+</div>
+
+<!-- 집주소 -->
+<div>
+<label for="address">주소</label><br>
+<input type="text" id="address" th:field="*{address}" placeholder="주소를 입력하세요" readonly>
+<button type="button" onclick="execDaumPostcode()">주소 검색</button>
+
+<label for="detailAddress">상세주소</label>
+<input type="text" id="detailAddress" th:field="*{detailAddress}" placeholder="상세주소를 입력하세요">
+</div>
+
+<!-- 요금 -->
+<div>
+<label for="cost">요금</label><br>
+기본요금: <input type="number" th:field="*{costBasic}"><br>
+주말요금: <input type="number" th:field="*{costExpen}">
+</div>
+
+<!-- 숙소타입 -->
+<div>
+<label for="homeType">숙소타입</label><br>
+<select th:field="*{homeType}">
+    <option value="PENSION">펜션</option>
+    <option value="DETACHED_HOUSE">단독주택</option>
+    <option value="APARTMENT">아파트</option>
+    <option value="HOTEL">호텔</option>
+    <option value="MOTEL">모텔</option>
+    <option value="VILLA">빌라</option>
+</select>
+</div>
+
+<!-- 썸네일 -->
+<div>
+<label for="thumbnail">썸네일</label><br>
+<input type="file" name="thumbnail">
+</div>
+
+<!-- 최대인원 -->
+<div>
+<label for="maxPeople">최대인원</label><br>
+<input type="number" th:field="*{maxPeople}">
+</div>
+
+<!-- 방갯수 -->
+<div>
+<label for="room">방갯수</label><br>
+<input type="number" th:field="*{room}">
+</div>
+
+<!-- 욕실갯수 -->
+<div>
+<label for="bath">욕실갯수</label><br>
+<input type="number" th:field="*{bath}">
+</div>
+
+<!-- 침대갯수 -->
+<div>
+<label for="bed">침대갯수</label><br>
+<input type="number" th:field="*{bed}">
+</div>
+
+<!-- 체크인/체크아웃 -->
+<div>
+<label for="checkIn">체크인 시간</label><br>
+<input type="time" th:field="*{checkIn}">
+</div>
+<div>
+<label for="checkOut">체크아웃 시간</label><br>
+<input type="time" th:field="*{checkOut}">
+</div>
+
+<!-- 숙소 사진 -->
+<div>
+<label for="homeImg">숙소 사진(최대 10장)</label>
+<input type="file" name="imgOne">
+<input type="file" name="imgTwo">
+<input type="file" name="imgThree">
+<input type="file" name="imgFour">
+<input type="file" name="imgFive">
+<input type="file" name="imgSix">
+<input type="file" name="imgSeven">
+<input type="file" name="imgEight">
+<input type="file" name="imgNine">
+<input type="file" name="imgTen">
+</div>
+
+<!-- 옵션 체크박스 부분 (수정됨) -->
+<div>
+<label>옵션 선택</label><br>
+<div th:each="groupEntry : ${groupedOptions}">
+    <h4 th:text="${groupEntry.key}"></h4>
+    <div th:each="opt : ${groupEntry.value}">
+        <label>
+            <!-- 수정: opt.id -> opt.optionId -->
+            <input type="checkbox" name="optionIds" th:value="${opt.optionId}">
+            <!-- 수정: opt.name -> opt.optionName -->
+            <span th:text="${opt.optionName}"></span>
+        </label><br>
+    </div>
+</div>
+</div>
+<!-- 등록 버튼 -->
+<button type="submit">등록</button>
+</form>
 </body>
 </html>
