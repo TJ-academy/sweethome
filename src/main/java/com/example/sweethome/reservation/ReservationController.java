@@ -48,6 +48,14 @@ public class ReservationController {
             
             Model model) {
 
+		// 1. reservedHomeId로 Home 객체 조회
+        Home home = homeRepository.findById(reservedHomeId)
+                .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + reservedHomeId));
+        
+        // 2. home 객체의 title 값을 모델에 추가
+        model.addAttribute("homeTitle", home.getTitle());
+		model.addAttribute("homeThumbnail", home.getThumbnail());
+		
         // 1. 전달받은 데이터를 Model에 다시 담아 다음 페이지로 전달합니다.
         model.addAttribute("homeId", reservedHomeId);
         model.addAttribute("adults", adultCount);

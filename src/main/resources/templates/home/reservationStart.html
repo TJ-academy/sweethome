@@ -128,15 +128,16 @@
         <!-- 예약 상세 정보 -->
         <div class="summary-container">
             <h2>예약 상세</h2>
-            <img src="https://via.placeholder.com/300" alt="숙소 이미지">
+            <img th:src="${homeThumbnail}" alt="숙소 이미지">
             <div class="details">
-                <p><strong>상품명:</strong> 조항 양일간 관람 오션뷰 숙소</p>
-                <p><strong>날짜:</strong> 2026년 2월 10일 ~ 2월 14일</p>
-                <p><strong>게스트:</strong> 2명, 1명</p>
+                <p><strong>상품명:</strong><span th:text="${homeTitle}">숙소 제목</span></p>
+                <p><strong>날짜:</strong> <span th:text="${checkIn}"></span> ~ <span th:text="${checkOut}"></span></p>
+                <p><strong>성인:</strong><span th:text="${adults}">2</span>명</p>
+                <p><strong>어린이:</strong><span th:text="${children}">1</span>명</p>
             </div>
             <div class="price">
-                <p>총 금액: W1,913,168</p>
-                <p>1박 기준</p>
+                <p>총 금액: <span th:text="${totalPrice}">200000</span>원</p>
+                <p>총 숙박 일수: <span th:text="${nights}">2</span>박</p>
             </div>
         </div>
 
@@ -144,13 +145,5 @@
     
     
     
-        <p>숙소 ID: <span th:text="${homeId}">8</span></p>
-    <p>체크인 날짜: <span th:text="${checkIn}">2025-10-16</span></p>
-    <p>체크아웃 날짜: <span th:text="${checkOut}">2025-10-18</span></p>
-    <p>총 숙박 일수: <span th:text="${nights}">2</span>박</p>
-    <p>성인: <span th:text="${adults}">2</span>명</p>
-    <p>어린이: <span th:text="${children}">1</span>명</p>
-    <p>총 금액: <span th:text="${totalPrice}">200000</span>원</p>
-
 </body>
 </html>

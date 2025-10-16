@@ -1,10 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>내 예약 확인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .reservation-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .reservation-item:last-child {
+            border-bottom: none;
+        }
+
+        .reservation-item h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .reservation-item p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .reservation-item .status {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .back-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-내 예약함
+
+    <div class="container">
+        <h1>내 예약 내역</h1>
+
+        <div th:each="reservation : ${reservations}" class="reservation-item">
+            <h3 th:text="${reservation.reservedHome.title}">숙소 제목</h3>
+            <p><strong>체크인:</strong> <span th:text="${reservation.startDate}">2025-10-01</span></p>
+            <p><strong>체크아웃:</strong> <span th:text="${reservation.endDate}">2025-10-05</span></p>
+            <p><strong>총 금액:</strong> <span th:text="${reservation.totalMoney}">50000</span> 원</p>
+            <p><strong>상태:</strong> <span class="status" th:text="${reservation.reservationStatus}">REQUESTED</span></p>
+        </div>
+
+        <a href="/" class="back-button">홈으로 돌아가기</a>
+    </div>
+
 </body>
 </html>
