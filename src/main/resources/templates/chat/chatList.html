@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>채팅창</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+
+    .chat-room {
+        border-bottom: 1px solid #ccc;  /* ✅ 아래 선 추가 */
+        padding: 10px 0;
+        cursor: pointer;
+    }
+
+    .chat-room:hover {
+        background-color: #f9f9f9;
+    }
+
+    .room-name {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .last-message {
+        color: #555;
+        margin-top: 5px;
+    }
+
+    .last-message-time {
+        color: #888;
+        font-size: 0.85em;
+        margin-top: 3px;
+    }
+</style>
 </head>
 <body>
+<a href="/">Home</a>
+<h2>내 채팅방</h2>
+    
+    <div th:if="${#lists.isEmpty(roomsList)}">
+        채팅방이 없습니다.
+    </div>
 
+    <div th:each="room : ${roomsList}" class="chat-room"
+         th:onclick="'location.href=\'/chat/room/' + ${room.roomId} + '\';'">
+        <div class="room-name" th:text="${room.roomName}">상대방 이름</div>
+        <div class="last-message" th:text="${room.lastMessage}">마지막 메시지</div>
+        <div class="last-message-time" th:text="${#dates.format(room.lastMessageTime, 'yyyy-MM-dd HH:mm')}">마지막 메시지 시간</div>
+    </div>
 </body>
 </html>

@@ -209,6 +209,10 @@ body {
 						<p th:text="|호스트: ${home.host.username}|">호스트: 홍길동 님</p>
 						<p th:if="${hostMemberSince != null}"
 							th:text="|호스트 활동 기간: ${hostMemberSince}년|">호스트 활동 기간: 3년</p>
+						<form th:action="@{/chat/room/question}" method="post">
+						    <input type="hidden" name="nickname" th:value="${home.host.nickname}" />
+						    <button type="submit">문의하기</button>
+						</form>
 					</div>
 				</div>
 			</div>

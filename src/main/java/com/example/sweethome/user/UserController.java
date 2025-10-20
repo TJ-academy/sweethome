@@ -53,20 +53,22 @@ public class UserController {
     		@RequestParam("password") String password,
             HttpSession session,
             Model model) {
+    	System.out.println("a");
     	if(service.loginUser(email, password)) {
             Optional<User> user = repo.findByEmail(email);
             session.setAttribute("userProfile", user.get());
             
-        // 로그인 후 prevPage가 존재하면 해당 페이지로 리다이렉트
-        String prevPage = (String) session.getAttribute("prevPage");
-        if (prevPage != null && !prevPage.isEmpty()) {
-            session.removeAttribute("prevPage"); // 사용 후 제거
-            return "redirect:" + prevPage; // 예약 페이지로 리다이렉트
-        }
-            
-            
+	        // 로그인 후 prevPage가 존재하면 해당 페이지로 리다이렉트
+	        String prevPage = (String) session.getAttribute("prevPage");
+	        System.out.println("prevPage : " + prevPage);
+	        if (prevPage != null && !prevPage.isEmpty()) {
+	            session.removeAttribute("prevPage"); // 사용 후 제거
+	            return "redirect:" + prevPage; // 예약 페이지로 리다이렉트
+	        }
+	        System.out.println("c");
             return "redirect:/";
         } else {
+        	System.out.println("d");
             model.addAttribute("error", "이메일 또는 비밀번호가 일치하지 않습니다.");
             return "login/login"; 
         }
