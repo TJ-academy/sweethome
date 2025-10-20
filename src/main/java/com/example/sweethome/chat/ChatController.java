@@ -1,6 +1,13 @@
 package com.example.sweethome.chat;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -11,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
@@ -76,7 +84,7 @@ public class ChatController {
 	
 	//한 채팅방에 들어가기
 	@GetMapping("/room/{roomId}")
-	public String getChat(@PathVariable Integer roomId,
+	public String getChat(@PathVariable("roomId") Integer roomId,
 			Model model, 
 			HttpSession session) {
 		User user = (User) session.getAttribute("userProfile");
@@ -104,4 +112,30 @@ public class ChatController {
         ChatMessage savedMessage = service.saveMessage(dto);
         messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), savedMessage);
     }
+	
+	//이미지 전송
+	@PostMapping("/uploadImage")
+	public Map<String, String> uploadImage(
+			@RequestParam("image") MultipartFile file,
+			@RequestParam("roomId") Integer roomId) 
+			throws IOException {
+		//이미지 저장 경로
+		String uploadDir = "src/main/resources/static/img/chat/room_" + roomId;
+	    Path uploadPath = Paths.get(uploadDir);
+	    
+	    //폴더 없나?
+	    if (!Files.exists(uploadPath)) {
+	        Files.createDirectories(uploadPath);
+	    }
+	    
+	    //파일 이름 설정
+	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+	    Path filePath = uploadPath.resolve(fileName);
+	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+	    // 클라이언트가 접근할 수 있는 URL
+	    String fileUrl = "/img/chat/room_" + roomId + "/" + fileName;
+
+	    return Map.of("url", fileUrl);
+	}
 }
