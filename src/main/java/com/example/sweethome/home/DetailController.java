@@ -23,6 +23,7 @@ public class DetailController {
     private final HomeRepository homeRepository;
     private final HashtagRepository hashtagRepository;
     private final OptionRepository optionRepository;
+    private final AccommodationOptionRepository accommodationOptionRepository;
     private final HomePhotoRepository homePhotoRepository;
 
     /** 상세 페이지: /home/detail/{idx} */
@@ -45,17 +46,27 @@ public class DetailController {
         // 2) Hashtag 조회 (없을 수 있음)
         Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
 
-        // 3) Option 전체 조회 후 그룹핑(“욕실”, “침실 및 세탁”, “냉난방” …)
-        List<Option> allOptions = optionRepository.findAll();
-        Map<String, List<Option>> optionsByGroup = allOptions.stream()
+        // 3) 숙소 옵션 조회 및 그룹핑 (기존 로직 수정)
+        // 해당 숙소(Home)에 연결된 AccommodationOption 목록을 조회합니다.
+        List<AccommodationOption> accOptions = accommodationOptionRepository.findByHome(home);
+        
+        // AccommodationOption 목록에서 Option 엔티티를 추출하고, optionGroup별로 그룹핑합니다.
+        // 그리고 OptionGroup과 OptionName 기준으로 정렬합니다.
+        Map<String, List<Option>> existingOptionsByGroup = accOptions.stream()
+                // exist=true 인 옵션만 필터링 (Optional)
+                .filter(AccommodationOption::isExist) 
+                // Option 엔티티로 매핑
+                .map(AccommodationOption::getOption)
+                // 그룹별로 Option 객체들을 모으기 전에 정렬
                 .sorted(Comparator.comparing(Option::getOptionGroup)
                         .thenComparing(Option::getOptionName))
+                // OptionGroup 기준으로 그룹핑
                 .collect(groupingBy(Option::getOptionGroup, toList()));
-
+        
         // 4) 뷰 모델 바인딩 (엔티티 기준 필드명 그대로)
         model.addAttribute("home", home);               // title, description, location, address, thumbnail, maxPeople, room, checkIn, checkOut, costBasic, costExpen, homeType, host 등
         model.addAttribute("hashtag", hashtag);         // wifi, tv, kitchen, freePark, selfCheckin, coldWarm, petFriendly, barrierFree, elevator
-        model.addAttribute("optionsByGroup", optionsByGroup);
+        model.addAttribute("optionsByGroup", existingOptionsByGroup);
         model.addAttribute("homePhoto", homePhoto); // 이미 위에서 바인딩했으므로 중복 제거 (아래 코드는 삭제)
 
         return "home/detail";

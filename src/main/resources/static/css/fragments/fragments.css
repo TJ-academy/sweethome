@@ -1,0 +1,166 @@
+/* 로고 이미지 크기를 조정할 수 있는 스타일 (선택 사항) */
+.navbar-brand img {
+	height: 40px; /* 로고 높이 조정 */
+}
+
+/* ⭐ 검색 바 스타일 ⭐ */
+.search-container {
+	display: flex;
+	max-width: 850px;
+	margin: 50px auto;
+	border: 1px solid #ddd;
+	border-radius: 40px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	padding: 0;
+	background-color: white;
+	position: relative;
+}
+
+.search-item {
+	flex-grow: 1;
+	padding: 10px 20px;
+	cursor: pointer;
+	text-align: left;
+	min-width: 0;
+	position: relative;
+}
+
+.search-item:not(:last-child) {
+	border-right: 1px solid #eee;
+}
+
+/* 첫 번째 검색 항목 (여행지) 기본 스타일 */
+.search-item:first-child {
+	border: none;
+	border-radius: 40px;
+	transition: box-shadow 0.2s, border 0.2s;
+}
+
+/* 여행지 항목이 활성화되었을 때의 스타일 (이미지 반영) */
+.search-item.active {
+	border: 1px solid #333 !important;
+	border-radius: 40px;
+	margin: -1px;
+	z-index: 10;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+	background-color: white;
+}
+
+.search-label {
+	font-weight: bold;
+	font-size: 14px;
+	color: #333;
+	display: block;
+	margin-bottom: 2px;
+}
+
+.search-item input[type="text"], .search-item input[type="date"] {
+	border: none;
+	padding: 0;
+	width: 100%;
+	font-size: 14px;
+	color: #333;
+	outline: none;
+	background-color: transparent;
+	cursor: text;
+}
+
+/* Placeholder 스타일 */
+.search-item input::placeholder {
+	color: #999;
+	font-size: 14px;
+	opacity: 1;
+}
+
+.search-button-wrap {
+	flex-shrink: 0;
+	padding: 5px;
+}
+
+.search-button {
+	width: 50px;
+	height: 50px;
+	background-color: #5ab1f7;
+	border: none;
+	border-radius: 50%;
+	color: white;
+	font-size: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ⭐ 여행지 추천 목록 스타일 및 초기 숨김 ⭐ */
+.recommendation-list {
+	position: absolute;
+	top: 65px;
+	left: 0;
+	width: 300px;
+	background-color: white;
+	border-radius: 20px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+	z-index: 20;
+	padding: 10px 0;
+	max-height: 400px;
+	overflow-y: auto;
+	border: 1px solid #ddd;
+	display: none; /* 초기 숨김 */
+	visibility: hidden; /* 초기 숨김 처리 */
+}
+
+.recommendation-item {
+	display: flex;
+	align-items: center;
+	padding: 10px 20px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.recommendation-item:hover {
+	background-color: #f5f5f5;
+}
+
+.item-text {
+	flex-grow: 1;
+}
+
+.item-title {
+	font-weight: bold;
+	color: #333;
+	font-size: 14px;
+}
+
+.item-description {
+	font-size: 12px;
+	color: #777;
+	margin-top: 2px;
+}
+
+.item-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 8px;
+	margin-right: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	color: white;
+}
+
+.icon-sea {
+	background-color: #a0c4ff;
+}
+
+.icon-mountain {
+	background-color: #b0e0a0;
+}
+
+.icon-city {
+	background-color: #ffb7b2;
+}
+
+.icon-island {
+	background-color: #ffd6a5;
+}

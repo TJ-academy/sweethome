@@ -156,6 +156,9 @@ body {
 </head>
 <body>
 
+<div th:insert="fragments/header :: menuBar"></div>
+<div th:insert="fragments/search :: searchSection"></div>
+
 	<div class="container">
 
 		<h1 th:text="${home.title}">숙소 제목</h1>
@@ -317,13 +320,17 @@ body {
 			<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
 		</ul>
 
-		<div th:if="${optionsByGroup != null}">
-			<div th:each="entry : ${optionsByGroup}">
-				<h3 th:text="${entry.key}">옵션 그룹</h3>
+		<div th:if="${optionsByGroup != null and not #maps.isEmpty(optionsByGroup)}">
+			<th:block th:each="entry : ${optionsByGroup}">
+				<h3 th:text="${entry.key}">옵션 그룹</h3> 
 				<ul>
 					<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
 				</ul>
-			</div>
+			</th:block>
+		</div>
+		
+		<div th:if="${optionsByGroup == null or #maps.isEmpty(optionsByGroup)}">
+		    <p>등록된 추가 옵션이 없습니다.</p>
 		</div>
 
 		<button>더 보기</button>
