@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div th:fragment="guestSideBar">
+		<div class="container">
+			<!-- 사이드바 -->
+			<div class="sidebar">
+				<div class="profile">
+					<img src="your-profile-image.jpg" alt="Profile" class="profile-img">
+					<h2>SeonahKim</h2>
+					<p>프로필 텍스트</p>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="#">자기소개</a></li>
+						<li><a href="#">프로필 설정</a></li>
+						<li><a href="#">알림</a></li>
+						<li><a href="#">친구</a></li>
+						<li><a href="#">내가 작성한 글</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+	<script>
+	document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
+		  item.addEventListener('click', function() {
+		    document.querySelectorAll('.sidebar nav ul li a').forEach(link => link.classList.remove('active'));
+		    item.classList.add('active');
+		  });
+		});
+	</script>
+</body>
+</html>
