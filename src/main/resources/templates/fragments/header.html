@@ -26,9 +26,15 @@
 						</li>
 					</th:block>
 					<th:block th:if="${userProfile != null}">
-						<li class="nav-item me-3"><a class="nav-link"
-							href="/user/logout">로그아웃</a></li>
-						<li class="nav-item"><a class="nav-link" href="/mypage">마이페이지</a>
+						<li class="nav-item me-3">
+							<a class="nav-link"
+							href="/user/logout">로그아웃</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/mypage">마이페이지</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/chat/rooms">메시지</a>
 						</li>
 					</th:block>
 				</ul>
