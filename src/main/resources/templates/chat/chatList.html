@@ -34,6 +34,21 @@
         font-size: 0.85em;
         margin-top: 3px;
     }
+    
+    .unread-count {
+        color: white;
+        background-color: red;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.8em;
+        text-align: center;
+        line-height: 20px;
+        float: right;
+        margin-top: -40px;
+        margin-right: 10px;
+        font-weight: bold;
+    }
 </style>
 </head>
 <body>
@@ -49,6 +64,8 @@
         <div class="room-name" th:text="${room.roomName}">상대방 이름</div>
         <div class="last-message" th:text="${room.lastMessage}">마지막 메시지</div>
         <div class="last-message-time" th:text="${#dates.format(room.lastMessageTime, 'yyyy-MM-dd HH:mm')}">마지막 메시지 시간</div>
+        
+        <div th:if="${room.unreadCount > 0}" class="unread-count" th:text="${room.unreadCount}"></div>
     </div>
 </body>
 </html>
