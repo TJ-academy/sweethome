@@ -1,167 +1,183 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 </head>
 <body>
 
-    <div th:fragment="searchSection">
-        <div class="main-content">
-    <div class="search-container">
-        <div class="search-item" id="destination-search-item">
-            <label for="destination" class="search-label">여행지</label>
-            <input type="text" id="destination" placeholder="여행지 검색" />
-            <div class="recommendation-list" id="recommendation-list">
-                <div class="recommendation-item" data-region="서울">
-                    <div class="item-icon icon-city">🏛️</div>
-                    <div class="item-text">
-                        <div class="item-title">서울</div>
-                        <div class="item-description">역사와 현대가 공존하는 한국의 중심지</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="경기">
-                    <div class="item-icon icon-city">🎡</div>
-                    <div class="item-text">
-                        <div class="item-title">경기</div>
-                        <div class="item-description">수도권 최대 규모의 해양문화공간과 복합 테마파크를 즐길 수 있는 곳</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="인천">
-                    <div class="item-icon icon-sea">🏝️</div>
-                    <div class="item-text">
-                        <div class="item-title">인천</div>
-                        <div class="item-description">아름다운 섬들과 갯벌 체험, 역사적 등대가 있는 곳</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="대전">
-                    <div class="item-icon icon-city">🔬</div>
-                    <div class="item-text">
-                        <div class="item-title">대전</div>
-                        <div class="item-description">과학 명소와 황톳길, 메타세콰이어 숲 등 생태환경이 풍부한 도시</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="세종">
-                    <div class="item-icon icon-city">🌳</div>
-                    <div class="item-text">
-                        <div class="item-title">세종</div>
-                        <div class="item-description">국립수목원, 호수공원 등 다양한 휴식 공간이 있는 행정 중심 복합도시</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="충남">
-                    <div class="item-icon icon-sea">🌊</div>
-                    <div class="item-text">
-                        <div class="item-title">충남</div>
-                        <div class="item-description">광활한 갯벌과 고운 백사장, 아름다운 일출을 간직한 서해의 명소</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="충북">
-                    <div class="item-icon icon-mountain">⛰️</div>
-                    <div class="item-text">
-                        <div class="item-title">충북</div>
-                        <div class="item-description">단양 패러글라이딩, 이끼터널 등 자연경관이 아름다운 내륙의 명소</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="광주">
-                    <div class="item-icon icon-city">🎨</div>
-                    <div class="item-text">
-                        <div class="item-title">광주</div>
-                        <div class="item-description">문화와 예술, 그리고 맛의 도시로 불리는 예향</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="전남">
-                    <div class="item-icon icon-sea">🎋</div>
-                    <div class="item-text">
-                        <div class="item-title">전남</div>
-                        <div class="item-description">죽녹원, 느러지전망대, 해상케이블카 등 아름다운 비경과 자연이 가득한 곳</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="전북">
-                    <div class="item-icon icon-city">韓</div>
-                    <div class="item-text">
-                        <div class="item-title">전북</div>
-                        <div class="item-description">단풍으로 유명한 내장산과 근대 유산이 풍부한 군산 등 역사가 깊은 예향의 고장</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="대구">
-                    <div class="item-icon icon-city">🥖</div>
-                    <div class="item-text">
-                        <div class="item-title">대구</div>
-                        <div class="item-description">서문시장, 근대골목 등 볼거리와 먹거리가 가득한 활기 넘치는 도시</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="경북">
-                    <div class="item-icon icon-mountain">🏘️</div>
-                    <div class="item-text">
-                        <div class="item-title">경북</div>
-                        <div class="item-description">퇴계 선생의 가르침이 남아있는 도산서원, 독도 일출 등 역사와 자연이 공존하는 곳</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="부산">
-                    <div class="item-icon icon-sea">🌉</div>
-                    <div class="item-text">
-                        <div class="item-title">부산</div>
-                        <div class="item-description">해운대, 송도 등 바다의 정석을 보여주는 우리나라 최대 해양도시</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="울산">
-                    <div class="item-icon icon-sea">🐳</div>
-                    <div class="item-text">
-                        <div class="item-title">울산</div>
-                        <div class="item-description">태화강 국가정원, 간절곶 등 생태정원과 해양문화가 어우러진 산업 수도</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="경남">
-                    <div class="item-icon icon-sea">⛴️</div>
-                    <div class="item-text">
-                        <div class="item-title">경남</div>
-                        <div class="item-description">한려해상국립공원, 진주성과 같이 바다와 역사가 조화를 이루는 곳</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="강원">
-                    <div class="item-icon icon-mountain">❄️</div>
-                    <div class="item-text">
-                        <div class="item-title">강원</div>
-                        <div class="item-description">설악산, 경포대 등 웅장한 산맥과 동해안 바다가 어우러진 대한민국 대표 휴양지</div>
-                    </div>
-                </div>
-                <div class="recommendation-item" data-region="제주">
-                    <div class="item-icon icon-island">🍊</div>
-                    <div class="item-text">
-                        <div class="item-title">제주</div>
-                        <div class="item-description">돌과 바람, 오름과 푸른 바다가 함께하는 대한민국 최고의 섬 관광지</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+	<div th:fragment="searchSection">
+		<div class="main-content">
+			<div class="search-container">
+				<div class="search-item" id="destination-search-item">
+					<label for="destination" class="search-label">여행지</label> <input
+						type="text" id="destination" placeholder="여행지 검색" />
+					<div class="recommendation-list" id="recommendation-list">
+						<div class="recommendation-item" data-region="서울">
+							<div class="item-icon icon-city">🏛️</div>
+							<div class="item-text">
+								<div class="item-title">서울</div>
+								<div class="item-description">역사와 현대가 공존하는 한국의 중심지</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="경기">
+							<div class="item-icon icon-city">🎡</div>
+							<div class="item-text">
+								<div class="item-title">경기</div>
+								<div class="item-description">수도권 최대 규모의 해양문화공간과 복합 테마파크를
+									즐길 수 있는 곳</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="인천">
+							<div class="item-icon icon-sea">🏝️</div>
+							<div class="item-text">
+								<div class="item-title">인천</div>
+								<div class="item-description">아름다운 섬들과 갯벌 체험, 역사적 등대가 있는 곳</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="대전">
+							<div class="item-icon icon-city">🔬</div>
+							<div class="item-text">
+								<div class="item-title">대전</div>
+								<div class="item-description">과학 명소와 황톳길, 메타세콰이어 숲 등 생태환경이
+									풍부한 도시</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="세종">
+							<div class="item-icon icon-city">🌳</div>
+							<div class="item-text">
+								<div class="item-title">세종</div>
+								<div class="item-description">국립수목원, 호수공원 등 다양한 휴식 공간이 있는
+									행정 중심 복합도시</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="충남">
+							<div class="item-icon icon-sea">🌊</div>
+							<div class="item-text">
+								<div class="item-title">충남</div>
+								<div class="item-description">광활한 갯벌과 고운 백사장, 아름다운 일출을 간직한
+									서해의 명소</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="충북">
+							<div class="item-icon icon-mountain">⛰️</div>
+							<div class="item-text">
+								<div class="item-title">충북</div>
+								<div class="item-description">단양 패러글라이딩, 이끼터널 등 자연경관이 아름다운
+									내륙의 명소</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="광주">
+							<div class="item-icon icon-city">🎨</div>
+							<div class="item-text">
+								<div class="item-title">광주</div>
+								<div class="item-description">문화와 예술, 그리고 맛의 도시로 불리는 예향</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="전남">
+							<div class="item-icon icon-sea">🎋</div>
+							<div class="item-text">
+								<div class="item-title">전남</div>
+								<div class="item-description">죽녹원, 느러지전망대, 해상케이블카 등 아름다운
+									비경과 자연이 가득한 곳</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="전북">
+							<div class="item-icon icon-city">韓</div>
+							<div class="item-text">
+								<div class="item-title">전북</div>
+								<div class="item-description">단풍으로 유명한 내장산과 근대 유산이 풍부한 군산
+									등 역사가 깊은 예향의 고장</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="대구">
+							<div class="item-icon icon-city">🥖</div>
+							<div class="item-text">
+								<div class="item-title">대구</div>
+								<div class="item-description">서문시장, 근대골목 등 볼거리와 먹거리가 가득한
+									활기 넘치는 도시</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="경북">
+							<div class="item-icon icon-mountain">🏘️</div>
+							<div class="item-text">
+								<div class="item-title">경북</div>
+								<div class="item-description">퇴계 선생의 가르침이 남아있는 도산서원, 독도 일출
+									등 역사와 자연이 공존하는 곳</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="부산">
+							<div class="item-icon icon-sea">🌉</div>
+							<div class="item-text">
+								<div class="item-title">부산</div>
+								<div class="item-description">해운대, 송도 등 바다의 정석을 보여주는 우리나라
+									최대 해양도시</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="울산">
+							<div class="item-icon icon-sea">🐳</div>
+							<div class="item-text">
+								<div class="item-title">울산</div>
+								<div class="item-description">태화강 국가정원, 간절곶 등 생태정원과 해양문화가
+									어우러진 산업 수도</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="경남">
+							<div class="item-icon icon-sea">⛴️</div>
+							<div class="item-text">
+								<div class="item-title">경남</div>
+								<div class="item-description">한려해상국립공원, 진주성과 같이 바다와 역사가
+									조화를 이루는 곳</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="강원">
+							<div class="item-icon icon-mountain">❄️</div>
+							<div class="item-text">
+								<div class="item-title">강원</div>
+								<div class="item-description">설악산, 경포대 등 웅장한 산맥과 동해안 바다가
+									어우러진 대한민국 대표 휴양지</div>
+							</div>
+						</div>
+						<div class="recommendation-item" data-region="제주">
+							<div class="item-icon icon-island">🍊</div>
+							<div class="item-text">
+								<div class="item-title">제주</div>
+								<div class="item-description">돌과 바람, 오름과 푸른 바다가 함께하는 대한민국
+									최고의 섬 관광지</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-        <div class="search-item">
-            <label for="checkin" class="search-label">체크인</label>
-            <input type="date" id="checkin" placeholder="날짜 추가" />
-        </div>
-        <div class="search-item">
-            <label for="checkout" class="search-label">체크아웃</label>
-            <input type="date" id="checkout" placeholder="날짜 추가" />
-        </div>
-        <div class="search-item d-flex align-items-center justify-content-between">
-            <div style="flex-grow: 1;">
-                <label for="guests" class="search-label">여행자</label>
-                <input type="text" id="guests" placeholder="게스트 추가" readonly style="cursor: pointer;" />
-            </div>
-            
-            <div class="search-button-wrap">
-                <button class="search-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.041.062.083.098.124l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.124-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+				<div class="search-item">
+					<label for="checkin" class="search-label">체크인</label> <input
+						type="date" id="checkin" placeholder="날짜 추가" />
+				</div>
+				<div class="search-item">
+					<label for="checkout" class="search-label">체크아웃</label> <input
+						type="date" id="checkout" placeholder="날짜 추가" />
+				</div>
+				<div
+					class="search-item d-flex align-items-center justify-content-between">
+					<div style="flex-grow: 1;">
+						<label for="guests" class="search-label">여행자</label> <input
+							type="text" id="guests" placeholder="게스트 추가" readonly
+							style="cursor: pointer;" />
+					</div>
+
+					<div class="search-button-wrap">
+						<button class="search-button">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+								fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path
+									d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.041.062.083.098.124l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.124-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                     </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- 콘텐츠 영역 -->
-    ㅇㅇ
-</div>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <script>
+		<script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchItem = document.getElementById('destination-search-item');
     const inputField = document.getElementById('destination');
@@ -223,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-    </div>
+	</div>
 
 </body>
 </html>
