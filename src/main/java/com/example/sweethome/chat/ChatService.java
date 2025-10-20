@@ -79,7 +79,10 @@ public class ChatService {
 	            } else {
 	                lastMsgPreview = "이미지";
 	            }
-	        	ChatRoomPreviewDTO preview = new ChatRoomPreviewDTO(roomId, roomName, lastMsgPreview, lastMessage.getSendedAt());
+	        	
+	        	int unreadCount = countUnreadMessages(roomId, userRoom.getLastRead());
+	        	
+	        	ChatRoomPreviewDTO preview = new ChatRoomPreviewDTO(roomId, roomName, lastMsgPreview, lastMessage.getSendedAt(), unreadCount);
 		        previews.add(preview);
 	        }
 		}
@@ -93,6 +96,14 @@ public class ChatService {
 
 	    return previews;
     }
+	
+	//안읽은 메시지 수 계산하기
+	public int countUnreadMessages(Integer roomId, Integer lastRead) {
+		if (lastRead == null) {
+            lastRead = 0; // 초기값 설정 (읽은 메시지 없음)
+        }
+        return mrepo.countByChatRoom_IdAndIdxGreaterThan(roomId, lastRead);
+	}
 	
 	//한 채팅방의 메시지 조회
 	public List<ChatMessage> getMessagesByChatRoom(Integer chatRoomId) {
@@ -147,5 +158,14 @@ public class ChatService {
 				.build();
 		
 		return mrepo.save(message);
+	}
+	
+	//마지막으로 읽은 메시지 업데이트
+	public void updateLastRead(Integer roomId, String nickname, Integer messageIdx) {
+	    ChatUser user = urepo.findByRoomIdAndNickname(roomId, nickname).get();
+	    if (user != null) {
+	        user.setLastRead(messageIdx);
+	        urepo.save(user);
+	    }
 	}
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.reservation.Reservation;
@@ -137,5 +138,18 @@ public class ChatController {
 	    String fileUrl = "/img/chat/room_" + roomId + "/" + fileName;
 
 	    return Map.of("url", fileUrl);
+	}
+	
+	//마지막으로 읽은 메시지 업데이트
+	@ResponseBody
+	@PostMapping("/updateLastRead")
+	public String updateLastRead(@RequestParam("roomId") Integer roomId,
+	                             @RequestParam("messageIdx") Integer messageIdx,
+	                             HttpSession session) {
+	    User user = (User) session.getAttribute("userProfile");
+	    String nickname = user.getNickname();
+
+	    service.updateLastRead(roomId, nickname, messageIdx);
+	    return "ok";
 	}
 }
