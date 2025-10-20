@@ -1,0 +1,35 @@
+/* mypage.html의 3분할 영역 컨테이너 */
+.mypage-layout-wrap {
+    padding: 20px; /* 전체적인 안쪽 여백 */
+    max-width: 1200px; /* 페이지의 최대 너비 제한 (선택 사항) */
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+/* Bootstrap의 row를 사용하여 플렉스 레이아웃 적용 */
+.mypage-layout-wrap .row {
+    display: flex;
+    flex-wrap: nowrap; /* 사이드바와 콘텐츠가 한 줄에 유지되도록 */
+}
+
+/* 사이드바 영역 (왼쪽) - 너비 고정 */
+.mypage-sidebar-col {
+    flex: 0 0 250px; /* 너비를 250px로 고정 */
+    max-width: 250px;
+    padding-right: 20px;
+}
+
+/* 메인 콘텐츠 영역 (오른쪽) - 남은 공간 전체 사용 */
+.mypage-content-col {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    min-width: 0; /* flexbox의 오버플로우 방지 */
+    padding-left: 20px;
+}
+
+/* 마이페이지 콘텐츠 내부 여백 */
+.mypage-content-area {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fff;
+    min-height: 600px; /* 최소 높이 설정 */
+}

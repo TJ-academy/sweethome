@@ -1,0 +1,59 @@
+/* 사이드바 컨테이너 자체 스타일링 */
+.sidebar {
+    width: 100%; /* mypage-sidebar-col 너비(250px)를 따름 */
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar .profile {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 15px;
+}
+
+.sidebar .profile-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 3px solid #5ab1f7;
+}
+
+.sidebar h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li a {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #495057;
+    transition: background-color 0.2s, color 0.2s;
+    font-size: 0.95rem;
+}
+
+.sidebar nav ul li a:hover {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+/* 현재 활성화된 메뉴 아이템 스타일 */
+.sidebar nav ul li a.active {
+    background-color: #5ab1f7;
+    color: white;
+    font-weight: bold;
+    border-left: 5px solid #007bff; /* 활성화 표시 */
+    padding-left: 15px;
+}
