@@ -18,6 +18,17 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
 public class MypageController {
+	
+	private User getLoggedInUser(HttpSession session) {
+		// 세션에서 userProfile (User 객체)을 가져와 형 변환
+		Object userProfile = session.getAttribute("userProfile");
+		if (userProfile instanceof User) {
+			return (User) userProfile;
+		}
+		// 로그인 정보가 없으면 예외 처리 또는 로그인 페이지 리다이렉션
+		throw new IllegalStateException("로그인이 필요합니다.");
+	}
+	
 	private final MypageService service;
 	private final UserService userService;
 	private final UserRepository userRepo;
@@ -40,7 +51,11 @@ public class MypageController {
 	
 	//회원탈퇴하시겠습니까?
 	@GetMapping("/delete")
-    public String delete(HttpSession session) {
+    public String delete(HttpSession session, Model model) {
+		
+		User user = getLoggedInUser(session);
+		model.addAttribute("user", user);
+		
     	return "mypage/deleteReal";
     }
 	

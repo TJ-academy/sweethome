@@ -71,6 +71,22 @@ public class DetailController {
         
         // 2) Hashtag 조회 (없을 수 있음)
         Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
+        model.addAttribute("hashtag", hashtag);
+        
+        // 보기 좋은 태그 리스트 생성
+        List<String> activeTags = new ArrayList<>();
+        if (hashtag != null) {
+            if (hashtag.isWifi())         activeTags.add("#와이파이");
+            if (hashtag.isTv())           activeTags.add("#TV");
+            if (hashtag.isKitchen())      activeTags.add("#주방");
+            if (hashtag.isFreePark())     activeTags.add("#무료주차");
+            if (hashtag.isSelfCheckin())  activeTags.add("#셀프체크인");
+            if (hashtag.isColdWarm())     activeTags.add("#냉난방");
+            if (hashtag.isPetFriendly())  activeTags.add("#반려동물동반");
+            if (hashtag.isBarrierFree())  activeTags.add("#장애물없는시설");
+            if (hashtag.isElevator())     activeTags.add("#엘리베이터");
+        }
+        model.addAttribute("activeTags", activeTags);
 
         // 3) 숙소 옵션 조회 및 그룹핑 (기존 로직 수정)
         // 해당 숙소(Home)에 연결된 AccommodationOption 목록을 조회합니다.
