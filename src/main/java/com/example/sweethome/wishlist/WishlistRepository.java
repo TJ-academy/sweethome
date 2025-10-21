@@ -53,4 +53,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
      */
     @Transactional // 삭제는 트랜잭션이 필요합니다.
     long deleteByHomeAndUser(Home home, User user);
+    
+    @Query("SELECT w.home.idx, COUNT(w) FROM Wishlist w GROUP BY w.home.idx")
+    List<Object[]> countWishlistsByHome();
 }
