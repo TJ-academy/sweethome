@@ -49,21 +49,22 @@ public class HomePhoto {
 
     @Column(length = 100)
     private String imgFive;
-
+    
     @Column(length = 100)
     private String imgSix;
-
+    
     @Column(length = 100)
     private String imgSeven;
-
+    
     @Column(length = 100)
     private String imgEight;
-
+    
     @Column(length = 100)
     private String imgNine;
-
+    
     @Column(length = 100)
     private String imgTen;
+    
     
     // --- 이미지 리스트를 반환하는 커스텀 Getter 추가 ---
     /**
@@ -73,8 +74,7 @@ public class HomePhoto {
      */
     public List<String> getImages() {
         return Arrays.asList(
-            this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive,
-            this.imgSix, this.imgSeven, this.imgEight, this.imgNine, this.imgTen
+            this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive
         ).stream()
          .filter(img -> img != null && !img.trim().isEmpty()) // null 또는 빈 문자열 제외
          .collect(Collectors.toList());

@@ -24,16 +24,7 @@ public class HomeWriteDTO {
     private String checkIn;
     private String checkOut;
 
-    private MultipartFile imgOne;
-    private MultipartFile imgTwo;
-    private MultipartFile imgThree;
-    private MultipartFile imgFour;
-    private MultipartFile imgFive;
-    private MultipartFile imgSix;
-    private MultipartFile imgSeven;
-    private MultipartFile imgEight;
-    private MultipartFile imgNine;
-    private MultipartFile imgTen;
+    private List<MultipartFile> homeImages;
 
     // 체크박스 값이 Integer든 Long이든 service에서 변환 가능
     private List<Long> optionIds;  

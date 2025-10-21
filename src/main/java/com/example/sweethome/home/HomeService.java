@@ -126,36 +126,29 @@ public class HomeService {
     }
 
     //이미지 저장 메서드
+ // 숙소 이미지 저장 메서드 (수정 버전)
     private void processHomePhotos(Home home, HomeWriteDTO dto) {
+        List<MultipartFile> imageFiles = dto.getHomeImages();
 
-        // DTO의 10개 이미지 필드를 리스트로 모음
-        List<MultipartFile> imageFiles = Arrays.asList(
-                dto.getImgOne(), dto.getImgTwo(), dto.getImgThree(), dto.getImgFour(),
-                dto.getImgFive(), dto.getImgSix(), dto.getImgSeven(), dto.getImgEight(),
-                dto.getImgNine(), dto.getImgTen()
-        );
+        if (imageFiles == null || imageFiles.isEmpty()) {
+            return; // 업로드된 이미지가 없으면 종료
+        }
 
-        // 유효한 파일(널이 아니거나 비어있지 않은)만 필터링하여 저장
+        // 파일 저장 후 경로 리스트 생성
         List<String> filePaths = imageFiles.stream()
                 .filter(file -> file != null && !file.isEmpty())
-                .map(fileHandlerService::saveFile) // 파일 저장 및 경로 리턴
+                .map(fileHandlerService::saveFile)
                 .collect(Collectors.toList());
 
-        // HomePhoto 엔티티에 파일 경로를 설정하고 저장
         if (!filePaths.isEmpty()) {
+            // 최대 5장까지만 저장 (DB 컬럼 수 제한 고려)
             HomePhoto homePhoto = HomePhoto.builder()
                     .home(home)
-                    // 최대 10개의 컬럼에 파일 경로를 순서대로 매핑
                     .imgOne(filePaths.size() > 0 ? filePaths.get(0) : null)
                     .imgTwo(filePaths.size() > 1 ? filePaths.get(1) : null)
                     .imgThree(filePaths.size() > 2 ? filePaths.get(2) : null)
                     .imgFour(filePaths.size() > 3 ? filePaths.get(3) : null)
                     .imgFive(filePaths.size() > 4 ? filePaths.get(4) : null)
-                    .imgSix(filePaths.size() > 5 ? filePaths.get(5) : null)
-                    .imgSeven(filePaths.size() > 6 ? filePaths.get(6) : null)
-                    .imgEight(filePaths.size() > 7 ? filePaths.get(7) : null)
-                    .imgNine(filePaths.size() > 8 ? filePaths.get(8) : null)
-                    .imgTen(filePaths.size() > 9 ? filePaths.get(9) : null)
                     .build();
 
             homePhotoRepository.save(homePhoto);
