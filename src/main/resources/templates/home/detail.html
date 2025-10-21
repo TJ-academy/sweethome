@@ -6,29 +6,29 @@
 <script type="text/javascript"
 	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
 <script type="text/javascript">
-    // 카카오 지도 API가 로드된 후 실행되는 코드
-    kakao.maps.load(function() {
-        
-    	var address = '[[${home.address}]]' // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
+	// 카카오 지도 API가 로드된 후 실행되는 코드
+	kakao.maps.load(function() {
 
-    	var geocoder = new kakao.maps.services.Geocoder();
-    	geocoder.addressSearch(address, function(result, status) {
-    	    if (status === kakao.maps.services.Status.OK) {
-    	        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-    	        var mapContainer = document.getElementById('map');
-    	        var mapOption = {
-    	            center: coords,
-    	            level: 3
-    	        };
-    	        var map = new kakao.maps.Map(mapContainer, mapOption);
-    	        var marker = new kakao.maps.Marker({
-    	            position: coords
-    	        });
-    	        marker.setMap(map);
-    	    }
-    	});
+		var address = '[[${home.address}]]' // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
 
-    });
+		var geocoder = new kakao.maps.services.Geocoder();
+		geocoder.addressSearch(address, function(result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+				var mapContainer = document.getElementById('map');
+				var mapOption = {
+					center : coords,
+					level : 3
+				};
+				var map = new kakao.maps.Map(mapContainer, mapOption);
+				var marker = new kakao.maps.Marker({
+					position : coords
+				});
+				marker.setMap(map);
+			}
+		});
+
+	});
 </script>
 
 <link rel="stylesheet" th:href="@{/css/home/detail.css}">
@@ -59,76 +59,85 @@
 		</p>
 
 		<!-- 좋아요 버튼 (우측 상단) -->
-<div class="like-button">
-    
-    <form th:action="@{/wishlist/remove}" method="post" 
-          th:if="${userProfile != null and isLiked}" 
-          style="display: inline;">
-        
-        <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-        
-        <button type="submit" class="btn btn-secondary">
-            <i class="bi bi-heart-fill"></i> 좋아요 취소
-        </button>
-    </form>
-    
-    <button class="btn btn-primary" 
-            th:if="${userProfile != null and !isLiked}" 
-            data-bs-toggle="modal" data-bs-target="#likeModal">
-        <i class="bi bi-heart"></i> 좋아요
-    </button>
-    
-    <button class="btn btn-primary" th:if="${userProfile == null}" onclick="window.location.href='/user/login'">
-        로그인 후 좋아요
-    </button>
-</div>
+		<div class="like-button">
+
+			<form th:action="@{/wishlist/remove}" method="post"
+				th:if="${userProfile != null and isLiked}" style="display: inline;">
+
+				<input type="hidden" name="homeIdx" th:value="${home.idx}" />
+
+				<button type="submit" class="btn btn-secondary">
+					<i class="bi bi-heart-fill"></i> 좋아요 취소
+				</button>
+			</form>
+
+			<button class="btn btn-primary"
+				th:if="${userProfile != null and !isLiked}" data-bs-toggle="modal"
+				data-bs-target="#likeModal">
+				<i class="bi bi-heart"></i> 좋아요
+			</button>
+
+			<button class="btn btn-primary" th:if="${userProfile == null}"
+				onclick="window.location.href='/user/login'">로그인 후 좋아요</button>
+		</div>
 
 
 		<!-- 좋아요 폴더 선택 모달 -->
-<div class="modal fade" id="likeModal" tabindex="-1" aria-labelledby="likeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="likeModalLabel">좋아요 폴더 선택</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                
-                <form id="addToExistingFolderForm" th:action="@{/wishlist/add}" method="post">
-                    <div class="mb-3">
-                        <label for="folderSelect" class="form-label">기존 폴더 선택</label>
-                        <select id="folderSelect" name="folderId" class="form-select" required>
-                            <option value="" disabled selected>폴더를 선택하세요</option>
-                            <option th:each="folder : ${folders}" th:value="${folder.idx}" th:text="${folder.folderName}">폴더 이름</option>
-                        </select>
-                    </div>
-                    <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-                    <input type="hidden" name="userEmail" th:value="${userProfile?.email ?: ''}" />
-                    <button type="submit" class="btn btn-primary w-100">선택된 폴더에 추가</button>
-                </form>
+		<div class="modal fade" id="likeModal" tabindex="-1"
+			aria-labelledby="likeModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="likeModalLabel">좋아요 폴더 선택</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
 
-                <hr class="my-3">
-                
-                <div class="d-grid gap-2">
-                    <button id="toggleNewFolderFormBtn" class="btn btn-outline-secondary btn-sm">
-                        + 새 폴더 생성 및 추가
-                    </button>
-                </div>
-                
-                <form id="createNewFolderForm" th:action="@{/wishlist/createAndAdd}" method="post" style="display:none; margin-top: 15px;">
-                    <div class="mb-3">
-                        <label for="newFolderName" class="form-label">새 폴더 이름</label>
-                        <input type="text" id="newFolderName" name="newFolderName" class="form-control" required placeholder="예: '이번 여름 여행'">
-                    </div>
-                    <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-                    <input type="hidden" name="userEmail" th:value="${userProfile?.email ?: ''}" />
-                    <button type="submit" class="btn btn-success w-100">폴더 생성 후 추가</button>
-                </form>
+						<form id="addToExistingFolderForm" th:action="@{/wishlist/add}"
+							method="post">
+							<div class="mb-3">
+								<label for="folderSelect" class="form-label">기존 폴더 선택</label> <select
+									id="folderSelect" name="folderId" class="form-select" required>
+									<option value="" disabled selected>폴더를 선택하세요</option>
+									<option th:each="folder : ${folders}" th:value="${folder.idx}"
+										th:text="${folder.folderName}">폴더 이름</option>
+								</select>
+							</div>
+							<input type="hidden" name="homeIdx" th:value="${home.idx}" /> <input
+								type="hidden" name="userEmail"
+								th:value="${userProfile?.email ?: ''}" />
+							<button type="submit" class="btn btn-primary w-100">선택된
+								폴더에 추가</button>
+						</form>
 
-            </div>
-        </div>
-    </div>
-</div>
+						<hr class="my-3">
+
+						<div class="d-grid gap-2">
+							<button id="toggleNewFolderFormBtn"
+								class="btn btn-outline-secondary btn-sm">+ 새 폴더 생성 및 추가
+							</button>
+						</div>
+
+						<form id="createNewFolderForm"
+							th:action="@{/wishlist/createAndAdd}" method="post"
+							style="display: none; margin-top: 15px;">
+							<div class="mb-3">
+								<label for="newFolderName" class="form-label">새 폴더 이름</label> <input
+									type="text" id="newFolderName" name="newFolderName"
+									class="form-control" required placeholder="예: '이번 여름 여행'">
+							</div>
+							<input type="hidden" name="homeIdx" th:value="${home.idx}" /> <input
+								type="hidden" name="userEmail"
+								th:value="${userProfile?.email ?: ''}" />
+							<button type="submit" class="btn btn-success w-100">폴더
+								생성 후 추가</button>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</div>
 
 
 		<p th:if="${rating != null}">
@@ -268,17 +277,16 @@
 
 		<div class="amenities-section">
 			<h2>숙소 편의시설</h2>
-			<ul>
-				<li th:if="${hashtag != null and hashtag.wifi}">와이파이</li>
-				<li th:if="${hashtag != null and hashtag.tv}">TV</li>
-				<li th:if="${hashtag != null and hashtag.kitchen}">주방</li>
-				<li th:if="${hashtag != null and hashtag.freePark}">무료 주차</li>
-				<li th:if="${hashtag != null and hashtag.selfCheckin}">셀프 체크인</li>
-				<li th:if="${hashtag != null and hashtag.coldWarm}">냉난방</li>
-				<li th:if="${hashtag != null and hashtag.petFriendly}">반려동물 동반</li>
-				<li th:if="${hashtag != null and hashtag.barrierFree}">장애물 없는
-					시설</li>
-				<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
+
+			<div th:if="${#lists.isEmpty(activeTags)}">
+				<p>등록된 해시태그가 없습니다.</p>
+			</div>
+
+			<ul class="tag-list" th:if="${!#lists.isEmpty(activeTags)}"
+				style="display: flex; gap: .5rem; flex-wrap: wrap;">
+				<li th:each="t : ${activeTags}" th:text="${t}"
+					style="list-style: none; padding: .2rem .6rem; border: 1px solid #ddd; border-radius: 999px; font-size: .9rem;">
+					#와이파이</li>
 			</ul>
 
 			<div
@@ -330,195 +338,235 @@
 	</div>
 
 	<script>
-    const MAX_LENGTH = 300; // 최대 길이 설정
+		const MAX_LENGTH = 300; // 최대 길이 설정
 
-    // ==========================================================
-    // 1. 숙소 설명 토글 로직 (기존 및 수정된 로직)
-    // ==========================================================
+		// ==========================================================
+		// 1. 숙소 설명 토글 로직 (기존 및 수정된 로직)
+		// ==========================================================
 
-    // 페이지 로드 시 실행되는 함수
-    document.addEventListener('DOMContentLoaded', function() {
-        const originalDescElement = document.getElementById('original-description');
-        // 'data-full-content'에서 원본 HTML 내용을 가져옴
-        const originalContent = originalDescElement ? originalDescElement.getAttribute('data-full-content') : "";
-        
-        // 순수 텍스트 내용 (길이 체크를 위해)
-        const plainTextContent = new DOMParser().parseFromString(originalContent, 'text/html').documentElement.textContent.trim();
+		// 페이지 로드 시 실행되는 함수
+		document
+				.addEventListener(
+						'DOMContentLoaded',
+						function() {
+							const originalDescElement = document
+									.getElementById('original-description');
+							// 'data-full-content'에서 원본 HTML 내용을 가져옴
+							const originalContent = originalDescElement ? originalDescElement
+									.getAttribute('data-full-content')
+									: "";
 
-        const shortDescElement = document.getElementById('short-description');
-        const toggleButton = document.getElementById('toggle-button');
-        
-        // ******************** 수정된 로직 시작 ********************
-        // (HTML 태그를 유지하면서 내용 자르기)
-        if (plainTextContent.length > MAX_LENGTH) {
-            // 원본 HTML 스트링 자체를 잘라 사용합니다. (줄바꿈 태그 유지를 위함)
-            let shortHTMLContent = originalContent.substring(0, MAX_LENGTH);
-            
-            // 줄임표를 추가합니다.
-            if (!shortHTMLContent.endsWith('...')) { 
-                 shortHTMLContent += '...'; 
-            }
-            
-            // HTML에 자른 내용을 표시 (태그 포함)
-            shortDescElement.innerHTML = shortHTMLContent;
-            
-            // 버튼 표시
-            toggleButton.style.display = 'block';
+							// 순수 텍스트 내용 (길이 체크를 위해)
+							const plainTextContent = new DOMParser()
+									.parseFromString(originalContent,
+											'text/html').documentElement.textContent
+									.trim();
 
-            // 상태를 "short"으로 설정
-            shortDescElement.setAttribute('data-current-state', 'short');
-        } else {
-            // 300자 이하인 경우: 전체 내용 표시 및 버튼 숨김 (HTML 포함)
-            shortDescElement.innerHTML = originalContent;
-            toggleButton.style.display = 'none';
-        }
-        // ******************** 수정된 로직 끝 ********************
-        
-        // ==========================================================
-        // 2. 예약 가격 계산 로직 (새로 추가된 로직)
-        // ==========================================================
-        
-        // 2-1. 가격 정보 가져오기 (Thymeleaf Hidden Field에서)
-        const basicCostElement = document.getElementById('basicCost');
-        const expenCostElement = document.getElementById('expenCost');
-        
-        // 값이 null이거나 숫자가 아니면 0 또는 기본값으로 설정
-        const basicCost = basicCostElement ? parseInt(basicCostElement.value) || 0 : 0;
-        const expenCost = expenCostElement ? parseInt(expenCostElement.value) || 0 : 0;
+							const shortDescElement = document
+									.getElementById('short-description');
+							const toggleButton = document
+									.getElementById('toggle-button');
 
+							// ******************** 수정된 로직 시작 ********************
+							// (HTML 태그를 유지하면서 내용 자르기)
+							if (plainTextContent.length > MAX_LENGTH) {
+								// 원본 HTML 스트링 자체를 잘라 사용합니다. (줄바꿈 태그 유지를 위함)
+								let shortHTMLContent = originalContent
+										.substring(0, MAX_LENGTH);
 
-        // 2-2. DOM 요소 선택
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const totalPriceDisplay = document.getElementById('totalPriceDisplay');
-        const nightsInput = document.getElementById('nights');
-        const totalCostInput = document.getElementById('totalCost');
-        
-        // 2-3. 이벤트 리스너 등록
-        startDateInput.addEventListener('change', calculatePrice);
-        endDateInput.addEventListener('change', calculatePrice);
+								// 줄임표를 추가합니다.
+								if (!shortHTMLContent.endsWith('...')) {
+									shortHTMLContent += '...';
+								}
 
-        // 페이지 로드 시 초기 가격 계산 (만약 날짜가 미리 채워져 있다면)
-        calculatePrice();
+								// HTML에 자른 내용을 표시 (태그 포함)
+								shortDescElement.innerHTML = shortHTMLContent;
 
+								// 버튼 표시
+								toggleButton.style.display = 'block';
 
-        /**
-         * 특정 날짜가 주말(금요일 또는 토요일)인지 확인합니다.
-         * @param {Date} date - 확인할 날짜 객체
-         * @returns {boolean} 주말이면 true (금=5, 토=6)
-         */
-        function isWeekend(date) {
-            const dayOfWeek = date.getDay();
-            // 5: 금요일, 6: 토요일
-            return dayOfWeek === 5 || dayOfWeek === 6;
-        }
+								// 상태를 "short"으로 설정
+								shortDescElement.setAttribute(
+										'data-current-state', 'short');
+							} else {
+								// 300자 이하인 경우: 전체 내용 표시 및 버튼 숨김 (HTML 포함)
+								shortDescElement.innerHTML = originalContent;
+								toggleButton.style.display = 'none';
+							}
+							// ******************** 수정된 로직 끝 ********************
 
-        /**
-         * 체크인/체크아웃 날짜를 기반으로 총 숙박 가격을 계산합니다.
-         */
-        function calculatePrice() {
-            const startDateStr = startDateInput.value;
-            const endDateStr = endDateInput.value;
-            
-            // 날짜가 모두 선택되지 않았다면 종료
-            if (!startDateStr || !endDateStr) {
-                totalPriceDisplay.textContent = '날짜를 선택해 주세요.';
-                nightsInput.value = 0;
-                totalCostInput.value = 0;
-                return;
-            }
+							// ==========================================================
+							// 2. 예약 가격 계산 로직 (새로 추가된 로직)
+							// ==========================================================
 
-            // Date 객체 생성 (날짜만 포함)
-            const startDate = new Date(startDateStr);
-            const endDate = new Date(endDateStr);
-            
-            // 시간 부분을 00:00:00으로 설정하여 날짜 비교 정확도 향상
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
+							// 2-1. 가격 정보 가져오기 (Thymeleaf Hidden Field에서)
+							const basicCostElement = document
+									.getElementById('basicCost');
+							const expenCostElement = document
+									.getElementById('expenCost');
 
-            // 유효성 검사: 체크아웃이 체크인보다 이전이거나 같으면 에러
-            if (endDate <= startDate) {
-                totalPriceDisplay.textContent = '유효하지 않은 날짜 범위입니다.';
-                nightsInput.value = 0;
-                totalCostInput.value = 0;
-                return;
-            }
+							// 값이 null이거나 숫자가 아니면 0 또는 기본값으로 설정
+							const basicCost = basicCostElement ? parseInt(basicCostElement.value) || 0
+									: 0;
+							const expenCost = expenCostElement ? parseInt(expenCostElement.value) || 0
+									: 0;
 
-            let totalCost = 0;
-            let nights = 0;
-            
-            // 체크인 날짜부터 체크아웃 전날까지 반복 (1박씩 계산)
-            let currentDate = new Date(startDate);
-            
-            while (currentDate < endDate) {
-                // 숙박 시작일이 주말(금/토)인지 확인하여 가격 적용
-                const costPerNight = isWeekend(currentDate) ? expenCost : basicCost;
-                totalCost += costPerNight;
-                nights++;
+							// 2-2. DOM 요소 선택
+							const startDateInput = document
+									.getElementById('startDate');
+							const endDateInput = document
+									.getElementById('endDate');
+							const totalPriceDisplay = document
+									.getElementById('totalPriceDisplay');
+							const nightsInput = document
+									.getElementById('nights');
+							const totalCostInput = document
+									.getElementById('totalCost');
 
-                // 다음 날짜로 이동 (1일 추가)
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
+							// 2-3. 이벤트 리스너 등록
+							startDateInput.addEventListener('change',
+									calculatePrice);
+							endDateInput.addEventListener('change',
+									calculatePrice);
 
-            // 결과 업데이트
-            nightsInput.value = nights;
-            totalCostInput.value = totalCost;
+							// 페이지 로드 시 초기 가격 계산 (만약 날짜가 미리 채워져 있다면)
+							calculatePrice();
 
-            // 화면에 표시 (toLocaleString으로 콤마(,) 추가)
-            const formattedTotalCost = totalCost.toLocaleString('ko-KR');
-            totalPriceDisplay.innerHTML = `총 ${nights}박<br><span>${formattedTotalCost}원</span>`;
-        }
-        
-    }); // DOMContentLoaded 끝
+							/**
+							 * 특정 날짜가 주말(금요일 또는 토요일)인지 확인합니다.
+							 * @param {Date} date - 확인할 날짜 객체
+							 * @returns {boolean} 주말이면 true (금=5, 토=6)
+							 */
+							function isWeekend(date) {
+								const dayOfWeek = date.getDay();
+								// 5: 금요일, 6: 토요일
+								return dayOfWeek === 5 || dayOfWeek === 6;
+							}
 
-    // "더 보기/닫기" 토글 함수 (이 함수는 밖에 두는 것이 일반적입니다)
-    function toggleDescription() {
-        const shortDescElement = document.getElementById('short-description');
-        const originalDescElement = document.getElementById('original-description');
-        const toggleButton = document.getElementById('toggle-button');
-        
-        const currentState = shortDescElement.getAttribute('data-current-state');
-        // 원본 내용은 hidden div의 data-full-content 속성에서 가져옵니다.
-        const fullContent = originalDescElement.getAttribute('data-full-content');
-        
-        // 순수 텍스트 내용으로 길이 체크를 다시 합니다.
-        const plainTextContent = new DOMParser().parseFromString(fullContent, 'text/html').documentElement.textContent.trim();
-        
-        // HTML 문자열을 직접 잘라 태그를 유지합니다.
-        let shortHTMLContent = fullContent.substring(0, MAX_LENGTH);
-         if (!shortHTMLContent.endsWith('...')) {
-             shortHTMLContent += '...';
-         }
+							/**
+							 * 체크인/체크아웃 날짜를 기반으로 총 숙박 가격을 계산합니다.
+							 */
+							function calculatePrice() {
+								const startDateStr = startDateInput.value;
+								const endDateStr = endDateInput.value;
 
-        if (currentState === 'short') {
-            // 현재 짧은 내용 -> 전체 내용으로 변경 (HTML 포함)
-            shortDescElement.innerHTML = fullContent;
-            toggleButton.textContent = '닫기';
-            shortDescElement.setAttribute('data-current-state', 'full');
-        } else {
-            // 현재 전체 내용 -> 짧은 내용으로 변경 (HTML 포함)
-            shortDescElement.innerHTML = shortHTMLContent; 
-            toggleButton.textContent = '더 보기';
-            shortDescElement.setAttribute('data-current-state', 'short');
-        }
-    }
-    
-    
-    // 좋아요 폴더 모달 동작을 위한 JavaScript 추가
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('toggleNewFolderFormBtn');
-    const newFolderForm = document.getElementById('createNewFolderForm');
-    
-    if (toggleBtn && newFolderForm) {
-        toggleBtn.addEventListener('click', function() {
-            // 새 폴더 폼을 토글합니다.
-            const isHidden = newFolderForm.style.display === 'none';
-            newFolderForm.style.display = isHidden ? 'block' : 'none';
-            toggleBtn.textContent = isHidden ? '폴더 선택으로 돌아가기' : '+ 새 폴더 생성 및 추가';
-        });
-    }
-});
-</script>
+								// 날짜가 모두 선택되지 않았다면 종료
+								if (!startDateStr || !endDateStr) {
+									totalPriceDisplay.textContent = '날짜를 선택해 주세요.';
+									nightsInput.value = 0;
+									totalCostInput.value = 0;
+									return;
+								}
+
+								// Date 객체 생성 (날짜만 포함)
+								const startDate = new Date(startDateStr);
+								const endDate = new Date(endDateStr);
+
+								// 시간 부분을 00:00:00으로 설정하여 날짜 비교 정확도 향상
+								startDate.setHours(0, 0, 0, 0);
+								endDate.setHours(0, 0, 0, 0);
+
+								// 유효성 검사: 체크아웃이 체크인보다 이전이거나 같으면 에러
+								if (endDate <= startDate) {
+									totalPriceDisplay.textContent = '유효하지 않은 날짜 범위입니다.';
+									nightsInput.value = 0;
+									totalCostInput.value = 0;
+									return;
+								}
+
+								let totalCost = 0;
+								let nights = 0;
+
+								// 체크인 날짜부터 체크아웃 전날까지 반복 (1박씩 계산)
+								let currentDate = new Date(startDate);
+
+								while (currentDate < endDate) {
+									// 숙박 시작일이 주말(금/토)인지 확인하여 가격 적용
+									const costPerNight = isWeekend(currentDate) ? expenCost
+											: basicCost;
+									totalCost += costPerNight;
+									nights++;
+
+									// 다음 날짜로 이동 (1일 추가)
+									currentDate
+											.setDate(currentDate.getDate() + 1);
+								}
+
+								// 결과 업데이트
+								nightsInput.value = nights;
+								totalCostInput.value = totalCost;
+
+								// 화면에 표시 (toLocaleString으로 콤마(,) 추가)
+								const formattedTotalCost = totalCost
+										.toLocaleString('ko-KR');
+								totalPriceDisplay.innerHTML = `총 ${nights}박<br><span>${formattedTotalCost}원</span>`;
+							}
+
+						}); // DOMContentLoaded 끝
+
+		// "더 보기/닫기" 토글 함수 (이 함수는 밖에 두는 것이 일반적입니다)
+		function toggleDescription() {
+			const shortDescElement = document
+					.getElementById('short-description');
+			const originalDescElement = document
+					.getElementById('original-description');
+			const toggleButton = document.getElementById('toggle-button');
+
+			const currentState = shortDescElement
+					.getAttribute('data-current-state');
+			// 원본 내용은 hidden div의 data-full-content 속성에서 가져옵니다.
+			const fullContent = originalDescElement
+					.getAttribute('data-full-content');
+
+			// 순수 텍스트 내용으로 길이 체크를 다시 합니다.
+			const plainTextContent = new DOMParser().parseFromString(
+					fullContent, 'text/html').documentElement.textContent
+					.trim();
+
+			// HTML 문자열을 직접 잘라 태그를 유지합니다.
+			let shortHTMLContent = fullContent.substring(0, MAX_LENGTH);
+			if (!shortHTMLContent.endsWith('...')) {
+				shortHTMLContent += '...';
+			}
+
+			if (currentState === 'short') {
+				// 현재 짧은 내용 -> 전체 내용으로 변경 (HTML 포함)
+				shortDescElement.innerHTML = fullContent;
+				toggleButton.textContent = '닫기';
+				shortDescElement.setAttribute('data-current-state', 'full');
+			} else {
+				// 현재 전체 내용 -> 짧은 내용으로 변경 (HTML 포함)
+				shortDescElement.innerHTML = shortHTMLContent;
+				toggleButton.textContent = '더 보기';
+				shortDescElement.setAttribute('data-current-state', 'short');
+			}
+		}
+
+		// 좋아요 폴더 모달 동작을 위한 JavaScript 추가
+		document
+				.addEventListener(
+						'DOMContentLoaded',
+						function() {
+							const toggleBtn = document
+									.getElementById('toggleNewFolderFormBtn');
+							const newFolderForm = document
+									.getElementById('createNewFolderForm');
+
+							if (toggleBtn && newFolderForm) {
+								toggleBtn
+										.addEventListener(
+												'click',
+												function() {
+													// 새 폴더 폼을 토글합니다.
+													const isHidden = newFolderForm.style.display === 'none';
+													newFolderForm.style.display = isHidden ? 'block'
+															: 'none';
+													toggleBtn.textContent = isHidden ? '폴더 선택으로 돌아가기'
+															: '+ 새 폴더 생성 및 추가';
+												});
+							}
+						});
+	</script>
 
 </body>
 </html>
