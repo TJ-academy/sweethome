@@ -53,7 +53,7 @@ function execDaumPostcode() {
 <body>
 <h2>숙소 등록</h2>
 
-<form method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
+<form th:action="@{/home/write}" method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
 <input type="hidden" name="hostId" th:value="${hostId}">
 
 <!-- 제목 -->
@@ -176,7 +176,7 @@ function execDaumPostcode() {
     <div th:each="opt : ${groupEntry.value}">
         <label>
             <!-- 수정: opt.id -> opt.optionId -->
-            <input type="checkbox" name="optionIds" th:value="${opt.optionId}">
+            <input type="checkbox" th:field="*{optionIds}" th:value="${opt.optionId}">
             <!-- 수정: opt.name -> opt.optionName -->
             <span th:text="${opt.optionName}"></span>
         </label><br>

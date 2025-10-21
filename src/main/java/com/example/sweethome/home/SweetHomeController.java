@@ -45,7 +45,7 @@ public class SweetHomeController {
     public String registerHome(@ModelAttribute HomeWriteDTO homeWriteDTO,
                                RedirectAttributes redirectAttributes,
                                HttpSession session,BindingResult br) {
-    	
+    	System.out.println("111111111111111111111");
     	System.out.println("binding:"+br.getAllErrors());
     	
         User userProfile = (User) session.getAttribute("userProfile");
@@ -53,7 +53,7 @@ public class SweetHomeController {
             redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
             return "redirect:/user/login";
         }
-
+        
         homeWriteDTO.setHostId(userProfile.getEmail());
 
         try {

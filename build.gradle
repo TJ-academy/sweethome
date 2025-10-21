@@ -47,6 +47,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	//카카오 관련 의존성.
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	
+	implementation 'org.springframework:spring-context-support'
+	implementation 'commons-fileupload:commons-fileupload'
 }
 
 tasks.named('test') {
