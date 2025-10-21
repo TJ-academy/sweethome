@@ -65,7 +65,6 @@ public class HomePhoto {
     @Column(length = 100)
     private String imgTen;
     
-    
     // --- 이미지 리스트를 반환하는 커스텀 Getter 추가 ---
     /**
      * imgOne부터 imgTen까지의 필드를 List<String>으로 반환합니다.

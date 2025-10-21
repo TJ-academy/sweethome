@@ -149,6 +149,11 @@ public class HomeService {
                     .imgThree(filePaths.size() > 2 ? filePaths.get(2) : null)
                     .imgFour(filePaths.size() > 3 ? filePaths.get(3) : null)
                     .imgFive(filePaths.size() > 4 ? filePaths.get(4) : null)
+                    .imgSix(filePaths.size() > 5 ? filePaths.get(5) : null)
+                    .imgSeven(filePaths.size() > 6 ? filePaths.get(6) : null)
+                    .imgEight(filePaths.size() > 7 ? filePaths.get(7) : null)
+                    .imgNine(filePaths.size() > 8 ? filePaths.get(8) : null)
+                    .imgTen(filePaths.size() > 9 ? filePaths.get(9) : null)
                     .build();
 
             homePhotoRepository.save(homePhoto);
