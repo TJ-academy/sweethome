@@ -30,8 +30,9 @@ public class HomeService {
     private final HomePhotoRepository homePhotoRepository;
 
     private final AccommodationOptionRepository accommodationOptionRepository;
-    
     private final OptionRepository optionRepository;
+    
+    private final HashtagRepository hashtagRepository;  
 
     private final FileHandlerService fileHandlerService;
 
@@ -50,12 +51,7 @@ public class HomeService {
     }
 
 
-    /**
-     * 숙소 등록 프로세스를 처리
-     * @param dto HomeWriteDTO (폼 데이터 및 파일 포함)
-     * @return 등록된 Home 엔티티의 ID (idx)
-     * @throws RuntimeException 사용자 정보나 파일 처리 오류 발생 시
-     */
+    //숙소 등록 처리 메서드
     @Transactional
     public int registerHome(HomeWriteDTO dto) {
 
@@ -95,17 +91,16 @@ public class HomeService {
         // 5. 숙소 사진 (HomePhoto) 처리
         processHomePhotos(savedHome, dto);
 
-        // DTO의 실제 getter 이름인 getOptionIds()를 사용
+        // 옵션 처리 - DTO의 실제 getter 이름인 getOptionIds()를 사용
         processAccommodationOptions(savedHome, dto.getOptionIds());
 
+        // 6. 해시태그 처리
+        processHashtag(savedHome, dto);
+        
         return savedHome.getIdx();
     }
 
-    /**
-     * DTO에서 넘어온 선택된 옵션 ID들을 Option 객체로 변환하여 AccommodationOption 테이블에 저장합니다.
-     * @param home 등록된 Home 엔티티
-     * @param selectedOptionIds 폼에서 넘어온 선택된 옵션 ID 목록 (List<Long>)
-     */
+    //옵션 저장 메서드
     private void processAccommodationOptions(Home home, List<Long> selectedOptionIds) {
         if (selectedOptionIds == null || selectedOptionIds.isEmpty()) {
             return; // 선택된 옵션이 없으면 종료
@@ -130,9 +125,7 @@ public class HomeService {
         accommodationOptionRepository.saveAll(optionsToSave);
     }
 
-    /**
-     * HomeWriteDTO에 있는 10개의 이미지 파일을 처리하고 HomePhoto 엔티티를 저장.
-     */
+    //이미지 저장 메서드
     private void processHomePhotos(Home home, HomeWriteDTO dto) {
 
         // DTO의 10개 이미지 필드를 리스트로 모음
@@ -169,9 +162,7 @@ public class HomeService {
         }
     }
 
-    /**
-     * 시간 문자열 ("HH:mm")을 시간 정수 (int)로 변환 (예: "15:00" -> 15)
-     */
+    //시간(time) -> 정수(int) 변환 로직
     private int convertTimeToInt(String timeStr) {
         if (timeStr == null || timeStr.isEmpty()) {
             return 0; // 또는 기본값 설정
@@ -179,5 +170,26 @@ public class HomeService {
 
         // LocalTime.parse를 사용하여 시간만 추출 (int로 반환)
         return LocalTime.parse(timeStr).getHour();
+    }
+    
+    //해시태그 저장 메서드
+    @Transactional
+    private void processHashtag(Home home, HomeWriteDTO dto) {
+    	//DTO의 boolean 값 -> Hashtag 엔티티로 매핑
+    	Hashtag hashtag = Hashtag.builder()
+    			.home(home)
+    			.wifi(dto.isWifi())
+                .tv(dto.isTv())
+                .kitchen(dto.isKitchen())
+                .freePark(dto.isFreePark())
+                .selfCheckin(dto.isSelfCheckin())
+                .coldWarm(dto.isColdWarm())
+                .petFriendly(dto.isPetFriendly())
+                .barrierFree(dto.isBarrierFree())
+                .elevator(dto.isElevator())
+                .build();
+    	
+    	//Hashtag 엔티티 저장
+    	hashtagRepository.save(hashtag);
     }
 }
