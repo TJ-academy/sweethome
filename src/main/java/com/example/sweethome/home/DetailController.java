@@ -3,6 +3,7 @@ package com.example.sweethome.home;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.sweethome.user.User;
+import com.example.sweethome.wishlist.WishlistFolder;
+import com.example.sweethome.wishlist.WishlistFolderRepository;
+import com.example.sweethome.wishlist.WishlistRepository;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -25,11 +32,30 @@ public class DetailController {
     private final OptionRepository optionRepository;
     private final AccommodationOptionRepository accommodationOptionRepository;
     private final HomePhotoRepository homePhotoRepository;
+    private final WishlistRepository wishlistRepository;
+    private final WishlistFolderRepository wishlistFolderRepository;
 
     /** 상세 페이지: /home/detail/{idx} */
     @GetMapping("/{idx}")
-    public String show(@PathVariable("idx") int idx, Model model) {
+    public String show(@PathVariable("idx") int idx, Model model, HttpSession session) {
 
+    	// ******************** 수정된 부분: userProfile 추가 ********************
+        Object userProfile = session.getAttribute("userProfile");
+        model.addAttribute("userProfile", userProfile); // userProfile이 null일 수 있습니다.
+        // *******************************************************************
+        
+        // 좋아요 폴더 목록 조회
+        List<WishlistFolder> folders = new ArrayList<>(); // 기본적으로 빈 리스트로 초기화
+        
+        if (userProfile instanceof User) {
+            User user = (User) userProfile;
+            // 👈 완성된 폴더 조회 로직
+            folders = wishlistFolderRepository.findByUser(user); 
+        }
+        
+        // 3. 폴더 목록 Model 추가 (로그인 여부와 관계없이)
+        // 이 부분을 기존 코드 블록 밖으로 빼내고 중복을 제거합니다.
+        model.addAttribute("folders", folders);
     	
         // 1) Home 조회 (PK: idx)
         Home home = homeRepository.findById(idx)
@@ -62,6 +88,17 @@ public class DetailController {
                         .thenComparing(Option::getOptionName))
                 // OptionGroup 기준으로 그룹핑
                 .collect(groupingBy(Option::getOptionGroup, toList()));
+        
+     // ⭐️ 좋아요 상태 확인 로직 추가
+        boolean isLiked = false;
+        if (userProfile instanceof User) {
+            User user = (User) userProfile;
+            // existsByHomeAndUser 메서드를 사용하여 상태 확인
+            isLiked = wishlistRepository.existsByHomeAndUser(home, user);
+        }
+        
+        // Model에 좋아요 상태 추가
+        model.addAttribute("isLiked", isLiked); // ⭐️ 추가
         
         // 4) 뷰 모델 바인딩 (엔티티 기준 필드명 그대로)
         model.addAttribute("home", home);               // title, description, location, address, thumbnail, maxPeople, room, checkIn, checkOut, costBasic, costExpen, homeType, host 등

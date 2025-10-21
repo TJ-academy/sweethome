@@ -3,13 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="|${home.title} 상세 정보|">숙소 상세 정보</title>
-<script type="text/javascript"
-	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
 <script type="text/javascript">
     // 카카오 지도 API가 로드된 후 실행되는 코드
     kakao.maps.load(function() {
+    	/*
+        var geocoder = new kakao.maps.services.Geocoder();
         
-    	var address = '[[${home.address}]]' // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
+     // Thymeleaf에서 전달된 home.address 값을 JavaScript 변수로 사용
+        var address = /*[[${home.address}]] '';  // home.address 값을 Thymeleaf에서 가져오기
+        
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                var mapContainer = document.getElementById('map');
+                var mapOption = {
+                    center: coords,
+                    level: 3
+                };
+                var map = new kakao.maps.Map(mapContainer, mapOption);
+                var marker = new kakao.maps.Marker({
+                    position: coords
+                });
+                marker.setMap(map);
+            }
+        });
+        */
+        
+    	var address = /*[[${home.address}]]*/ '서울특별시 중구 을지로 79'; // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
 
     	var geocoder = new kakao.maps.services.Geocoder();
     	geocoder.addressSearch(address, function(result, status) {
@@ -30,142 +51,188 @@
 
     });
 </script>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	line-height: 1.6;
+	margin: 0;
+	padding: 20px;
+	background-color: #f4f4f4;
+}
 
-<link rel="stylesheet" th:href="@{/css/home/detail.css}">
+.container {
+	max-width: 1200px;
+	margin: auto;
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.gallery {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.main-img, .sub-img {
+	flex: 1;
+	min-width: 200px;
+	max-height: 300px;
+	overflow: hidden;
+}
+
+.main-img img, .sub-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 5px;
+}
+
+.main-img {
+	flex-basis: 50%;
+}
+
+.info-section {
+	display: flex;
+	justify-content: space-between;
+	gap: 40px;
+}
+
+.description-box, .booking-box {
+	flex: 1;
+}
+
+.booking-box {
+	border: 1px solid #ddd;
+	padding: 20px;
+	border-radius: 8px;
+}
+
+.price {
+	font-size: 2em;
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+.host-info {
+	display: flex;
+	align-items: center;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #eee;
+}
+
+.host-img {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	margin-right: 10px;
+	object-fit: cover;
+}
+
+#map {
+            width: 100%;
+            height: 400px;
+        }
+.review-card {
+	border-bottom: 1px solid #eee;
+	padding: 15px 0;
+}
+
+.facility-group {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+}
+
+.policy-item {
+	flex: 1;
+	padding: 0 10px;
+}
+</style>
+
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-	rel="stylesheet"
-	integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-	crossorigin="anonymous">
-<script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-	integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-	crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </head>
 <body>
-	<div th:insert="fragments/header :: menuBar"></div>
-	<div th:insert="fragments/search :: searchSection"></div>
+<div th:insert="fragments/header :: menuBar"></div>
+<div th:insert="fragments/search :: searchSection"></div>
 
 	<div class="container">
 
 		<h1 th:text="${home.title}">숙소 제목</h1>
 
 		<p>
-			<span th:text="|최대 인원: ${home.maxPeople}명|">최대 인원</span> <span
-				th:text="| · 침실 ${home.room}개|"> · 침실</span> <span
-				th:text="| · 침대 ${home.bed}개|"> · 침대</span> <span
-				th:text="| · 욕실 ${home.bath}개|"> · 욕실</span>
+			<span th:text="|최대 인원: ${home.maxPeople}명|">최대 인원</span>
+			<span th:text="| · 침실 ${home.room}개|"> · 침실</span>
+			<span th:text="| · 침대 ${home.bed}개|"> · 침대</span>
+			<span th:text="| · 욕실 ${home.bath}개|"> · 욕실</span>
 		</p>
 
-		<!-- 좋아요 버튼 (우측 상단) -->
+<!-- 좋아요 버튼 (우측 상단) -->
 <div class="like-button">
-    
-    <form th:action="@{/wishlist/remove}" method="post" 
-          th:if="${userProfile != null and isLiked}" 
-          style="display: inline;">
-        
-        <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-        
-        <button type="submit" class="btn btn-secondary">
-            <i class="bi bi-heart-fill"></i> 좋아요 취소
-        </button>
-    </form>
-    
-    <button class="btn btn-primary" 
-            th:if="${userProfile != null and !isLiked}" 
-            data-bs-toggle="modal" data-bs-target="#likeModal">
-        <i class="bi bi-heart"></i> 좋아요
+    <button class="btn btn-primary" th:if="${userProfile != null}" data-bs-toggle="modal" data-bs-target="#likeModal">
+        좋아요
     </button>
-    
     <button class="btn btn-primary" th:if="${userProfile == null}" onclick="window.location.href='/user/login'">
         로그인 후 좋아요
     </button>
 </div>
 
-
-		<!-- 좋아요 폴더 선택 모달 -->
+<!-- 좋아요 폴더 선택 모달 -->
 <div class="modal fade" id="likeModal" tabindex="-1" aria-labelledby="likeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="likeModalLabel">좋아요 폴더 선택</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <div class="modal-body">
-                
-                <form id="addToExistingFolderForm" th:action="@{/wishlist/add}" method="post">
-                    <div class="mb-3">
-                        <label for="folderSelect" class="form-label">기존 폴더 선택</label>
-                        <select id="folderSelect" name="folderId" class="form-select" required>
-                            <option value="" disabled selected>폴더를 선택하세요</option>
-                            <option th:each="folder : ${folders}" th:value="${folder.idx}" th:text="${folder.folderName}">폴더 이름</option>
-                        </select>
-                    </div>
+                <form id="wishlistForm" th:action="@{/wishlist/add}" method="post">
                     <input type="hidden" name="homeIdx" th:value="${home.idx}" />
                     <input type="hidden" name="userEmail" th:value="${userProfile?.email ?: ''}" />
-                    <button type="submit" class="btn btn-primary w-100">선택된 폴더에 추가</button>
+                    <button type="submit" class="btn btn-primary">추가하기</button>
                 </form>
-
-                <hr class="my-3">
-                
-                <div class="d-grid gap-2">
-                    <button id="toggleNewFolderFormBtn" class="btn btn-outline-secondary btn-sm">
-                        + 새 폴더 생성 및 추가
-                    </button>
-                </div>
-                
-                <form id="createNewFolderForm" th:action="@{/wishlist/createAndAdd}" method="post" style="display:none; margin-top: 15px;">
-                    <div class="mb-3">
-                        <label for="newFolderName" class="form-label">새 폴더 이름</label>
-                        <input type="text" id="newFolderName" name="newFolderName" class="form-control" required placeholder="예: '이번 여름 여행'">
-                    </div>
-                    <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-                    <input type="hidden" name="userEmail" th:value="${userProfile?.email ?: ''}" />
-                    <button type="submit" class="btn btn-success w-100">폴더 생성 후 추가</button>
-                </form>
-
             </div>
         </div>
     </div>
 </div>
 
-
+    
 		<p th:if="${rating != null}">
 			<span class="rating" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★
 				4.9 · 후기 12개</span>
 		</p>
 
-		<div class="gallery">
-			<div class="main-img">
-				<img
-					th:src="${homePhoto.imgOne != null ? homePhoto.imgOne : '/images/default_main_image.jpg'}"
-					src="/images/sample_main.jpg" alt="메인 숙소 이미지">
-			</div>
+<div class="gallery">
+    <div class="main-img">
+        <img th:src="${homePhoto.imgOne != null ? homePhoto.imgOne : '/images/default_main_image.jpg'}" 
+             src="/images/sample_main.jpg" alt="메인 숙소 이미지">
+    </div>
 
-			<th:block th:each="image, iterStat : ${homePhoto.images}">
-				<div class="sub-img" th:if="${iterStat.index > 0}">
-					<img th:src="${image}" src="/images/sample_sub.jpg" alt="서브 숙소 이미지">
-				</div>
-			</th:block>
+    <th:block th:each="image, iterStat : ${homePhoto.images}">
+        <div class="sub-img" th:if="${iterStat.index > 0}">
+            <img th:src="${image}" 
+                 src="/images/sample_sub.jpg" alt="서브 숙소 이미지">
+        </div>
+    </th:block>
 
-		</div>
-
+    </div>
+    
 		<div class="info-section">
 
 
 			<div class="description-box">
 				<h2>숙소 설명</h2>
 
-				<div id="original-description" style="display: none;"
-					th:attr="data-full-content=${home.description}">
+				<div id="original-description" style="display:none;" th:attr="data-full-content=${home.description}">
 					<p>숙소 설명 원본이 들어갑니다.</p>
 				</div>
+				
+				<div id="short-description">
+					</div>
 
-				<div id="short-description"></div>
-
-				<button id="toggle-button" onclick="toggleDescription()"
-					style="display: none;">더 보기</button>
+				<button id="toggle-button" onclick="toggleDescription()" style="display: none;">더 보기</button>
 
 				<div class="host-info" th:if="${home.host != null}">
 					<img class="host-img" th:src="${home.host.profileImg}"
@@ -175,23 +242,21 @@
 						<p th:if="${hostMemberSince != null}"
 							th:text="|호스트 활동 기간: ${hostMemberSince}년|">호스트 활동 기간: 3년</p>
 						<form th:action="@{/chat/room/question}" method="post">
-							<input type="hidden" name="nickname"
-								th:value="${home.host.nickname}" />
-							<button type="submit">문의하기</button>
+						    <input type="hidden" name="nickname" th:value="${home.host.nickname}" />
+						    <button type="submit">문의하기</button>
 						</form>
 					</div>
 				</div>
 			</div>
 
-			<form th:action="@{/home/reservationStart}" method="get"
-				class="booking-box" id="bookingForm">
+			<form th:action="@{/home/reservationStart}" method="get" class="booking-box" id="bookingForm">
 				<input type="hidden" name="reservedHome" th:value="${home.idx}" />
-
+				
 				<input type="hidden" id="basicCost" th:value="${home.costBasic}" />
-				<input type="hidden" id="expenCost" th:value="${home.costExpen}" />
-
-				<input type="hidden" id="nights" name="nights" value="0" /> <input
-					type="hidden" id="totalCost" name="totalMoney" value="0" />
+                <input type="hidden" id="expenCost" th:value="${home.costExpen}" />
+                
+                <input type="hidden" id="nights" name="nights" value="0" />
+                <input type="hidden" id="totalCost" name="totalMoney" value="0" />
 
 
 				<div class="price">
@@ -211,24 +276,25 @@
 						th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
 				</div>
 
-				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|"
-					style="font-size: 0.9em; margin-bottom: 5px; color: #555;">이
-					숙소의 최대 인원은 10명 (어린이 제외)입니다.</p>
+				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|" 
+				   style="font-size: 0.9em; margin-bottom: 5px; color: #555;">
+					이 숙소의 최대 인원은 10명 (어린이 제외)입니다.
+				</p>
 
 				<select name="adult" id="guests">
 					<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
 						th:value="${guest}" th:text="|성인 ${guest}명|">성인 2명</option>
-				</select> <select name="child" id="children" style="margin-top: 10px;">
+				</select>
+                
+				<select name="child" id="children" style="margin-top: 10px;">
 					<option value="0">어린이 0명</option>
 					<option th:each="child : ${#numbers.sequence(1, 5)}"
 						th:value="${child}" th:text="|어린이 ${child}명|">어린이 1명</option>
 				</select>
-
-				<div id="total-price-box"
-					style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
-					<p id="totalPriceDisplay"
-						style="font-size: 1.2em; font-weight: bold;">날짜를 선택해 주세요.</p>
-				</div>
+                
+                <div id="total-price-box" style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <p id="totalPriceDisplay" style="font-size: 1.2em; font-weight: bold;">날짜를 선택해 주세요.</p>
+                </div>
 
 
 				<button type="submit">예약하기</button>
@@ -236,100 +302,104 @@
 			</form>
 
 
+			</div>
+
+	<div class="bedroom-section">
+		<h2>숙박 장소</h2>
+
+		<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
+			<div th:text="|침실 ${iterStat.count}|">침실 1</div>
+			<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
 		</div>
 
-		<div class="bedroom-section">
-			<h2>숙박 장소</h2>
+		<div th:if="${rooms == null}">
+			<div th:text="|침실 ${home.room}개|">침실 3개</div>
+			<div th:text="${home.address}"></div>
+		</div>
+	</div>
+<!-- 
+	<div class="map-section">
+		<h2>위치</h2>
+		<p th:text="${home.address}">대한민국, 경상북도 포항시</p>
+	</div>
+-->
 
-			<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
-				<div th:text="|침실 ${iterStat.count}|">침실 1</div>
-				<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
-			</div>
+    <!-- 지도를 표시할 div -->
+    <div id="map"></div>
 
-			<div th:if="${rooms == null}">
-				<div th:text="|침실 ${home.room}개|">침실 3개</div>
-				<div th:text="${home.address}"></div>
-			</div>
+    
+	<div class="review-section">
+		<h2>★ 4.9 · 후기 12개</h2>
+
+		<div class="review-card">
+			<p>박*근</p>
+			<p>호스트 활동 기간 3년</p>
+			<p>모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
+			<button>더보기</button>
+		</div>
+	</div>
+
+	<div class="amenities-section">
+		<h2>숙소 편의시설</h2>
+		<ul>
+			<li th:if="${hashtag != null and hashtag.wifi}">와이파이</li>
+			<li th:if="${hashtag != null and hashtag.tv}">TV</li>
+			<li th:if="${hashtag != null and hashtag.kitchen}">주방</li>
+			<li th:if="${hashtag != null and hashtag.freePark}">무료 주차</li>
+			<li th:if="${hashtag != null and hashtag.selfCheckin}">셀프 체크인</li>
+			<li th:if="${hashtag != null and hashtag.coldWarm}">냉난방</li>
+			<li th:if="${hashtag != null and hashtag.petFriendly}">반려동물 동반</li>
+			<li th:if="${hashtag != null and hashtag.barrierFree}">장애물 없는 시설</li>
+			<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
+		</ul>
+
+		<div th:if="${optionsByGroup != null and not #maps.isEmpty(optionsByGroup)}">
+			<th:block th:each="entry : ${optionsByGroup}">
+				<h3 th:text="${entry.key}">옵션 그룹</h3> 
+				<ul>
+					<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
+				</ul>
+			</th:block>
+		</div>
+		
+		<div th:if="${optionsByGroup == null or #maps.isEmpty(optionsByGroup)}">
+		    <p>등록된 추가 옵션이 없습니다.</p>
 		</div>
 
-		<!-- 지도를 표시할 div -->
-		<div id="map"></div>
+		<button>더 보기</button>
+	</div>
 
-		<div class="review-section">
-			<h2>★ 4.9 · 후기 12개</h2>
-
-			<div class="review-card">
-				<p>박*근</p>
-				<p>호스트 활동 기간 3년</p>
-				<p>모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
-				<button>더보기</button>
-			</div>
-		</div>
-
-		<div class="amenities-section">
-			<h2>숙소 편의시설</h2>
-			<ul>
-				<li th:if="${hashtag != null and hashtag.wifi}">와이파이</li>
-				<li th:if="${hashtag != null and hashtag.tv}">TV</li>
-				<li th:if="${hashtag != null and hashtag.kitchen}">주방</li>
-				<li th:if="${hashtag != null and hashtag.freePark}">무료 주차</li>
-				<li th:if="${hashtag != null and hashtag.selfCheckin}">셀프 체크인</li>
-				<li th:if="${hashtag != null and hashtag.coldWarm}">냉난방</li>
-				<li th:if="${hashtag != null and hashtag.petFriendly}">반려동물 동반</li>
-				<li th:if="${hashtag != null and hashtag.barrierFree}">장애물 없는
-					시설</li>
-				<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
-			</ul>
-
-			<div
-				th:if="${optionsByGroup != null and not #maps.isEmpty(optionsByGroup)}">
-				<th:block th:each="entry : ${optionsByGroup}">
-					<h3 th:text="${entry.key}">옵션 그룹</h3>
-					<ul>
-						<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
-					</ul>
-				</th:block>
+	<div class="rules-section">
+		<h2>알아두어야 할 사항</h2>
+		<div class="facility-group">
+			<div class="policy-item">
+				<h3>숙소 이용 규칙</h3>
+				<p th:text="|체크인 시간: ${home.checkIn}시|">체크인 시간: 15시</p>
+				<p th:text="|체크아웃 시간: ${home.checkOut}시|">체크아웃 시간: 11시</p>
+				<p th:text="|게스트 정원: ${home.maxPeople}명|">게스트 정원: 10명</p>
+				<button>더 보기</button>
 			</div>
 
-			<div
-				th:if="${optionsByGroup == null or #maps.isEmpty(optionsByGroup)}">
-				<p>등록된 추가 옵션이 없습니다.</p>
+			<div class="policy-item">
+				<h3>안전 및 공간</h3>
+				<p>일산화탄소 경보기 없음</p>
+				<p>부지 내 실내 보안 카메라</p>
+				<p>화재경보기</p>
+				<button>더 보기</button>
 			</div>
 
-			<button>더 보기</button>
-		</div>
-
-		<div class="rules-section">
-			<h2>알아두어야 할 사항</h2>
-			<div class="facility-group">
-				<div class="policy-item">
-					<h3>숙소 이용 규칙</h3>
-					<p th:text="|체크인 시간: ${home.checkIn}시|">체크인 시간: 15시</p>
-					<p th:text="|체크아웃 시간: ${home.checkOut}시|">체크아웃 시간: 11시</p>
-					<p th:text="|게스트 정원: ${home.maxPeople}명|">게스트 정원: 10명</p>
-					<button>더 보기</button>
-				</div>
-
-				<div class="policy-item">
-					<h3>안전 및 공간</h3>
-					<p>일산화탄소 경보기 없음</p>
-					<p>부지 내 실내 보안 카메라</p>
-					<p>화재경보기</p>
-					<button>더 보기</button>
-				</div>
-
-				<div class="policy-item">
-					<h3>환불 정책</h3>
-					<p>24시간 무료 취소 가능...</p>
-					<button>더 보기</button>
-				</div>
+			<div class="policy-item">
+				<h3>환불 정책</h3>
+				<p>24시간 무료 취소 가능...</p>
+				<button>더 보기</button>
+			</div>
 
 			</div>
-		</div>
+	</div>
 
 	</div>
 
-	<script>
+<script>
     const MAX_LENGTH = 300; // 최대 길이 설정
 
     // ==========================================================
@@ -502,22 +572,6 @@
             shortDescElement.setAttribute('data-current-state', 'short');
         }
     }
-    
-    
-    // 좋아요 폴더 모달 동작을 위한 JavaScript 추가
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('toggleNewFolderFormBtn');
-    const newFolderForm = document.getElementById('createNewFolderForm');
-    
-    if (toggleBtn && newFolderForm) {
-        toggleBtn.addEventListener('click', function() {
-            // 새 폴더 폼을 토글합니다.
-            const isHidden = newFolderForm.style.display === 'none';
-            newFolderForm.style.display = isHidden ? 'block' : 'none';
-            toggleBtn.textContent = isHidden ? '폴더 선택으로 돌아가기' : '+ 새 폴더 생성 및 추가';
-        });
-    }
-});
 </script>
 
 </body>

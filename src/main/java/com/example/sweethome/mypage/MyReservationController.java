@@ -36,6 +36,8 @@ public class MyReservationController {
         // 사용자의 예약 정보를 조회
         List<Reservation> reservations = reservationRepository.findByBooker(user);
 
+        // user 정보를 마이페이지 모델에 전달
+        model.addAttribute("user", user);
         // 예약 목록을 모델에 추가
         model.addAttribute("reservations", reservations);
 

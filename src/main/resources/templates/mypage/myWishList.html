@@ -25,33 +25,38 @@
 			<div class="mypage-sidebar-col">
 				<div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
 			</div>
-			
+
 			<div class="mypage-content-col">
 				<div class="mypage-content-area">
-					<h1>내 예약 내역</h1>
-					<div th:if="${!reservations.isEmpty()}">
-					<div th:each="reservation : ${reservations}"
-						class="reservation-item">
-						<h3 th:text="${reservation.reservedHome.title}">숙소 제목</h3>
-						<p>
-							<strong>체크인:</strong> <span th:text="${reservation.startDate}">2025-10-01</span>
-						</p>
-						<p>
-							<strong>체크아웃:</strong> <span th:text="${reservation.endDate}">2025-10-05</span>
-						</p>
-						<p>
-							<strong>총 금액:</strong> <span th:text="${reservation.totalMoney}">50000</span>
-							원
-						</p>
-						<p>
-							<strong>상태:</strong> <span class="status"
-								th:text="${reservation.reservationStatus}">REQUESTED</span>
-						</p>
+					<h1 th:text="${folder.folderName} + ' 폴더의 숙소 목록'">폴더 이름 위시리스트</h1>
+
+					<div th:if="${wishlists.isEmpty()}">
+						<p>이 폴더에는 아직 좋아요 한 숙소가 없습니다.</p>
 					</div>
+
+					<div th:if="${!wishlists.isEmpty()}">
+						<div th:each="wishlist : ${wishlists}"
+							style="border: 1px solid #eee; padding: 15px; margin-bottom: 10px;">
+							<h2 th:text="${wishlist.home.title}">숙소 제목</h2>
+							<p>
+								위치: <span th:text="${wishlist.home.location}">숙소 위치</span>
+							</p>
+							<p>
+								가격: <span
+									th:text="${#numbers.formatDecimal(wishlist.home.costBasic, 0, 'COMMA', 0, 'POINT')} + ' 원'">100,000
+									원</span>
+							</p>
+							<p>
+								좋아요 누른 시간: <span
+									th:text="${#temporals.format(wishlist.likedAt, 'yyyy-MM-dd HH:mm')}">2023-10-21
+									12:00</span>
+							</p>
+							<a th:href="@{/home/detail/{idx}(idx=${wishlist.home.idx})}">숙소
+								자세히 보기</a>
+						</div>
 					</div>
-					<div th:if="${reservations.isEmpty()}">
-						<p>예약 내역이 아직 없습니다.</p>
-					</div>
+
+					<a href="/mypage/wishListFolder">다른 폴더 보기</a>
 				</div>
 			</div>
 		</div>
