@@ -25,33 +25,32 @@
 			<div class="mypage-sidebar-col">
 				<div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
 			</div>
-			
+
 			<div class="mypage-content-col">
 				<div class="mypage-content-area">
-					<h1>내 예약 내역</h1>
-					<div th:if="${!reservations.isEmpty()}">
-					<div th:each="reservation : ${reservations}"
-						class="reservation-item">
-						<h3 th:text="${reservation.reservedHome.title}">숙소 제목</h3>
-						<p>
-							<strong>체크인:</strong> <span th:text="${reservation.startDate}">2025-10-01</span>
-						</p>
-						<p>
-							<strong>체크아웃:</strong> <span th:text="${reservation.endDate}">2025-10-05</span>
-						</p>
-						<p>
-							<strong>총 금액:</strong> <span th:text="${reservation.totalMoney}">50000</span>
-							원
-						</p>
-						<p>
-							<strong>상태:</strong> <span class="status"
-								th:text="${reservation.reservationStatus}">REQUESTED</span>
-						</p>
+					<h1>내 위시리스트 폴더</h1>
+
+					<div th:if="${!hasFolders}">
+						<p>아직 좋아요 한 숙소가 없습니다. 😢</p>
 					</div>
+
+					<div th:if="${hasFolders}">
+						<div th:each="folder : ${folders}"
+							style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+							<a th:href="@{/mypage/wishList(folderIdx=${folder.idx})}">
+								<h2 th:text="${folder.folderName}">폴더 이름</h2>
+							</a>
+							<p>
+								생성일: <span
+									th:text="${#temporals.format(folder.createdAt, 'yyyy-MM-dd')}">2023-01-01</span>
+							</p>
+							<p>
+								총 저장된 숙소: <span th:text="${folderCounts.get(folder.idx)} ?: 0">0</span>개
+							</p>
+						</div>
 					</div>
-					<div th:if="${reservations.isEmpty()}">
-						<p>예약 내역이 아직 없습니다.</p>
-					</div>
+
+					<a href="/mypage">마이페이지로 돌아가기</a>
 				</div>
 			</div>
 		</div>

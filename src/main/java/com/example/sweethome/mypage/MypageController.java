@@ -22,10 +22,20 @@ public class MypageController {
 	private final UserService userService;
 	private final UserRepository userRepo;
 	
-	//마이페이지
-	@GetMapping("")
-    public String mypage(HttpSession session) {
-    	return "mypage/mypage";
+    // 마이페이지
+    @GetMapping("")
+    public String mypage(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("userProfile");
+
+        // 세션에 저장된 userProfile이 없으면 로그인 페이지로 리다이렉트
+        if (user == null) {
+            return "redirect:/user/login"; // 로그인 페이지로 리다이렉트
+        }
+
+        // user 정보를 마이페이지 모델에 전달
+        model.addAttribute("user", user);
+
+        return "mypage/mypage"; // 마이페이지 뷰로 이동
     }
 	
 	//회원탈퇴하시겠습니까?
