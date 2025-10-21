@@ -1,7 +1,10 @@
 package com.example.sweethome.reservation;
 
-import com.example.sweethome.user.User; 
-import com.example.sweethome.home.Home; 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.example.sweethome.home.Home;
+import com.example.sweethome.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,9 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -84,21 +84,4 @@ public class Reservation {
 
     // endDate (date) -> 퇴실일자
     private LocalDate endDate;
-}
-
-// 예약 상태 Enum 정의
-enum ReservationStatus {
-    REQUESTED,
-    CANCEL_REQUESTED,
-    CANCELLED,
-    REJECTED,
-    CONFIRMED,
-    IN_USE,
-    COMPLETED
-}
-
-// 결제 수단 Enum 정의
-enum PaymentMethod {
-    KAKAOPAY,
-    TRANSFER
 }

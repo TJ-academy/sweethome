@@ -73,9 +73,10 @@ public class HomePhoto {
      */
     public List<String> getImages() {
         return Arrays.asList(
-            this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive
+            this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive,
+            this.imgSix, this.imgSeven, this.imgEight, this.imgNine, this.imgTen
         ).stream()
-         .filter(img -> img != null && !img.trim().isEmpty()) // null 또는 빈 문자열 제외
+         .filter(img -> img != null && !img.trim().isEmpty())
          .collect(Collectors.toList());
     }
 }
