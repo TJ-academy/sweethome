@@ -53,7 +53,7 @@ function execDaumPostcode() {
 <body>
 <h2>숙소 등록</h2>
 
-<form method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
+<form th:action="@{/home/write}" method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
 <input type="hidden" name="hostId" th:value="${hostId}">
 
 <!-- 제목 -->
@@ -164,17 +164,8 @@ function execDaumPostcode() {
 
 <!-- 숙소 사진 -->
 <div>
-<label for="homeImg">숙소 사진(최대 10장)</label>
-<input type="file" name="imgOne">
-<input type="file" name="imgTwo">
-<input type="file" name="imgThree">
-<input type="file" name="imgFour">
-<input type="file" name="imgFive">
-<input type="file" name="imgSix">
-<input type="file" name="imgSeven">
-<input type="file" name="imgEight">
-<input type="file" name="imgNine">
-<input type="file" name="imgTen">
+<label for="homeImg">숙소 사진</label>
+<input type="file" name="homeImages" id="homeImages" multiple>
 </div>
 
 <!-- 옵션 체크박스 부분 (수정됨) -->
@@ -185,13 +176,56 @@ function execDaumPostcode() {
     <div th:each="opt : ${groupEntry.value}">
         <label>
             <!-- 수정: opt.id -> opt.optionId -->
-            <input type="checkbox" name="optionIds" th:value="${opt.optionId}">
+            <input type="checkbox" th:field="*{optionIds}" th:value="${opt.optionId}">
             <!-- 수정: opt.name -> opt.optionName -->
             <span th:text="${opt.optionName}"></span>
         </label><br>
     </div>
 </div>
 </div>
+<!-- 해시태그 선택 부분 -->
+<div>
+<label>해시태그 등록</label><br>
+<div class="hashtag-group">
+	<div>
+		<input type="checkbox" id="wifi" th:field="*{wifi}">
+		<label for="wifi">와이파이</label>
+	</div>
+	<div>
+		<input type="checkbox" id="tv" th:field="*{tv}">
+		<label for="tv">TV</label>
+	</div>
+	<div>
+		<input type="checkbox" id="kitchen" th:field="*{kitchen}">
+		<label for="kitchen">주방</label>
+	</div>
+	<div>
+		<input type="checkbox" id="freePark" th:field="*{freePark}">
+		<label for="freePark">무료주차</label>
+	</div>
+	<div>
+		<input type="checkbox" id="selfCheckin" th:field="*{selfCheckin}">
+		<label for="selfCheckin">셀프 체크인</label>
+	</div>
+	<div>
+		<input type="checkbox" id="coldWarm" th:field="*{coldWarm}">
+		<label for="coldWarm">냉난방</label>
+	</div>
+	<div>
+		<input type="checkbox" id="petFriendly" th:field="*{petFriendly}">
+		<label for="petFriendly">애견동반 가능</label>
+	</div>
+	<div>
+		<input type="checkbox" id="barrierFree" th:field="*{barrierFree}">
+		<label for="barrierFree">장애물 없는 시설</label>
+	</div>
+	<div>
+		<input type="checkbox" id="elevator" th:field="*{elevator}">
+		<label for="elevator">엘리베이터</label>
+	</div>	
+</div>
+</div>
+
 <!-- 등록 버튼 -->
 <button type="submit">등록</button>
 </form>

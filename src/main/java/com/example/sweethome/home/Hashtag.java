@@ -28,10 +28,15 @@ public class Hashtag {
 
     // homeIdx (int, FK) -> Home 엔티티와 ManyToOne 관계
     // 하나의 Home은 여러 개의 Hashtag 레코드를 가질 수 있습니다.
+   // @ManyToOne
+    //@JoinColumn(name = "homeIdx", referencedColumnName = "idx")
+    //private Home home;
+
     @ManyToOne
-    @JoinColumn(name = "homeIdx", referencedColumnName = "idx")
+    @JoinColumn(name = "home_idx", referencedColumnName = "idx", nullable = false)
     private Home home;
 
+    
     // 해당 1, 미해당 0
     private boolean wifi;
 

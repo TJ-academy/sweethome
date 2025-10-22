@@ -177,68 +177,99 @@
 			</div>
 		</div>
 
-		<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchItem = document.getElementById('destination-search-item');
-    const inputField = document.getElementById('destination');
-    const list = document.getElementById('recommendation-list');
-    const recommendationItems = document.querySelectorAll('.recommendation-item');
-
-    // 목록 표시/숨김 및 활성화 스타일 토글 함수
-    function toggleList(show) {
-        if (show) {
-            list.style.display = 'block';
-            list.style.visibility = 'visible';
-            searchItem.classList.add('active');
-        } else {
-            list.style.display = 'none';
-            list.style.visibility = 'hidden';
-            searchItem.classList.remove('active');
-        }
-    }
-
-    // 1. 입력 필드 클릭/포커스 시 목록 표시
-    inputField.addEventListener('click', function(event) {
-        event.stopPropagation(); // 이벤트 버블링 방지
-        toggleList(true);
-    });
-
-    inputField.addEventListener('focus', function() {
-        toggleList(true);
-    });
-
-    // 2. 외부 클릭 시 목록 숨기기
-    document.addEventListener('click', function(event) {
-        if (!searchItem.contains(event.target)) {
-            toggleList(false);
-        }
-    });
-
-    // 3. 지역 항목 클릭 시 입력 필드 값 변경
-    recommendationItems.forEach(item => {
-        item.addEventListener('click', function(event) {
-            const regionName = item.querySelector('.item-title').textContent;
-            inputField.value = regionName;
-            toggleList(false);
-            document.getElementById('checkin').focus();
-            event.stopPropagation();
-        });
-    });
-
-    // 4. 입력 시 필터링 기능
-    inputField.addEventListener('input', function() {
-        const filter = inputField.value.toLowerCase();
-        recommendationItems.forEach(item => {
-            const title = item.querySelector('.item-title').textContent.toLowerCase();
-            if (title.includes(filter)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    });
-});
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+	    const searchItem = document.getElementById('destination-search-item');
+	    const inputField = document.getElementById('destination');
+	    const list = document.getElementById('recommendation-list');
+	    const recommendationItems = document.querySelectorAll('.recommendation-item');
+	    const searchButton = document.querySelector('.search-button'); // 검색 버튼
+	
+	    // 목록 표시/숨김
+	    function toggleList(show) {
+	        if (show) {
+	            list.style.display = 'block';
+	            list.style.visibility = 'visible';
+	            searchItem.classList.add('active');
+	        } else {
+	            list.style.display = 'none';
+	            list.style.visibility = 'hidden';
+	            searchItem.classList.remove('active');
+	        }
+	    }
+	
+	    // 검색 실행 함수
+	    function performSearch() {
+	        const keyword = inputField.value.trim();
+	        if (keyword === '') {
+	            alert('여행지를 입력해주세요.');
+	            inputField.focus();
+	            return;
+	        }
+	
+	        // 👉 실제 검색 동작 (여기서 원하는 URL로 이동하거나 AJAX 호출 가능)
+	        // 예시: 특정 URL로 이동
+	        window.location.href = `/search?keyword=${encodeURIComponent(keyword)}`;
+	
+	        // 또는 AJAX 사용 시:
+	        // fetch(`/search?keyword=${encodeURIComponent(keyword)}`)
+	        //     .then(res => res.json())
+	        //     .then(data => console.log(data));
+	    }
+	
+	    // 입력 필드 클릭 시 목록 표시
+	    inputField.addEventListener('click', function(event) {
+	        event.stopPropagation();
+	        toggleList(true);
+	    });
+	
+	    inputField.addEventListener('focus', function() {
+	        toggleList(true);
+	    });
+	
+	    // 외부 클릭 시 목록 숨김
+	    document.addEventListener('click', function(event) {
+	        if (!searchItem.contains(event.target)) {
+	            toggleList(false);
+	        }
+	    });
+	
+	    // 지역 항목 클릭 시 입력 필드 값 변경
+	    recommendationItems.forEach(item => {
+	        item.addEventListener('click', function(event) {
+	            const regionName = item.querySelector('.item-title').textContent;
+	            inputField.value = regionName;
+	            toggleList(false);
+	            document.getElementById('checkin').focus();
+	            event.stopPropagation();
+	        });
+	    });
+	
+	    // 입력 시 필터링
+	    inputField.addEventListener('input', function() {
+	        const filter = inputField.value.toLowerCase();
+	        recommendationItems.forEach(item => {
+	            const title = item.querySelector('.item-title').textContent.toLowerCase();
+	            item.style.display = title.includes(filter) ? 'flex' : 'none';
+	        });
+	    });
+	
+	    // ✅ 검색 버튼 클릭 시 검색 실행
+	    searchButton.addEventListener('click', function(event) {
+	        event.preventDefault();
+	        performSearch();
+	    });
+	
+	    // ✅ 엔터 키로 검색 실행
+	    inputField.addEventListener('keypress', function(event) {
+	        if (event.key === 'Enter') {
+	            event.preventDefault();
+	            performSearch();
+	        }
+	    });
+	});
 </script>
+		
 	</div>
 
 </body>

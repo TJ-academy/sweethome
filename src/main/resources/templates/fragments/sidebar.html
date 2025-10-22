@@ -10,22 +10,22 @@
 			<!-- 사이드바 -->
 			<div class="sidebar">
 				<div class="profile">
-					<img src="your-profile-image.jpg" alt="Profile" class="profile-img">
-					<h2>SeonahKim</h2>
-					<p>프로필 텍스트</p>
+					<!-- 프로필 이미지 -->
+					<img th:src="${user.profileImg}" alt="Profile" class="profile-img">
+					<!-- 프로필 이름(닉네임) -->
+					<h2 th:text="${user.nickname}">SeonahKim</h2>
 				</div>
 				<nav>
 					<ul>
-						<li><a href="#">자기소개</a></li>
-						<li><a href="#">프로필 설정</a></li>
-						<li><a href="#">알림</a></li>
-						<li><a href="#">친구</a></li>
-						<li><a href="#">내가 작성한 글</a></li>
+						<li><a href="/mypage">자기소개</a></li>
+						<li><a href="/mypage/reservation">내 예약</a></li>
+						<li><a href="/mypage/wishListFolder">위시리스트</a></li>
 					</ul>
 				</nav>
 			</div>
 		</div>
 	</div>
+	<!-- 
 	<script>
 	document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
 		  item.addEventListener('click', function() {
@@ -34,5 +34,6 @@
 		  });
 		});
 	</script>
+	 -->
 </body>
 </html>

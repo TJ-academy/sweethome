@@ -31,29 +31,46 @@ public class LoginInterceptor implements HandlerInterceptor {
 				|| uri.startsWith("/error") || uri.startsWith("/user/")); // 로그인/회원/비번관련 자체도 제외
 	}
 
-	@Override
-	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
-		Object userProfile = req.getSession().getAttribute("userProfile");
-		if (userProfile != null)
-			return true;
+	// 로그인 여부를 확인하는 메서드
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
+        HttpSession session = req.getSession();
+        Object userProfile = session.getAttribute("userProfile");
+        
+     // 콘솔에 userProfile 세션 값 출력
+        if (userProfile != null) {
+            System.out.println("=== userProfile 세션 값 ===");
+            System.out.println("UserProfile: " + userProfile.toString());
+            System.out.println("===========================");
+        } else {
+            System.out.println("userProfile 세션 값이 없습니다.");
+        }
 
-		// 미로그인: prevPage 저장 조건을 엄격히
-		String uri = req.getRequestURI();
-		String qs = req.getQueryString();
-		String fullUrl = uri + (qs != null ? "?" + qs : "");
+        String uri = req.getRequestURI();
 
-		if ("GET".equalsIgnoreCase(req.getMethod()) && acceptsHtml(req) && isDocumentRequest(req) && !isAjax(req)
-				&& isPrevPageCandidate(uri)) {
+        // 로그인 안 한 사용자가 /mypage/**, /home/reservationStart, /home/reservationFinish로 접근할 때 리다이렉트
+        if (userProfile == null && (uri.startsWith("/mypage/") || uri.equals("/home/reservationStart") || uri.equals("/home/reservationFinish"))) {
+            String currentRequestUri = req.getRequestURI();
+            String queryString = req.getQueryString();
+            String fullUrl = currentRequestUri + (queryString != null ? "?" + queryString : "");
+            session.setAttribute("prevPage", fullUrl);
+            res.sendRedirect("/user/login");  // 로그인 페이지로 리다이렉트
+            return false;
+        }
 
-			// 이미 값이 있으면 덮어쓰지 않음 (최초 의도 유지)
-			if (req.getSession().getAttribute("prevPage") == null) {
-				req.getSession().setAttribute("prevPage", fullUrl);
-			}
-		}
+        // 로그인한 사용자가 /user/login, /user/join 페이지에 접근하면 홈 페이지로 리다이렉트
+        if (userProfile != null && (uri.equals("/user/login") || uri.equals("/user/join"))) {
+            res.sendRedirect("/");  // 홈 페이지로 리다이렉트
+            return false;
+        }
 
-		res.sendRedirect("/user/login");
-		return false;
-	}
+        // 이미지 경로에 대해서는 모두 열어두고 처리
+        if (uri.startsWith("/img/") || uri.startsWith("/css/") || uri.startsWith("/js/")) {
+            return true;
+        }
+
+        return true;
+    }
 
 	/*
 	 * @Override public boolean preHandle(HttpServletRequest request,

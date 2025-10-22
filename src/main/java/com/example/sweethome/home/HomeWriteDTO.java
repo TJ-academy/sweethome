@@ -24,17 +24,19 @@ public class HomeWriteDTO {
     private String checkIn;
     private String checkOut;
 
-    private MultipartFile imgOne;
-    private MultipartFile imgTwo;
-    private MultipartFile imgThree;
-    private MultipartFile imgFour;
-    private MultipartFile imgFive;
-    private MultipartFile imgSix;
-    private MultipartFile imgSeven;
-    private MultipartFile imgEight;
-    private MultipartFile imgNine;
-    private MultipartFile imgTen;
+    private List<MultipartFile> homeImages;
 
     // 체크박스 값이 Integer든 Long이든 service에서 변환 가능
     private List<Long> optionIds;  
+    
+    //Hastag 필드
+    private boolean wifi;
+    private boolean tv;
+    private boolean kitchen; //주방
+    private boolean freePark; // 무료 주차
+    private boolean selfCheckin; // 셀프 체크인
+    private boolean coldWarm; // 냉난방
+    private boolean petFriendly; // 애견 동반
+    private boolean barrierFree; // 휠체어 (장애물 없는 시설)
+    private boolean elevator; // 엘리베이터
 }

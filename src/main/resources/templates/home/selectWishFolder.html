@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<!-- 프래그먼트 정의: 파라미터 (home, folders, userProfile) -->
+	<div th:fragment="wishModal(home, folders, userProfile)">
+		<div class="modal fade" id="likeModal" tabindex="-1"
+			aria-labelledby="likeModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="likeModalLabel">좋아요 폴더 선택</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+
+						<form id="addToExistingFolderForm" th:action="@{/wishlist/add}"
+							method="post">
+							<div class="mb-3">
+								<label for="folderSelect" class="form-label">기존 폴더 선택</label> <select
+									id="folderSelect" name="folderId" class="form-select" required>
+									<option value="" disabled selected>폴더를 선택하세요</option>
+									<option th:each="folder : ${folders}" th:value="${folder.idx}"
+										th:text="${folder.folderName}">폴더 이름</option>
+								</select>
+							</div>
+							<input type="hidden" name="homeIdx" th:value="${home.idx}" /> <input
+								type="hidden" name="userEmail"
+								th:value="${userProfile?.email ?: ''}" />
+							<button type="submit" class="btn btn-primary w-100">선택된
+								폴더에 추가</button>
+						</form>
+
+						<hr class="my-3">
+
+						<div class="d-grid gap-2">
+							<button id="toggleNewFolderFormBtn"
+								class="btn btn-outline-secondary btn-sm">+ 새 폴더 생성 및 추가
+							</button>
+						</div>
+
+						<form id="createNewFolderForm"
+							th:action="@{/wishlist/createAndAdd}" method="post"
+							style="display: none; margin-top: 15px;">
+							<div class="mb-3">
+								<label for="newFolderName" class="form-label">새 폴더 이름</label> <input
+									type="text" id="newFolderName" name="newFolderName"
+									class="form-control" required placeholder="예: '이번 여름 여행'">
+							</div>
+							<input type="hidden" name="homeIdx" th:value="${home.idx}" /> <input
+								type="hidden" name="userEmail"
+								th:value="${userProfile?.email ?: ''}" />
+							<button type="submit" class="btn btn-success w-100">폴더
+								생성 후 추가</button>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 모달 토글 스크립트(필요 시) -->
+		<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggleBtn = document.getElementById('toggleNewFolderFormBtn');
+      const newFolderForm = document.getElementById('createNewFolderForm');
+      if (toggleBtn && newFolderForm) {
+        toggleBtn.addEventListener('click', function() {
+          const isHidden = newFolderForm.style.display === 'none';
+          newFolderForm.style.display = isHidden ? 'block' : 'none';
+          toggleBtn.textContent = isHidden ? '폴더 선택으로 돌아가기' : '+ 새 폴더 생성 및 추가';
+        });
+      }
+    });
+  </script>
+	</div>
+</body>
+</html>
+</body>
+</html>

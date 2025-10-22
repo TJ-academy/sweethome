@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div th:fragment="hostSideBar">
+		<div class="container">
+			<!-- 사이드바 -->
+			<div class="sidebar">
+				<div class="profile">
+					<!-- 프로필 이미지 -->
+					<img th:src="${user.profileImg}" alt="Profile" class="profile-img">
+					<!-- 프로필 이름(닉네임) -->
+					<h2 th:text="${user.nickname}">SeonahKim</h2>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="/host/list">숙소리스트</a></li>
+						<li><a href="/host/calendar">달력</a></li>
+						<li><a href="/host/today">투데이</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+	<!-- 
+	<script>
+	document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
+		  item.addEventListener('click', function() {
+		    document.querySelectorAll('.sidebar nav ul li a').forEach(link => link.classList.remove('active'));
+		    item.classList.add('active');
+		  });
+		});
+	</script>
+	 -->
+</body>
+</html>

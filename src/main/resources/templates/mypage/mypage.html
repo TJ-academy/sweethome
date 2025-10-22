@@ -22,10 +22,19 @@
             <div class="mypage-content-col">
                 <div class="mypage-content-area">
                     <h1>마이페이지</h1>
-                    <p>마이페이지 메인 콘텐츠입니다.</p>
+                    <div>
+                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
+                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
+                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
+                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
+                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
+                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img"></p>
+                    </div>
+                    
+                    <br><br><br><br><br>
                     <a href="/mypage/delete">회원탈퇴</a><br>
                     <a href="/">Home</a><br>
-                    <a href="/mypage/reservation">내 예약</a>
+                    
                 </div>
             </div>
         </div>

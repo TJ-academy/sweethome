@@ -49,19 +49,19 @@ public class HomePhoto {
 
     @Column(length = 100)
     private String imgFive;
-
+    
     @Column(length = 100)
     private String imgSix;
-
+    
     @Column(length = 100)
     private String imgSeven;
-
+    
     @Column(length = 100)
     private String imgEight;
-
+    
     @Column(length = 100)
     private String imgNine;
-
+    
     @Column(length = 100)
     private String imgTen;
     
@@ -76,7 +76,7 @@ public class HomePhoto {
             this.imgOne, this.imgTwo, this.imgThree, this.imgFour, this.imgFive,
             this.imgSix, this.imgSeven, this.imgEight, this.imgNine, this.imgTen
         ).stream()
-         .filter(img -> img != null && !img.trim().isEmpty()) // null 또는 빈 문자열 제외
+         .filter(img -> img != null && !img.trim().isEmpty())
          .collect(Collectors.toList());
     }
 }
