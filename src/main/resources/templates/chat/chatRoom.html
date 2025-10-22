@@ -74,12 +74,13 @@
 						<span th:text="${msg.content}"></span><br>
 						<img th:if="${msg.img != '-'}" th:src="${msg.img}" width="200" alt="이미지">
 						<span class="message-time" 
-						      th:text="${#dates.format(msg.sendedAt, 'a hh:mm')}"></span>
+						      th:attr="data-time=${msg.sendedAt}"></span>
 					</p>
 				</div>
 				
 				<!-- 읽음 표시 -->
-				<div th:if="${msg.idx == lastRead}">
+				<div th:if="${msg.idx == lastRead}
+					and ${lastRead < messageList[messageList.size() - 1].idx}">
 					<hr>
 					<p style="color: gray; font-style: italic; text-align:center;">
 						여기까지 읽으셨습니다.
@@ -195,6 +196,7 @@ function showMessage(message) {
 
 //메시지 보내기
 function sendMessage(content, img = '-') {
+	console.log("content : " + content + "\nimg : " + img)
 	if (stompClient && stompClient.connected) {
 		console.log("sendMessage 함수 실행");
 		stompClient.send("/app/message/send", {}, JSON.stringify({
@@ -216,7 +218,7 @@ form.addEventListener('submit', async function(e) {
 	let imageUrl = '-';
 
     if (imageInput.files.length > 0) {
-    	console.log("[2] 이미지 업로드 시도 중");
+    	console.log("a");
         const formData = new FormData();
         formData.append('image', imageInput.files[0]);
         formData.append('roomId', roomId);
@@ -229,7 +231,7 @@ form.addEventListener('submit', async function(e) {
 
         if (response.ok) {
             const result = await response.json();
-            imageUrl = result.url;  //서버에서 반환하는 이미지 URL
+            imageUrl = result.imgUrl;  //서버에서 반환하는 이미지 URL
         } else {
             alert('이미지 업로드 실패');
             return;
@@ -237,7 +239,7 @@ form.addEventListener('submit', async function(e) {
     }
 	
 	const message = input.value.trim();
-	console.log("[4] 전송할 메시지:", message);
+	console.log("b");
 	if (message || imageUrl !== '-') {
 		sendMessage(message, imageUrl);
 		console.log("sendMessage 함수 실행 완료");
@@ -289,6 +291,26 @@ function updateLastRead(messageIdx) {
         tryScroll();
     }
 })();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+	const timeElements = document.querySelectorAll('.message-time');
+	
+	timeElements.forEach(el => {
+		const isoTime = el.getAttribute('data-time');
+		if (!isoTime) return;
+		
+		const date = new Date(isoTime);  //자동으로 브라우저 로컬 시간대로 변환됨
+		
+		const formatted = date.toLocaleTimeString('ko-KR', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true
+		});
+		
+		el.textContent = formatted;
+	});
+});
 </script>
 </body>
 </html>
