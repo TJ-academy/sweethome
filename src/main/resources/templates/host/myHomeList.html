@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>호스트 숙소 목록</title>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -15,6 +15,32 @@
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
 <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
 <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+<style>
+    .home-card { 
+        display: flex; 
+        align-items: center; 
+        border: 1px solid #ddd; 
+        border-radius: 8px; 
+        margin-bottom: 15px;
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .home-card:hover {
+        background-color: #f8f8f8;
+    }
+    .home-thumb { 
+        width: 80px; 
+        height: 80px; 
+        border-radius: 6px; 
+        object-fit: cover; 
+        margin-right: 15px; 
+    }
+    .home-info { line-height: 1.4; flex-grow: 1; }
+    .home-title { font-weight: 600; font-size: 1.1rem; }
+    .home-meta { font-size: 0.9rem; color: #666; }
+    .home-price { font-weight: 700; color: #007bff; }
+</style>
 </head>
 <body>
 	<div th:insert="~{fragments/header :: menuBar}"></div>
@@ -26,19 +52,38 @@
 		
 			<div class="mypage-content-col">
                 <div class="mypage-content-area">
-                    <h1>마이페이지</h1>
-                    <div>
-                    리스트페이지
+                    <h1>등록 숙소 목록</h1>
+                    
+                    <a th:href="@{/host/register}" class="btn btn-primary mb-3">새 숙소 등록</a>
+                    
+                    <div th:if="${#lists.isEmpty(myHomes)}" class="alert alert-info">
+                        현재 등록된 숙소가 없습니다.
                     </div>
                     
-                    <br><br><br><br><br>
-                    <a href="/mypage/delete">회원탈퇴</a><br>
-                    <a href="/">Home</a><br>
-                    
+                    <div th:each="home : ${myHomes}">
+                        <a th:href="@{/host/detail/{idx}(idx=${home.idx})}" style="text-decoration: none; color: inherit;">
+                            <div class="home-card">
+                                <img class="home-thumb" th:src="${home.thumbnail}" alt="숙소 썸네일"
+                                     onerror="this.src='/images/no-image.png'">
+                                <div class="home-info">
+                                    <div class="home-title" th:text="${home.title}">[예시] 편안한 강남 원룸</div>
+                                    <div class="home-meta" th:text="${home.location}">서울시 강남구</div>
+                                    <div class="home-meta">
+                                        <span th:text="${home.homeType}">APARTMENT</span>
+                                        <span>|</span>
+                                        <span th:text="|최대 ${home.maxPeople}인|">최대 4인</span>
+                                    </div>
+                                    <div class="home-price" th:text="|1박 기준: ${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">
+                                        1박 기준: 100,000원
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 </html>

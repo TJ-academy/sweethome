@@ -36,6 +36,7 @@ public class MypageController {
     // 마이페이지
     @GetMapping("")
     public String mypage(HttpSession session, Model model) {
+    	
         User user = (User) session.getAttribute("userProfile");
 
         // 세션에 저장된 userProfile이 없으면 로그인 페이지로 리다이렉트

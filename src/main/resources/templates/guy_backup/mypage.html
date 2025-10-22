@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}"> 
+    <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}"> 
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    
+</head>
+<body>
+    <div th:insert="~{fragments/header :: menuBar}"></div>
+    <!-- <div th:insert="~{fragments/search :: searchSection}"></div>  -->
+    <div class="mypage-layout-wrap container-fluid">
+        <div class="row">
+            <div class="mypage-sidebar-col">
+                <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
+            </div>
+
+            <div class="mypage-content-col">
+                <div class="mypage-content-area">
+                    <h1>마이페이지</h1>
+                    <div>
+                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
+                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
+                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
+                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
+                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
+                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img"></p>
+                    </div>
+                    <a href="/mypage/delete">회원탈퇴</a><br>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+</body>
+</html>

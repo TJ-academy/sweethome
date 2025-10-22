@@ -1,113 +1,178 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>내 예약 내역</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<meta charset="UTF-8">
+<title>내 예약 내역</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-  <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-  <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
-  <style>
-    .reservation-card { display:flex; gap:14px; align-items:center; padding:12px 8px; }
-    .reservation-thumb { width:64px; height:64px; border-radius:12px; object-fit:cover; background:#f2f2f2; }
-    .reservation-meta { line-height:1.3; }
-    .reservation-title { font-weight:600; }
-    .reservation-dates { font-size:.9rem; color:#666; }
-    .empty-hint { color:#888; padding:32px 8px; text-align:center; }
-  </style>
+<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+<link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
+<style>
+.reservation-card {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+	padding: 12px 8px;
+}
+
+.reservation-thumb {
+	width: 64px;
+	height: 64px;
+	border-radius: 12px;
+	object-fit: cover;
+	background: #f2f2f2;
+}
+
+.reservation-meta {
+	line-height: 1.3;
+}
+
+.reservation-title {
+	font-weight: 600;
+}
+
+.reservation-dates {
+	font-size: .9rem;
+	color: #666;
+}
+
+.empty-hint {
+	color: #888;
+	padding: 32px 8px;
+	text-align: center;
+}
+</style>
 </head>
 <body>
 
-<div th:insert="~{fragments/header :: menuBar}"></div>
+	<div th:insert="~{fragments/header :: menuBar}"></div>
 
-<div class="container my-4">
-  <div class="row">
-    <div class="col-12 col-lg-3">
-      <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
-    </div>
+	<div class="container my-4">
+		<div class="row">
+			<div class="col-12 col-lg-3">
+				<div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
+			</div>
 
-    <div class="col-12 col-lg-9">
-      <h1 class="h4 mb-3">내 예약 내역</h1>
+			<div class="col-12 col-lg-9">
+				<h1 class="h4 mb-3">내 예약 내역</h1>
 
-      <!-- 탭 헤더 -->
-      <ul class="nav nav-tabs" id="reservationTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming-pane"
-                  type="button" role="tab" aria-controls="upcoming-pane" aria-selected="true">다가오는 예약</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-pane"
-                  type="button" role="tab" aria-controls="completed-pane" aria-selected="false">완료된 예약</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled-pane"
-                  type="button" role="tab" aria-controls="cancelled-pane" aria-selected="false">취소된 예약</button>
-        </li>
-      </ul>
+				<!-- 탭 헤더 -->
+				<ul class="nav nav-tabs" id="reservationTabs" role="tablist">
+					<li class="nav-item" role="presentation">
+						<button class="nav-link active" id="upcoming-tab"
+							data-bs-toggle="tab" data-bs-target="#upcoming-pane"
+							type="button" role="tab" aria-controls="upcoming-pane"
+							aria-selected="true">다가오는 예약</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="completed-tab" data-bs-toggle="tab"
+							data-bs-target="#completed-pane" type="button" role="tab"
+							aria-controls="completed-pane" aria-selected="false">완료된
+							예약</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="cancelled-tab" data-bs-toggle="tab"
+							data-bs-target="#cancelled-pane" type="button" role="tab"
+							aria-controls="cancelled-pane" aria-selected="false">취소된
+							예약</button>
+					</li>
+				</ul>
 
-      <!-- 탭 내용 -->
-      <div class="tab-content pt-3" id="reservationTabsContent">
+				<!-- 탭 내용 -->
+				<div class="tab-content pt-3" id="reservationTabsContent">
 
-        <!-- 다가오는 예약 -->
-        <div class="tab-pane fade show active" id="upcoming-pane" role="tabpanel" aria-labelledby="upcoming-tab">
-          <div th:if="${#lists.isEmpty(upcoming)}" class="empty-hint">다가오는 예약이 없습니다.</div>
-          <div th:each="r : ${upcoming}" class="reservation-card">
-            <img class="reservation-thumb" th:src="${r.reservedHome.thumbnail}" alt="thumb"
-                 onerror="this.src='/images/no-image.png'">
-            <div class="reservation-meta">
-              <div class="reservation-title" th:text="${r.reservedHome.title}">숙소 제목</div>
-              <div class="reservation-dates"
-                   th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~ 2025-10-05</div>
-              <div>
-                <span class="badge text-bg-secondary" th:text="${r.reservationStatus}">REQUESTED</span>
-                <span class="ms-2" th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총 500,000원</span>
-              </div>
-            </div>
-          </div>
-        </div>
+					<!-- 다가오는 예약 -->
+					<div class="tab-pane fade show active" id="upcoming-pane"
+						role="tabpanel" aria-labelledby="upcoming-tab">
+						<div th:if="${#lists.isEmpty(upcoming)}" class="empty-hint">다가오는
+							예약이 없습니다.</div>
+						<a th:each="r : ${upcoming}"
+							th:href="@{/mypage/reservation/detail(reservationIdx=${r.reservationIdx})}"
+							class="reservation-card"
+							style="text-decoration: none; color: inherit;"> <img
+							class="reservation-thumb" th:src="${r.reservedHome.thumbnail}"
+							alt="thumb" onerror="this.src='/images/no-image.png'">
+							<div class="reservation-meta">
+								<div class="reservation-title" th:text="${r.reservedHome.title}">숙소
+									제목</div>
+								<div class="reservation-dates"
+									th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~
+									2025-10-05</div>
+								<div>
+									<span class="badge text-bg-secondary"
+										th:text="${r.reservationStatus}">REQUESTED</span> <span
+										class="ms-2"
+										th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총
+										500,000원</span>
+								</div>
+							</div>
+						</a>
+					</div>
 
-        <!-- 완료된 예약 -->
-        <div class="tab-pane fade" id="completed-pane" role="tabpanel" aria-labelledby="completed-tab">
-          <div th:if="${#lists.isEmpty(completed)}" class="empty-hint">완료된 예약이 없습니다.</div>
-          <div th:each="r : ${completed}" class="reservation-card">
-            <img class="reservation-thumb" th:src="${r.reservedHome.thumbnail}" alt="thumb"
-                 onerror="this.src='/images/no-image.png'">
-            <div class="reservation-meta">
-              <div class="reservation-title" th:text="${r.reservedHome.title}">숙소 제목</div>
-              <div class="reservation-dates"
-                   th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~ 2025-10-05</div>
-              <div>
-                <span class="badge text-bg-success">COMPLETED</span>
-                <span class="ms-2" th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총 500,000원</span>
-              </div>
-            </div>
-          </div>
-        </div>
+					<!-- 완료된 예약 -->
+					<div class="tab-pane fade" id="completed-pane" role="tabpanel"
+						aria-labelledby="completed-tab">
+						<div th:if="${#lists.isEmpty(completed)}" class="empty-hint">완료된
+							예약이 없습니다.</div>
+						<a th:each="r : ${completed}"
+							th:href="@{/mypage/reservation/detail(reservationIdx=${r.reservationIdx})}"
+							class="reservation-card"
+							style="text-decoration: none; color: inherit;"> <img
+							class="reservation-thumb" th:src="${r.reservedHome.thumbnail}"
+							alt="thumb" onerror="this.src='/images/no-image.png'">
+							<div class="reservation-meta">
+								<div class="reservation-title" th:text="${r.reservedHome.title}">숙소
+									제목</div>
+								<div class="reservation-dates"
+									th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~
+									2025-10-05</div>
+								<div>
+									<span class="badge text-bg-success">COMPLETED</span> <span
+										class="ms-2"
+										th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총
+										500,000원</span>
+								</div>
+							</div>
+						</a>
+					</div>
 
-        <!-- 취소된 예약 -->
-        <div class="tab-pane fade" id="cancelled-pane" role="tabpanel" aria-labelledby="cancelled-tab">
-          <div th:if="${#lists.isEmpty(cancelled)}" class="empty-hint">취소된 예약이 없습니다.</div>
-          <div th:each="r : ${cancelled}" class="reservation-card">
-            <img class="reservation-thumb" th:src="${r.reservedHome.thumbnail}" alt="thumb"
-                 onerror="this.src='/images/no-image.png'">
-            <div class="reservation-meta">
-              <div class="reservation-title" th:text="${r.reservedHome.title}">숙소 제목</div>
-              <div class="reservation-dates"
-                   th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~ 2025-10-05</div>
-              <div>
-                <span class="badge text-bg-danger" 
-                      th:text="${r.reservationStatus}">CANCELLED</span>
-                <span class="ms-2" th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총 500,000원</span>
-              </div>
-            </div>
-          </div>
-        </div>
+					<!-- 취소된 예약 -->
+					<div class="tab-pane fade" id="cancelled-pane" role="tabpanel"
+						aria-labelledby="cancelled-tab">
+						<div th:if="${#lists.isEmpty(cancelled)}" class="empty-hint">취소된
+							예약이 없습니다.</div>
+						<a th:each="r : ${cancelled}"
+							th:href="@{/mypage/reservation/detail(reservationIdx=${r.reservationIdx})}"
+							class="reservation-card"
+							style="text-decoration: none; color: inherit;"> <img
+							class="reservation-thumb" th:src="${r.reservedHome.thumbnail}"
+							alt="thumb" onerror="this.src='/images/no-image.png'">
+							<div class="reservation-meta">
+								<div class="reservation-title" th:text="${r.reservedHome.title}">숙소
+									제목</div>
+								<div class="reservation-dates"
+									th:text="|${r.startDate} ~ ${r.endDate}|">2025-10-01 ~
+									2025-10-05</div>
+								<div>
+									<span class="badge text-bg-danger"
+										th:text="${r.reservationStatus}">CANCELLED</span> <span
+										class="ms-2"
+										th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">총
+										500,000원</span>
+								</div>
+							</div>
+						</a>
+					</div>
 
-      </div><!-- /.tab-content -->
-    </div>
-  </div>
-</div>
+				</div>
+				<!-- /.tab-content -->
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>
