@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,7 +117,8 @@ public class ChatController {
 	
 	//이미지 전송
 	@PostMapping("/uploadImage")
-	public Map<String, String> uploadImage(
+	@ResponseBody
+	public Map<String, Object> uploadImage(
 			@RequestParam("image") MultipartFile file,
 			@RequestParam("roomId") Integer roomId) 
 			throws IOException {
@@ -136,8 +138,12 @@ public class ChatController {
 
 	    // 클라이언트가 접근할 수 있는 URL
 	    String fileUrl = "/img/chat/room_" + roomId + "/" + fileName;
+	    
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("imgUrl", fileUrl);
+	    map.put("success", "이미지가 저장되었습니다.");
 
-	    return Map.of("url", fileUrl);
+	    return map;
 	}
 	
 	//마지막으로 읽은 메시지 업데이트
