@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.sweethome.user.User;
+import com.example.sweethome.wishlist.Wishlist;
 import com.example.sweethome.wishlist.WishlistFolder;
 import com.example.sweethome.wishlist.WishlistFolderRepository;
 import com.example.sweethome.wishlist.WishlistRepository;
@@ -51,6 +53,21 @@ public class DetailController {
             User user = (User) userProfile;
             // 👈 완성된 폴더 조회 로직
             folders = wishlistFolderRepository.findByUser(user); 
+            
+            //나래추가
+            Map<Long, List<Wishlist>> folderWishlists = folders.stream()
+                    .collect(Collectors.toMap(
+                            WishlistFolder::getIdx,
+                            folder -> wishlistRepository.findByFolderWithHome(folder)
+                    ));
+            model.addAttribute("folderWishlists", folderWishlists);
+            //나래추가끝
+	         // 로그 찍기
+	            folderWishlists.forEach((folderId, wishlists) -> {
+	                System.out.println("폴더ID: " + folderId + ", 위시리스트 개수: " + wishlists.size());
+	                wishlists.forEach(w -> System.out.println("  - " + w.getHome().getTitle()));
+	            });
+
         }
         
         // 3. 폴더 목록 Model 추가 (로그인 여부와 관계없이)

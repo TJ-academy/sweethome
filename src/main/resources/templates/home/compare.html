@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>숙소 비교</title>
+</head>
+<body>
+    <h1>숙소 비교하기</h1>
+
+    <div th:if="${#lists.isEmpty(compareHomes)}">
+        <p>비교할 숙소 데이터가 없습니다.</p>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(compareHomes)}" border="1">
+        <thead>
+            <tr>
+                <th>항목</th>
+                <th th:each="home : ${compareHomes}" th:text="${home.title}">숙소 이름</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>가격 (1박)</td>
+                <td th:each="home : ${compareHomes}" th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">100,000원</td>
+            </tr>
+            <tr>
+                <td>최대 인원</td>
+                <td th:each="home : ${compareHomes}" th:text="|${home.maxPeople}명|">4명</td>
+            </tr>
+            <tr>
+                <td>침실 개수</td>
+                <td th:each="home : ${compareHomes}" th:text="|${home.room}개|">2개</td>
+            </tr>
+            </tbody>
+    </table>
+</body>
+</html>

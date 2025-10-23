@@ -188,4 +188,16 @@ public class HomeService {
 
         hashtagRepository.save(hashtag);
     }
+    
+    public List<Home> getHomesByIds(List<Long> ids) {
+        // JpaRepository의 기본 메서드인 findAllById(Iterable<ID>)를 사용하여 구현
+        // HomeRepository에 정의된 findByIds(List<Long>) 등의 커스텀 메서드가 있다면 그것을 사용해도 됩니다.
+        // 여기서는 Home의 PK가 Integer이지만, Long으로 넘어왔으므로, Integer 리스트로 변환하여 조회합니다.
+        
+        List<Integer> integerIds = ids.stream()
+            .map(Long::intValue)
+            .collect(Collectors.toList());
+            
+        return homeRepository.findAllById(integerIds);
+    }
 }

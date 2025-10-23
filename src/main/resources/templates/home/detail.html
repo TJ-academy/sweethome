@@ -30,7 +30,11 @@
 
 	});
 </script>
-
+<script>
+	//현재 보고 있는 숙소의 ID를 Thymeleaf를 이용해 JS 변수에 저장
+	const currentHomeId = '[[${home.idx}]]'; 
+	let selectedHomeIds = []; // 모달에서 선택된 숙소 ID를 저장할 배열
+</script>
 <link rel="stylesheet" th:href="@{/css/home/detail.css}">
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
 <link
@@ -163,8 +167,9 @@
 
 				<input type="hidden" id="nights" name="nights" value="0" /> <input
 					type="hidden" id="totalCost" name="totalMoney" value="0" />
-
-
+				<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#compareModal">
+					위시리스트와 비교하기
+				</button>
 				<div class="price">
 					<span
 						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">720,000원</span>
@@ -522,7 +527,118 @@
 				toggleButton.textContent = '더 보기 (옵션)';
 			}
 		}
-	</script>
+		
+		// ==========================================================
+        // 4. 위시리스트 숙소 비교 로직 (새로 추가)
+        // ==========================================================
+        
+        /**
+         * 비교 숙소 선택/해제 토글 및 최대 2개 제한
+         * @param {HTMLElement} element - 클릭된 <li> 요소
+         */
+        function toggleCompareSelection(element) {
+            const homeIdx = element.getAttribute('data-home-idx');
+            const compareButton = document.getElementById('compareButton');
+            
+            // 현재 보고 있는 숙소는 모달에서 선택할 수 없도록 제외
+            if (homeIdx === currentHomeId) {
+                alert("현재 보고 있는 숙소는 비교 대상에 자동 포함됩니다.");
+                return;
+            }
 
+            if (element.classList.contains('selected')) {
+                // 선택 해제
+                element.classList.remove('selected');
+                selectedHomeIds = selectedHomeIds.filter(id => id !== homeIdx);
+            } else {
+                // 선택
+                if (selectedHomeIds.length < 2) {
+                    element.classList.add('selected');
+                    selectedHomeIds.push(homeIdx);
+                } else {
+                    alert("비교할 숙소는 최대 2개까지만 선택할 수 있습니다.");
+                }
+            }
+
+            // 비교 버튼 활성화/비활성화 (선택된 숙소가 1개 이상일 때)
+            compareButton.disabled = selectedHomeIds.length === 0;
+            
+            console.log("선택된 비교 숙소 ID들:", selectedHomeIds);
+        }
+
+        /**
+         * 비교하기 버튼 클릭 시 실행. 숙소 ID를 쿼리 스트링으로 넘겨 페이지 이동.
+         */
+        function startComparison() {
+            // 현재 숙소 ID 포함 (Set을 사용하여 중복 제거)
+            let comparisonIds = new Set([currentHomeId]); 
+            
+            // 모달에서 선택된 숙소 ID 추가
+            selectedHomeIds.forEach(id => comparisonIds.add(id));
+            
+            const finalIds = Array.from(comparisonIds);
+            
+            // 현재 숙소 ID만 있는 경우 (선택된 것이 없는 경우)
+            if (finalIds.length < 2) {
+                alert("비교하려면 현재 숙소 외에 최소 1개 이상의 숙소를 선택해야 합니다.");
+                return;
+            }
+            
+            // 쿼리 스트링 생성 (예: /compare?ids=10,20,30)
+            const urlIds = finalIds.join(',');
+            
+            // 비교 페이지 URL로 이동 (경로: /compare 로 가정)
+            window.location.href = `/compare?ids=${urlIds}`;
+        }
+	</script>
+	<!-- 비교하기 모달 -->
+	<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+	    <div class="modal-dialog modal-lg modal-dialog-centered">
+	        <div class="modal-content">
+	
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="compareModalLabel">위시리스트 비교하기</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+	            </div>
+	
+	            <div class="modal-body">
+	                <p>비교할 숙소를 선택하세요 (최대 2개)</p>	
+	                <div class="folder-list" th:if="${folders != null and !#lists.isEmpty(folders)}">
+	                    <div class="row g-3">
+	                        <div class="col-md-4" th:each="folder : ${folders}">
+	                            <div class="card folder-card" th:attr="data-id=${folder.idx}">
+	                                <div class="card-body text-center">
+	                                    <h6 th:text="${folder.folderName}">폴더 이름</h6>  <p th:text="|${#lists.size(folderWishlists[folder.idx])}개의 숙소|">0개의 숙소</p>
+	                                    <ul class="folder-homes-list" style="text-align: left; font-size: 0.85em; margin-top: 5px;">
+	                                        <li th:each="wish : ${folderWishlists[folder.idx]}" 
+	                                            th:if="${wish.home != null}" 
+	                                            class="compare-item" 
+	                                            th:attr="data-home-idx=${wish.home.idx}" 
+	                                            onclick="toggleCompareSelection(this)">
+	                                            
+	                                            <img th:src="@{${wish.home.thumbnail}}" alt="썸네일" style="width: 50px; height: 50px; margin-right: 5px;">
+	                                            
+	                                            <span th:text="${wish.home.title}">숙소 제목</span>
+	                                        </li>
+	                                    </ul>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	
+	                <div th:if="${folders == null or #lists.isEmpty(folders)}" class="text-center text-muted">
+	                    <p>등록된 위시리스트 폴더가 없습니다.</p>
+	                </div>
+	
+	            </div>
+	
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	                <button type="button" id="compareButton" class="btn btn-primary" disabled onclick="startComparison()">비교하기</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>	
 </body>
 </html>

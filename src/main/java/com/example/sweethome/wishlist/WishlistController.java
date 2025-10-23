@@ -151,4 +151,5 @@ public class WishlistController {
         // 상세 페이지로 리다이렉트
         return "redirect:/home/detail/" + homeIdx;
     }
+    
 }
