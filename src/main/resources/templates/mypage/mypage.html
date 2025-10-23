@@ -19,7 +19,6 @@
 </head>
 <body>
     <div th:insert="~{fragments/header :: menuBar}"></div>
-
     <div class="mypage-layout-wrap container-fluid">
         <div class="row">
             <div class="mypage-sidebar-col">
@@ -28,98 +27,28 @@
 
             <div class="mypage-content-col">
                 <div class="mypage-content-area">
-                    <h1 class="mb-4">마이페이지</h1>
+                    <h1>마이페이지</h1>
                     
-                    <div th:if="${message}" class="alert alert-success" role="alert">
-                        <span th:text="${message}">프로필 정보가 성공적으로 수정되었습니다.</span>
+                    <div class="d-flex justify-content-end mb-3">
+                        <a th:href="@{/mypage/updateForm}" class="btn btn-primary">회원정보 수정</a>
                     </div>
 
-                    <form id="profileForm" th:action="@{/mypage/update}" method="post" enctype="multipart/form-data">
-                        
-                        <div class="data-row mb-4">
-                            <span class="data-label">프로필 사진:</span>
-                            <div class="data-value">
-                                <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img" id="currentProfileImg">
-                                <input type="file" name="profileFile" id="profileFile" class="form-control mt-2" style="display: none;">
-                            </div>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label">Email:</span>
-                            <span class="data-value" th:text="${user.email}">이메일</span>
-                        </div>
-                        
-                        <div class="data-row">
-                            <span class="data-label">가입일:</span>
-                            <span class="data-value" th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label">닉네임:</span>
-                            <span class="data-value" id="nicknameView" th:text="${user.nickname}">닉네임</span>
-                            <input type="text" name="nickname" id="nicknameInput" class="form-control data-input" th:value="${user.nickname}" style="display: none;" required>
-                        </div>
-                        
-                        <div class="data-row">
-                            <span class="data-label">이름:</span>
-                            <span class="data-value" id="usernameView" th:text="${user.username}">이름</span>
-                            <input type="text" name="username" id="usernameInput" class="form-control data-input" th:value="${user.username}" style="display: none;" required>
-                        </div>
-                        
-                        <div class="data-row">
-                            <span class="data-label">전화번호:</span>
-                            <span class="data-value" id="phoneView" th:text="${user.phone}">전화번호</span>
-                            <input type="text" name="phone" id="phoneInput" class="form-control data-input" th:value="${user.phone}" style="display: none;">
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label">생년월일:</span>
-                            <span class="data-value" id="birthdayView" th:text="${user.birthday}">생년월일</span>
-                            <input type="date" name="birthday" id="birthdayInput" class="form-control data-input" th:value="${user.birthday}" style="display: none;" required>
-                        </div>
-
-                        <div class="mt-4">
-                            <button type="button" class="btn btn-warning me-2" id="editButton" onclick="toggleEditMode(true)">수정</button>
-                            <button type="submit" class="btn btn-primary me-2" id="saveButton" style="display: none;">저장</button>
-                            <button type="button" class="btn btn-secondary" id="cancelButton" onclick="toggleEditMode(false)" style="display: none;">취소</button>
-                            <a href="/mypage/delete" class="btn btn-danger">회원탈퇴</a>
-                        </div>
-                    </form>
+                    <div>
+                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
+                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
+                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
+                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
+                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
+                        <p><strong>전화번호:</strong> <span th:text="${user.phone}">전화번호</span></p>
+                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img" style="max-width: 100px; max-height: 100px; border-radius: 50%;"></p>
                     </div>
+                    
+                    <a href="/mypage/delete" onclick="return confirmDelete();">회원탈퇴</a><br>
+                </div>
             </div>
         </div>
     </div>
     
-    <script>
-        function toggleEditMode(isEditing) {
-            const views = document.querySelectorAll('.data-value');
-            const inputs = document.querySelectorAll('.data-input');
-            const fileInput = document.getElementById('profileFile');
-            
-            // 이름 뷰, 입력 필드 등 토글
-            views.forEach(el => el.style.display = isEditing ? 'none' : 'block');
-            inputs.forEach(el => el.style.display = isEditing ? 'block' : 'none');
-
-            // 프로필 파일 입력 필드 토글
-            fileInput.style.display = isEditing ? 'block' : 'none';
-            document.getElementById('currentProfileImg').style.display = isEditing ? 'none' : 'block';
-            
-            // 버튼 토글
-            document.getElementById('editButton').style.display = isEditing ? 'none' : 'block';
-            document.getElementById('saveButton').style.display = isEditing ? 'block' : 'none';
-            document.getElementById('cancelButton').style.display = isEditing ? 'block' : 'none';
-
-            // 취소 시 초기 데이터로 복구
-            if (!isEditing) {
-                // 입력 필드에 초기 값 재설정 (Thymeleaf로 설정된 값으로)
-                document.getElementById('nicknameInput').value = document.getElementById('nicknameView').innerText;
-                document.getElementById('usernameInput').value = document.getElementById('usernameView').innerText;
-                document.getElementById('phoneInput').value = document.getElementById('phoneView').innerText;
-                document.getElementById('birthdayInput').value = document.getElementById('birthdayView').innerText;
-                // 파일 입력 초기화
-                fileInput.value = "";
-            }
-        }
-    </script>
+    
 </body>
 </html>

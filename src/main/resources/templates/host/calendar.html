@@ -33,8 +33,7 @@
     .color-blue { background-color: #007bff; }
     .color-red { background-color: #dc3545; }
 
-    /* 캘린더 커스텀 (FullCalendar 대신 HTML로 간소화) */
-    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    /* 🚨 삭제됨: .calendar-header 관련 CSS */
     .calendar-grid { padding: 20px; }
     .date-cell { text-align: center; padding: 10px 5px; cursor: pointer; }
     .date-cell.today { font-weight: bold; color: #007bff; } /* 오늘 날짜 */
@@ -44,31 +43,20 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  var calendarEl = document.getElementById('calendar');
-
-  var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'ko', // 한국어 설정
-    headerToolbar: { 
-      left: 'prev,next today', // 버튼 추가
-      center: 'title', 
-      right: 'dayGridMonth,timeGridWeek' // 뷰 선택 버튼 추가
-    },
-    events: '/api/schedules', // Spring REST API 엔드포인트 (백엔드 연결 확인)
+// ⭐ 재사용 가능한 일정 로드 함수 정의
+function loadSchedules(dateStr) {
+    console.log('Loading schedules for: ' + dateStr);
     
-    // ⭐ 날짜 클릭 이벤트 로직 수정
-    dateClick: function(info) {
-      console.log('Date clicked: ' + info.dateStr);
-      
-      const detailBox = document.querySelector('.schedule-detail');
-      const detailDay = new Date(info.dateStr).getDate();
-      
-      // 로딩 중 표시
-      detailBox.innerHTML = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr><p class="text-muted">일정 로딩 중...</p>`;
-      
-      // API 호출: /api/schedules/day?date=YYYY-MM-DD
-      fetch('/api/schedules/day?date=' + info.dateStr)
+    const detailBox = document.querySelector('.schedule-detail');
+    // dateStr이 YYYY-MM-DD 형식임을 가정하고 날짜 객체 생성 (시간대 문제 방지 위해 T00:00:00 추가)
+    const dateObj = new Date(dateStr + 'T00:00:00'); 
+    const detailDay = dateObj.getDate();
+
+    // 로딩 중 표시
+    detailBox.innerHTML = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr><p class="text-muted">일정 로딩 중...</p>`;
+
+    // API 호출: /api/schedules/day?date=YYYY-MM-DD
+    fetch('/api/schedules/day?date=' + dateStr)
         .then(res => {
           if (!res.ok) {
             throw new Error('API 응답 오류: ' + res.status);
@@ -114,14 +102,45 @@ document.addEventListener('DOMContentLoaded', function() {
           console.error("일정 로딩 중 오류:", error);
           detailBox.innerHTML = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr><p class="text-danger">일정 로딩에 실패했습니다.</p>`;
         });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  
+  // 1. 오늘 날짜 (YYYY-MM-DD) 계산
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
+
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'ko', // 한국어 설정
+    headerToolbar: { 
+      left: 'prev', // 이전/다음 버튼만 유지
+      center: 'title',   // 제목 유지
+      right: 'today,next'          // 나머지 버튼 제거
     },
+    events: '/api/schedules', // Spring REST API 엔드포인트 (백엔드 연결 확인)
+    
+    // ⭐ dateClick 이벤트에서 새 함수 사용
+    dateClick: function(info) {
+      loadSchedules(info.dateStr);
+    },
+    
+    // ⭐ 이벤트 로드 후 오늘 날짜를 선택 상태로 만듦
+    datesSet: function(dateInfo) {
+        // 뷰가 변경될 때마다 오늘 날짜의 이벤트를 다시 로드하도록 설정 (선택 사항)
+        // loadSchedules(todayStr); 
+    }
   });
 
   calendar.render();
   
-  // 캘린더를 수동으로 렌더링했기 때문에 HTML의 가짜 캘린더는 제거하거나 숨겨야 합니다.
-  // FullCalendar가 'calendar' div 내부에 자체 테이블을 생성하므로,
-  // HTML 코드에서 직접 작성한 테이블(`.calendar-grid` 내부)은 삭제/주석 처리하는 것이 좋습니다.
+  // ⭐ 페이지 로드 시 오늘 일정을 즉시 불러와 표시
+  loadSchedules(todayStr); 
 });
 </script>
 
@@ -142,58 +161,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="row">
                             <div class="col-lg-8">
                                 <div class="p-4 bg-white calendar-card">
-                                    <div class="p-4 bg-white calendar-card">
-    <div class="calendar-header">
-        <button class="btn btn-light me-3"><</button>
-        <div>
-            <div class="text-secondary" style="font-size: 0.8rem;">OCTOBER</div>
-            <div class="month-name">10</div>
-        </div>
-        <button class="btn btn-light ms-3">></button>
-    </div>
-    
-    <div id="calendar" class="calendar-grid">
-        </div>
-</div>
-                                </div>
-    
-                                <div class="mt-4 p-3 bg-white calendar-card">
-                                    <div class="row">
-                                        <div class="col-auto legend-item"><span class="color-blue"></span><span>총괄 호스팅</span></div>
-                                        <div class="col-auto legend-item"><span class="color-blue"></span><span>포항시 숙소 체크인</span></div>
-                                        <div class="col-auto legend-item"><span class="color-red"></span><span>제주시 숙소 체크아웃</span></div>
-                                        <div class="col-auto legend-item"><span style="background-color: #cc6699;"></span><span>제주시 숙소 체크인</span></div>
-                                        <div class="col-auto legend-item"><span style="background-color: #993333;"></span><span>제주시 숙소 체크아웃</span></div>
+                                    <div id="calendar" class="calendar-grid">
                                         </div>
                                 </div>
-                            </div>
+    
+                                </div>
     
                             <div class="col-lg-4 mt-4 mt-lg-0">
-                                <div class="schedule-detail">
-                                    <h5><span class="text-primary">2</span>일 일정</h5>
-                                    <hr>
-    
-                                    <div class="schedule-item" style="border-left-color: #dc3545;">
-                                        <p class="mb-1"><span class="badge text-bg-secondary me-2">11:00</span> <span>게스트 ssong님의 체크아웃</span></p>
-                                    </div>
-    
-                                    <div class="schedule-item" style="border-left-color: #007bff;">
-                                        <p class="mb-1"><span class="badge text-bg-primary me-2">15:00</span> <span>게스트 guyguuyguy 님의 체크인</span></p>
-                                        <small class="text-muted d-block ms-4">비행기 연착으로 17:00 체크인 예정</small>
-                                        <div class="d-flex justify-content-end mt-2">
-                                            <button class="btn btn-outline-secondary btn-sm me-2">메모 수정</button>
-                                            <button class="btn btn-outline-danger btn-sm">메모 삭제</button>
-                                        </div>
-                                    </div>
-    
-                                    <div class="schedule-item" style="border-left-color: #007bff;">
-                                        <p class="mb-1"><span class="badge text-bg-primary me-2">15:00</span> <span>게스트 nanana 님의 체크인</span></p>
-                                        <div class="d-flex justify-content-end mt-2">
-                                            <button class="btn btn-primary btn-sm">메모 추가</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+							    <div class="schedule-detail">
+							        <p class="text-muted">일정을 불러오고 있습니다.</p>
+							    </div>
+							</div>
                         </div>
                     </div>
                 </div>
