@@ -20,7 +20,10 @@ public class EmailController {
     public String mailConfirm(@RequestParam("email") String email, 
     		HttpSession session) {
         try {
+        	session.removeAttribute("emailCode");
+            session.removeAttribute("emailCodeTime");
         	emailService.sendEmail(email, session);
+        	System.out.println((String) session.getAttribute("emailCode"));
             return "메일이 전송되었습니다.";
         } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace(); // 또는 로깅
@@ -50,6 +53,9 @@ public class EmailController {
         }
 
         if (code.equals(inputCode)) {
+        	System.out.println(code);
+        	System.out.println(inputCode);
+        	System.out.println("코드 인증 성공");
         	//인증 성공
             session.setAttribute("emailVerified", true);
             session.removeAttribute("emailCode");

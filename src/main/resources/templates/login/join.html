@@ -37,6 +37,7 @@ function sendVerificationCode() {
         
         //이메일 보내는 중~
         emailResult.innerText = "인증 코드 보내는 중..";
+        emailResult.style.color = "black";
         document.getElementById("emailBtn").disabled = true;
         
 		//중복이 아니면 이메일 인증 요청
@@ -68,12 +69,14 @@ function sendVerificationCode() {
 //인증 코드 확인 함수
 function verifyCode() {
     const code = document.getElementById("emailCode").value;
+    const emailResult = document.getElementById("verificationResult");
 
     fetch("/user/verifyEmailCode?inputCode=" + code, {
         method: "POST"
     })
     .then(res => res.text())
     .then(msg => {
+    	console.log(msg);
     	emailResult.innerText = msg;
     	emailResult.style.color = "red";
         if (msg === "인증이 완료되었습니다.") {
@@ -210,7 +213,7 @@ function updateJoinButtonState() {
 	<p id="nicknameResult"></p>
 
     <label for="profileImg">프로필 이미지 URL:</label><br>
-    <input type="text" id="profileImg" name="profileImg" 
+    <input type="file" id="profileImg" name="profileImg" 
     th:value="${user != null ? user.profileImg : (kakaouser != null ? kakaouser.kakaoAccount.profile.thumbnailImageUrl : '')}">
     <br><br>
 
