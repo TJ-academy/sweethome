@@ -82,7 +82,7 @@
 			</button>
 
 			<button class="btn btn-primary" th:if="${userProfile == null}"
-				onclick="window.location.href='/user/login'">로그인 후 좋아요</button>
+				th:onclick="|window.location.href='/home/like?homeId=${home.idx}'|">로그인 후 좋아요</button>
 		</div>
 
 

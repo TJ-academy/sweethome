@@ -41,6 +41,89 @@
     .date-cell.event-dots::after { content: '...'; display: block; font-size: 10px; line-height: 1; color: #007bff; } /* 이벤트 표시 */
     .month-name { font-size: 24px; font-weight: 300; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'ko', // 한국어 설정
+    headerToolbar: { 
+      left: 'prev,next today', // 버튼 추가
+      center: 'title', 
+      right: 'dayGridMonth,timeGridWeek' // 뷰 선택 버튼 추가
+    },
+    events: '/api/schedules', // Spring REST API 엔드포인트 (백엔드 연결 확인)
+    
+    // ⭐ 날짜 클릭 이벤트 로직 수정
+    dateClick: function(info) {
+      console.log('Date clicked: ' + info.dateStr);
+      
+      const detailBox = document.querySelector('.schedule-detail');
+      const detailDay = new Date(info.dateStr).getDate();
+      
+      // 로딩 중 표시
+      detailBox.innerHTML = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr><p class="text-muted">일정 로딩 중...</p>`;
+      
+      // API 호출: /api/schedules/day?date=YYYY-MM-DD
+      fetch('/api/schedules/day?date=' + info.dateStr)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('API 응답 오류: ' + res.status);
+          }
+          return res.json();
+        })
+        .then(list => {
+          let html = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr>`;
+          
+          if (!list || list.length === 0) {
+            html += `<p class="text-muted">일정이 없습니다.</p>`;
+          } else {
+            list.forEach(item => {
+              // Time 추출 (LocalDateTime 객체에서 ISO 8601 형식으로 와야 함)
+              const checkInHHmm  = item.checkInTime ? new Date(item.checkInTime).toTimeString().substring(0, 5) : '15:00';
+              const checkOutHHmm = item.checkOutTime ? new Date(item.checkOutTime).toTimeString().substring(0, 5) : '11:00';
+
+              // 체크인 항목 추가 (파란색)
+              html += `
+                <div class="schedule-item" style="border-left-color:#007bff;">
+                  <p class="mb-1">
+                    <span class="badge text-bg-primary me-2">${checkInHHmm}</span>
+                    <span>게스트 ${item.guestNickname} 님 ${item.homeTitle} 체크인</span>
+                  </p>
+                  ${item.memoForHost ? `<small class="text-muted d-block ms-4">${item.memoForHost}</small>` : ''}
+                </div>
+              `;
+              
+              // 체크아웃 항목 추가 (빨간색)
+              html += `
+                <div class="schedule-item" style="border-left-color:#dc3545;">
+                  <p class="mb-1">
+                    <span class="badge text-bg-secondary me-2">${checkOutHHmm}</span>
+                    <span>게스트 ${item.guestNickname} 님 ${item.homeTitle} 체크아웃</span>
+                  </p>
+                </div>
+              `;
+            });
+          }
+          detailBox.innerHTML = html; // 우측 패널 갱신
+        })
+        .catch(error => {
+          console.error("일정 로딩 중 오류:", error);
+          detailBox.innerHTML = `<h5><span class="text-primary">${detailDay}</span>일 일정</h5><hr><p class="text-danger">일정 로딩에 실패했습니다.</p>`;
+        });
+    },
+  });
+
+  calendar.render();
+  
+  // 캘린더를 수동으로 렌더링했기 때문에 HTML의 가짜 캘린더는 제거하거나 숨겨야 합니다.
+  // FullCalendar가 'calendar' div 내부에 자체 테이블을 생성하므로,
+  // HTML 코드에서 직접 작성한 테이블(`.calendar-grid` 내부)은 삭제/주석 처리하는 것이 좋습니다.
+});
+</script>
 
 </head>
 <body>
@@ -59,32 +142,19 @@
                         <div class="row">
                             <div class="col-lg-8">
                                 <div class="p-4 bg-white calendar-card">
-                                    <div class="calendar-header">
-                                        <button class="btn btn-light me-3"><</button>
-                                        <div>
-                                            <div class="text-secondary" style="font-size: 0.8rem;">OCTOBER</div>
-                                            <div class="month-name">10</div>
-                                        </div>
-                                        <button class="btn btn-light ms-3">></button>
-                                    </div>
-                                    
-                                    <div id="calendar" class="calendar-grid">
-                                        <table class="table table-borderless">
-                                            <thead>
-                                                <tr class="text-center text-secondary">
-                                                    <th class="text-danger">SUN</th><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th class="text-danger">SAT</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="text-center">
-                                                    <td class="date-cell text-danger"></td><td></td><td class="date-cell text-danger">1</td><td class="date-cell event-dots today text-primary">2</td><td class="date-cell text-danger">3</td><td class="date-cell text-primary">4</td><td class="date-cell text-danger">5</td>
-                                                </tr>
-                                                <tr class="text-center">
-                                                    <td class="date-cell text-danger">6</td><td>7</td><td class="date-cell text-danger">8</td><td>9</td><td>10</td><td>11</td><td class="date-cell text-primary">12</td>
-                                                </tr>
-                                                </tbody>
-                                        </table>
-                                    </div>
+                                    <div class="p-4 bg-white calendar-card">
+    <div class="calendar-header">
+        <button class="btn btn-light me-3"><</button>
+        <div>
+            <div class="text-secondary" style="font-size: 0.8rem;">OCTOBER</div>
+            <div class="month-name">10</div>
+        </div>
+        <button class="btn btn-light ms-3">></button>
+    </div>
+    
+    <div id="calendar" class="calendar-grid">
+        </div>
+</div>
                                 </div>
     
                                 <div class="mt-4 p-3 bg-white calendar-card">
@@ -126,33 +196,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var calendarEl = document.getElementById('calendar');
-                    
-                            var calendar = new FullCalendar.Calendar(calendarEl, {
-                                initialView: 'dayGridMonth',
-                                locale: 'ko', 
-                                headerToolbar: {
-                                    left: 'prev',
-                                    center: 'title',
-                                    right: 'next'
-                                },
-                                events: '/api/schedules', // Spring REST API 엔드포인트
-                                
-                                dateClick: function(info) {
-                                    console.log('Date clicked: ' + info.dateStr);
-                                    // AJAX 요청으로 우측 상세 일정 로드
-                                },
-                            });
-                    
-                            calendar.render();
-                        });
-                    </script>
-                    
                 </div>
             </div>
         </div>

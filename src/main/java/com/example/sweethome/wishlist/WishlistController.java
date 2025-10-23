@@ -48,6 +48,11 @@ public class WishlistController {
 
         // 로그인하지 않았다면 로그인 페이지로 리다이렉트
         if (userProfile == null) {
+        	// ⭐️ 핵심 수정: prevPage 세션에 상세 페이지 URL 저장
+            // 좋아요 요청이 들어왔을 때, 실제 돌아가고 싶은 곳은 상세 페이지입니다.
+            String detailPageUrl = "/home/detail/" + homeId;
+            session.setAttribute("prevPage", detailPageUrl);
+            
             return "redirect:/user/login"; // 로그인 페이지로 리다이렉트
         }
 
