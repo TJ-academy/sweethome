@@ -56,4 +56,12 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     
     @Query("SELECT w.home.idx, COUNT(w) FROM Wishlist w GROUP BY w.home.idx")
     List<Object[]> countWishlistsByHome();
+    
+    /**
+     * ✅ 특정 숙소 ID 리스트에 대한 위시리스트 항목 개수를 조회합니다. (숙소 비교용)
+     * @param homeIds 조회할 Home의 Integer 타입 ID 리스트
+     * @return List<Object[]> -> [home_idx, count]
+     */
+    @Query("SELECT w.home.idx, COUNT(w) FROM Wishlist w WHERE w.home.idx IN :homeIds GROUP BY w.home.idx")
+    List<Object[]> countWishlistsByHomeIds(@Param("homeIds") List<Integer> homeIds);
 }

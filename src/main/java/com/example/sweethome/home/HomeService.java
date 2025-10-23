@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.util.Set;    
+import java.util.HashSet;  
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -200,4 +203,86 @@ public class HomeService {
             
         return homeRepository.findAllById(integerIds);
     }
+        
+    /**
+     * ✅ 숙소 비교 대상의 상세 정보를 모두 조회 (기본정보, 좋아요 개수, 옵션)
+     * @param homeIds Long 타입의 숙소 ID 리스트 (URL 쿼리 파라미터로 받은 값)
+     * @return 상세 비교 데이터 DTO 리스트
+     */
+    public List<CompareHomeDetail> getCompareHomeDetails(List<Long> homeIds) {
+        
+        // Home ID를 Integer 리스트로 변환 (DB PK 타입에 맞춤)
+        List<Integer> integerIds = homeIds.stream()
+                .map(Long::intValue)
+                .collect(Collectors.toList());
+
+        // 1. Home 기본 정보 조회
+        List<Home> homes = homeRepository.findAllById(integerIds);
+
+        // 2. Wishlist (좋아요 개수) 조회
+        // 이 메서드는 WishlistRepository에 정의되어 있어야 합니다.
+        List<Object[]> likeCounts = wishlistRepository.countWishlistsByHomeIds(integerIds);
+        Map<Integer, Long> likeCountMap = likeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0], // Home idx
+                        arr -> (Long) arr[1]     // Like Count
+                ));
+
+        // 3. AccommodationOption (옵션) 조회
+        List<AccommodationOption> accOptions = accommodationOptionRepository.findOptionsByHomeIds(integerIds);
+        
+        // Home ID별로 옵션 그룹 및 이름을 매핑
+        Map<Integer, Map<String, List<String>>> homeOptionsMap = accOptions.stream()
+                .collect(Collectors.groupingBy(
+                        ao -> ao.getHome().getIdx(), // 숙소 ID로 1차 그룹핑
+                        Collectors.groupingBy(
+                                ao -> ao.getOption().getOptionGroup(), // 옵션 그룹으로 2차 그룹핑
+                                Collectors.mapping(
+                                        ao -> ao.getOption().getOptionName(), // 옵션 이름만 리스트로 매핑
+                                        Collectors.toList()
+                                )
+                        )
+                ));
+
+        // 4. 모든 데이터를 DTO로 조합 (Builder 패턴 사용)
+        return homes.stream()
+                .map(home -> 
+                    CompareHomeDetail.builder()
+                        .idx(home.getIdx())
+                        .title(home.getTitle())
+                        .thumbnail(home.getThumbnail())
+                        .costBasic(home.getCostBasic())
+                        .costExpen(home.getCostExpen())
+                        .maxPeople(home.getMaxPeople())
+                        .room(home.getRoom())
+                        .bath(home.getBath())
+                        .bed(home.getBed())
+                        // 나머지 필드 채우기
+                        .likeCount(likeCountMap.getOrDefault(home.getIdx(), 0L))
+                        .groupedOptions(homeOptionsMap.getOrDefault(home.getIdx(), Map.of()))
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * ✅ 모든 비교 대상 숙소의 옵션 그룹 이름을 추출하고 정렬된 단일 리스트로 반환합니다.
+     * Thymeleaf 템플릿에서 옵션 행을 동적으로 생성하는 기준이 됩니다.
+     * @param details CompareHomeDetail 리스트
+     * @return 모든 숙소가 포함하는 고유한 옵션 그룹 이름 리스트 (알파벳 순 정렬)
+     */
+    public List<String> getAllUniqueOptionGroups(List<CompareHomeDetail> details) {
+        // 1. 모든 숙소의 모든 옵션 그룹을 하나의 Set에 모아 중복을 제거합니다.
+        Set<String> allGroups = new HashSet<>();
+        for (CompareHomeDetail detail : details) {
+            allGroups.addAll(detail.getGroupedOptions().keySet());
+        }
+        
+        // 2. Set을 List로 변환하고 정렬합니다.
+        return allGroups.stream()
+                .sorted() // 그룹 이름을 알파벳 순으로 정렬
+                .collect(Collectors.toList());
+    }
+    
+    
 }
