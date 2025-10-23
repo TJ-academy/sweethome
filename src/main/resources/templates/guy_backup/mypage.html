@@ -9,10 +9,18 @@
     <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}"> 
     <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
     
+    <script>
+        function confirmDelete() {
+            const result = confirm("정말로 회원 탈퇴를 진행하시겠습니까?\n모든 정보가 삭제되며, 되돌릴 수 없습니다.");
+            
+            // 사용자가 '확인'을 누르면 true를 반환하여 링크 이동(탈퇴) 진행
+            // '취소'를 누르면 false를 반환하여 링크 이동(탈퇴) 취소
+            return result;
+        }
+    </script>
 </head>
 <body>
     <div th:insert="~{fragments/header :: menuBar}"></div>
-    <!-- <div th:insert="~{fragments/search :: searchSection}"></div>  -->
     <div class="mypage-layout-wrap container-fluid">
         <div class="row">
             <div class="mypage-sidebar-col">
@@ -22,15 +30,22 @@
             <div class="mypage-content-col">
                 <div class="mypage-content-area">
                     <h1>마이페이지</h1>
-                    <div>
-                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
-                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
-                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
-                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
-                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
-                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img"></p>
+                    
+                    <div class="d-flex justify-content-end mb-3">
+                        <a th:href="@{/mypage/updateForm}" class="btn btn-primary">회원정보 수정</a>
                     </div>
-                    <a href="/mypage/delete">회원탈퇴</a><br>
+
+                    <div>
+                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img" style="max-width: 100px; max-height: 100px; border-radius: 50%;"></p>
+                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
+                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
+                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
+                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
+                        <p><strong>전화번호:</strong> <span th:text="${user.phone}">전화번호</span></p>
+                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
+                    </div>
+                    
+                    <a href="/mypage/delete" onclick="return confirmDelete();">회원탈퇴</a><br>
                 </div>
             </div>
         </div>
