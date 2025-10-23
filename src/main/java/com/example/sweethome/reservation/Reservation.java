@@ -84,4 +84,6 @@ public class Reservation {
 
     // endDate (date) -> 퇴실일자
     private LocalDate endDate;
+    
+    private String memoForHost;
 }

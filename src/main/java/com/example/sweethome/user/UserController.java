@@ -65,7 +65,9 @@ public class UserController {
         // 로그인 후 prevPage가 존재하면 해당 페이지로 리다이렉트
         String prevPage = (String) session.getAttribute("prevPage");
 
-        // prevPage가 없으면 기본 페이지(홈 페이지)로 리다이렉트
+        /*
+         // prevPage가 없으면 기본 페이지(홈 페이지)로 리다이렉트
+        
         if (prevPage == null || prevPage.isEmpty()) {
             prevPage = "/"; // 기본 URL 설정
         }
@@ -74,6 +76,18 @@ public class UserController {
         session.removeAttribute("prevPage");
 
         return "redirect:" + prevPage; // 예약 페이지로 리다이렉트
+        */
+        
+       // prevPage가 있으면 사용하고, 세션에서 삭제
+        if (prevPage != null && !prevPage.isEmpty()) {
+            session.removeAttribute("prevPage"); // 사용 후 삭제
+            System.out.println("로그인 성공! 이전 페이지로 리다이렉트: " + prevPage);
+            return "redirect:" + prevPage;
+        }
+        
+        // prevPage가 없으면 기본 경로('/')로 리다이렉트
+        System.out.println("로그인 성공! 기본 경로('/')로 리다이렉트");
+        return "redirect:/";
     }
 
     
