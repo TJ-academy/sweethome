@@ -81,11 +81,13 @@ function verifyCode() {
     	emailResult.style.color = "red";
         if (msg === "인증이 완료되었습니다.") {
         	emailResult.style.color = "blue";
-            document.getElementById("email").readonly = true;
+            document.getElementById("email").readOnly = true;
             document.getElementById("emailBtn").disabled = true;
             document.getElementById("emailCode").disabled = true;
             document.getElementById("codeBtn").disabled = true;
             document.getElementById("joinBtn").disabled = false;
+            console.log("설정 완료");
+            updateJoinButtonState();
         }
     });
 }
