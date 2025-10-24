@@ -19,19 +19,20 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
+import com.example.sweethome.review.ReviewDirection;
+import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/mypage")
 public class MyReservationController {
 
     private final ReservationRepository reservationRepository;
-
-    public MyReservationController(ReservationRepository reservationRepository) {
-        this.reservationRepository = reservationRepository;
-    }
+    private final ReviewRepository reviewRepository;
     
     @GetMapping("/reservation")
     public String myReservation(HttpSession session, Model model) {
@@ -105,6 +106,13 @@ public class MyReservationController {
         // 3. 모델에 추가
         model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
+        
+     // 예약 상세 컨트롤러 예시
+        boolean guestReviewWritten =
+                reviewRepository.existsByReservationAndDirection(reservation, ReviewDirection.GUEST_TO_HOST);
+
+        // ★ 반드시 모델에 Boolean 값으로 내려주기
+        model.addAttribute("guestReviewWritten", guestReviewWritten);
         
         return "mypage/myReservationDetail";
     }

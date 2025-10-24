@@ -30,68 +30,91 @@
       <h1 class="h4 mb-3">내 예약 내역 > 상세</h1>
       
       <div th:object="${reservation}">
-          <h2 class="h5 mb-3" th:text="*{reservedHome.title}">숙소 제목</h2>
+        <h2 class="h5 mb-3" th:text="*{reservedHome.title}">숙소 제목</h2>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <span th:switch="*{reservationStatus}">
+            <span th:case="REQUESTED" class="badge text-bg-secondary">예약 대기 중</span>
+            <span th:case="CONFIRMED" class="badge text-bg-primary">예약 확정</span>
+            <span th:case="IN_USE" class="badge text-bg-success">이용 중</span>
+            <span th:case="COMPLETED" class="badge text-bg-success">이용 완료</span>
+            <span th:case="CANCEL_REQUESTED" class="badge text-bg-warning">취소 요청 중</span>
+            <span th:case="CANCELLED" class="badge text-bg-danger">취소 완료</span>
+            <span th:case="REJECTED" class="badge text-bg-danger">예약 거절</span>
+            <span th:case="*" class="badge text-bg-light" th:text="*{reservationStatus}">기타 상태</span>
+          </span>
           
-          <div class="d-flex justify-content-between align-items-center mb-4">
-              <span th:switch="*{reservationStatus}">
-                  <span th:case="REQUESTED" class="badge text-bg-secondary">예약 대기 중</span>
-                  <span th:case="CONFIRMED" class="badge text-bg-primary">예약 확정</span>
-                  <span th:case="IN_USE" class="badge text-bg-success">이용 중</span>
-                  <span th:case="COMPLETED" class="badge text-bg-success">이용 완료</span>
-                  <span th:case="CANCEL_REQUESTED" class="badge text-bg-warning">취소 요청 중</span>
-                  <span th:case="CANCELLED" class="badge text-bg-danger">취소 완료</span>
-                  <span th:case="REJECTED" class="badge text-bg-danger">예약 거절</span>
-                  <span th:case="*" class="badge text-bg-light" th:text="*{reservationStatus}">기타 상태</span>
-              </span>
-              
-              <div th:if="*{reservationStatus.name() == 'CONFIRMED' or reservationStatus.name() == 'REQUESTED'}">
-                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                      예약 취소 신청
-                  </button>
-              </div>
+          <div th:if="*{reservationStatus.name() == 'CONFIRMED' or reservationStatus.name() == 'REQUESTED'}">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              예약 취소 신청
+            </button>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <div class="detail-item">
+            <span class="item-label">체크인/체크아웃</span>
+            <span class="item-value" th:text="|*{startDate} ~ *{endDate}|">2025-10-01 ~ 2025-10-05</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-label">총 숙박 인원</span>
+            <span class="item-value" th:text="|성인 *{adult}명, 어린이 *{child}명|">성인 2명, 어린이 1명</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-label">총 결제 금액</span>
+            <span class="item-value text-primary"
+                  th:text="|${#numbers.formatInteger(reservation.totalMoney, 3, 'COMMA')}원|">500,000원</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-label">예약 날짜</span>
+            <span class="item-value"
+                  th:text="${#temporals.format(reservation.reservedDate, 'yyyy-MM-dd HH:mm')}">2025-09-01 10:30</span>
+          </div>
+          <div class="detail-item">
+            <span class="item-label">결제 수단</span>
+            <span class="item-value" th:text="*{payby.name()}">TRANSFER</span>
           </div>
           
-          <div class="detail-section">
-              <div class="detail-item">
-                  <span class="item-label">체크인/체크아웃</span>
-                  <span class="item-value" th:text="|*{startDate} ~ *{endDate}|">2025-10-01 ~ 2025-10-05</span>
-              </div>
-              <div class="detail-item">
-                  <span class="item-label">총 숙박 인원</span>
-                  <span class="item-value" th:text="|성인 *{adult}명, 어린이 *{child}명|">성인 2명, 어린이 1명</span>
-              </div>
-              <div class="detail-item">
-                  <span class="item-label">총 결제 금액</span>
-                  <span class="item-value text-primary" 
-                        th:text="|${#numbers.formatInteger(reservation.totalMoney, 3, 'COMMA')}원|">500,000원</span>
-              </div>
-              <div class="detail-item">
-                  <span class="item-label">예약 날짜</span>
-                  <span class="item-value" th:text="*{#temporals.format(reservedDate, 'yyyy-MM-dd HH:mm')}">2025-09-01 10:30</span>
-              </div>
-              <div class="detail-item">
-                  <span class="item-label">결제 수단</span>
-                  <span class="item-value" th:text="*{payby.name()}">TRANSFER</span>
-              </div>
-              
-              <div th:if="*{payby.name() == 'TRANSFER'}" class="detail-item">
-                  <span class="item-label">입금 계좌 정보</span>
-                  <span class="item-value" th:text="|*{bank} / *{account}|">국민은행 / 123456789</span>
-              </div>
-              
-              <div class="detail-item" th:if="*{message != null and !message.isEmpty()}">
-                  <span class="item-label">호스트에게 보내는 메시지</span>
-                  <span class="item-value" th:text="*{message}">조용히 잘 이용하겠습니다.</span>
-              </div>
+          <div th:if="*{payby.name() == 'TRANSFER'}" class="detail-item">
+            <span class="item-label">입금 계좌 정보</span>
+            <span class="item-value" th:text="|*{bank} / *{account}|">국민은행 / 123456789</span>
           </div>
           
-          <div class="text-center mt-4">
-              <a th:href="@{/home/detail/{idx}(idx=*{reservedHome.idx})}" class="btn btn-outline-primary">
-                  숙소 상세 페이지로 이동
-              </a>
+          <div class="detail-item" th:if="*{message != null and !message.isEmpty()}">
+            <span class="item-label">호스트에게 보내는 메시지</span>
+            <span class="item-value" th:text="*{message}">조용히 잘 이용하겠습니다.</span>
           </div>
-          
-      </div></div>
+        </div>
+
+        <!-- 리뷰 버튼: 예약 상태가 COMPLETED일 때만 노출 -->
+        <div th:if="${reservation.reservationStatus.name() == 'COMPLETED'}" class="mt-3 d-flex gap-2">
+
+          <!-- 아직 리뷰 미작성 -->
+          <a th:if="${guestReviewWritten == false}"
+             th:href="@{/mypage/review/write(reservationId=${reservation.reservationIdx},direction='GUEST_TO_HOST')}"
+             class="btn btn-outline-primary">
+            리뷰 작성하기
+          </a>
+
+          <!-- 이미 리뷰 작성됨 -->
+          <button th:if="${guestReviewWritten == true}" type="button" class="btn btn-success" disabled>
+            리뷰 작성 완료
+          </button>
+          <a th:if="${guestReviewWritten == true}"
+             th:href="@{/mypage/review/detail(reservationId=${reservation.reservationIdx},direction='GUEST_TO_HOST')}"
+             class="btn btn-outline-secondary">
+            내 리뷰 보기
+          </a>
+        </div>
+
+        <div class="text-center mt-4">
+          <a th:href="@{/home/detail/{idx}(idx=*{reservedHome.idx})}" class="btn btn-outline-primary">
+            숙소 상세 페이지로 이동
+          </a>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
 
@@ -109,12 +132,11 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
         <form th:action="@{/mypage/reservation/cancel/{idx}(idx=${reservation.reservationIdx})}" method="post">
-            <button type="submit" class="btn btn-danger">취소 신청</button>
+          <button type="submit" class="btn btn-danger">취소 신청</button>
         </form>
       </div>
     </div>
   </div>
 </div>
-
 </body>
 </html>
