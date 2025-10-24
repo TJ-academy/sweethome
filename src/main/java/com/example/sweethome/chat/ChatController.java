@@ -1,14 +1,9 @@
 package com.example.sweethome.chat;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
+import com.example.sweethome.util.FileHandlerService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class ChatController {
 	private final ChatService service;
 	private final SimpMessagingTemplate messagingTemplate;
+	private final FileHandlerService fileHandlerService;
 	
 	//내 채팅방 리스트
 	@GetMapping("/rooms")
@@ -122,25 +119,10 @@ public class ChatController {
 			@RequestParam("image") MultipartFile file,
 			@RequestParam("roomId") Integer roomId) 
 			throws IOException {
-		//이미지 저장 경로
-		String uploadDir = "src/main/resources/static/img/chat/room_" + roomId;
-	    Path uploadPath = Paths.get(uploadDir);
-	    
-	    //폴더 없나?
-	    if (!Files.exists(uploadPath)) {
-	        Files.createDirectories(uploadPath);
-	    }
-	    
-	    //파일 이름 설정
-	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-	    Path filePath = uploadPath.resolve(fileName);
-	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-	    // 클라이언트가 접근할 수 있는 URL
-	    String fileUrl = "/img/chat/room_" + roomId + "/" + fileName;
-	    
+		String savedUrl = fileHandlerService.saveFile(file, "chat/room_" + roomId);
+		
 	    Map<String, Object> map = new HashMap<>();
-	    map.put("imgUrl", fileUrl);
+	    map.put("imgUrl", savedUrl);
 	    map.put("success", "이미지가 저장되었습니다.");
 
 	    return map;

@@ -138,6 +138,8 @@ function autoHyphenPhone(target) {
 document.addEventListener('DOMContentLoaded', () => {
 	//전화번호 하이픈 처리
     const phoneInput = document.getElementById('phone');
+	//프사 미리보기
+	const profileInput = document.getElementById('profileImgFile');
     
     phoneInput.addEventListener('input', () => {
         autoHyphenPhone(phoneInput);
@@ -152,6 +154,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("nicknameBtn").disabled = false;
         updateJoinButtonState();
     });
+    
+    if (profileInput) {
+        profileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('profilePreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        });
+    }
 });
 
 //가입하기 버튼 활성화 여부
@@ -168,7 +188,7 @@ function updateJoinButtonState() {
 <body>
 <div th:insert="fragments/header :: menuBar"></div>
 <h1>회원가입</h1>
-<form th:action="@{/user/join}" method="post">
+<form th:action="@{/user/join}" method="post" enctype="multipart/form-data">
     <label for="email">이메일:</label><br>
 	<input type="email" id="email" name="email" 
 		th:value="${user != null ? user.email : (kakaouser != null ? kakaouser.kakaoAccount.email : '')}" 
@@ -182,7 +202,7 @@ function updateJoinButtonState() {
 	<!-- 인증 코드 입력 -->
 	<input type="text" id="emailCode" 
 		placeholder="인증 코드 입력"
-		th:value="${kakaouser != null} ? '인증완료' : ''" 
+		th:value="${kakaouser != null ? '인증완료' : ''}" 
 		disabled
 	>
 	<button type="button" id="codeBtn"
@@ -192,7 +212,7 @@ function updateJoinButtonState() {
 	
 	<!-- 인증 상태 표시 -->
 	<p id="verificationResult" 
-	th:text="${kakaouser != null} ? '인증이 완료되었습니다.' : ''"></p>
+	th:text="${kakaouser != null ? '인증이 완료되었습니다.' : ''}"></p>
 
     <label for="password">비밀번호:</label><br>
     <input type="password" id="password" name="password" 
@@ -213,11 +233,26 @@ function updateJoinButtonState() {
 	>닉네임 중복 확인</button>
 	
 	<p id="nicknameResult"></p>
+	
+	<div>
+	    <p>프로필 이미지:</p>
+	    <!-- 카카오 계정 + 프사 동의 시 -->
+	    <div th:if="${kakaouser != null and kakaouser.kakaoAccount.profile.thumbnailImageUrl != null}">
+	        <img th:src="${kakaouser.kakaoAccount.profile.thumbnailImageUrl}" 
+	             alt="카카오 프로필 이미지" width="100" height="100">
+	        <input type="hidden" name="profileImg" 
+	               th:value="${kakaouser.kakaoAccount.profile.thumbnailImageUrl}" />
+	    </div>
+	
+	    <!-- 카카오 계정이 없거나 프사 미동의 시 -->
+	    <div th:if="${kakaouser == null or kakaouser.kakaoAccount.profile.thumbnailImageUrl == null}">
+	        <input type="file" id="profileImgFile" name="profileImgFile">
+	        <br>
+	        <img id="profilePreview" src="#" alt="이미지 미리보기" style="display:none; width:100px; height:100px; margin-top:10px;">
+	        
+	    </div>
+	</div>
 
-    <label for="profileImg">프로필 이미지 URL:</label><br>
-    <input type="file" id="profileImg" name="profileImg" 
-    th:value="${user != null ? user.profileImg : (kakaouser != null ? kakaouser.kakaoAccount.profile.thumbnailImageUrl : '')}">
-    <br><br>
 
     <label for="phone">전화번호:</label><br>
     <input type="text" id="phone" name="phone" 
