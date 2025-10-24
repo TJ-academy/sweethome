@@ -61,7 +61,11 @@ public class ChatService {
 			Integer roomId = userRoom.getRoomId();
 	        
 	        //채팅 상대 닉네임
-	        String roomName = findChatOtherUser(roomId, nickname).getNickname();
+			ChatUser otherUser = findChatOtherUser(roomId, nickname);
+	        String roomName = "-";
+	        if (otherUser != null) {
+	            roomName = otherUser.getNickname();
+	        }
 
 	        //마지막 메시지 가져오기
 	        ChatMessage lastMessage = mrepo.findFirstByChatRoom_IdOrderBySendedAtDesc(roomId)
@@ -119,7 +123,7 @@ public class ChatService {
 	//한 채팅방의 채팅 상대 조회
 	public ChatUser findChatOtherUser(Integer roomId, 
 			String myNickname) {
-		return urepo.findByRoomIdAndNicknameNot(roomId, myNickname).get();
+		return urepo.findByRoomIdAndNicknameNot(roomId, myNickname).orElse(null);
 	}
 	
 	//한 채팅방 조회

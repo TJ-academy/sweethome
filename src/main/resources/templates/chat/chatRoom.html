@@ -109,7 +109,7 @@ const form = document.getElementById('chatForm');
 const roomId = '[[${roomId}]]';
 const myNickname = '[[${myNickname}]]';
 const otherNickname = '[[${otherNickname}]]';
-const lastRead = [[${lastRead}]];
+const lastRead = [[${lastRead != null ? lastRead : 0}]];
 
 let stompClient = null;
 
