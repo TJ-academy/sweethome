@@ -14,4 +14,5 @@ public interface FileHandlerService {
      * @return 저장된 파일의 DB에 저장할 경로 (예: /img/home/파일명)
      */
     String saveFile(MultipartFile file);
+    String saveFile(MultipartFile file, String subDir);
 }

@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.email.EmailService;
 import com.example.sweethome.kakao.dto.KakaoProfile;
+import com.example.sweethome.util.FileHandlerService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class UserController {
 	private final UserService service;
 	
 	private final EmailService emailService;
+	private final FileHandlerService fileHandlerService;
 	
 	@Value("${kakao.client_id}")
     private String client_id;
@@ -109,13 +112,16 @@ public class UserController {
 	}
 
 	@PostMapping("/join")
-	public String insertUser(@ModelAttribute User user, 
+	public String insertUser(@ModelAttribute User user,
+			@RequestParam(value = "profileImgFile", required = false) MultipartFile profileImg,
 			HttpSession session,
 			Model model) {
 		Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
 		Boolean nicknameVerified = (Boolean) session.getAttribute("nicknameVerified");
 		String verifiedNickname = (String) session.getAttribute("verifiedNickname");
+		KakaoProfile kakaouser = (KakaoProfile) session.getAttribute("kakaouser");
 		model.addAttribute("user", user);
+		System.out.println("입력된 값 : \n" + user);
 
 	    if (emailVerified == null || !emailVerified) {
 	        model.addAttribute("message", "이메일 인증을 완료해주세요.");
@@ -126,6 +132,24 @@ public class UserController {
 	            !user.getNickname().equals(verifiedNickname)) {
 	        model.addAttribute("message", "닉네임 중복 확인을 완료해주세요.");
 	        return "login/join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
+	    }
+	    
+	    //일반 회원가입이면
+	    if (kakaouser == null) {
+	        if (profileImg != null && !profileImg.isEmpty()) {
+	            String savedPath = fileHandlerService.saveFile(profileImg, "userProfile");
+	            user.setProfileImg(savedPath);
+	        } else {
+	            user.setProfileImg("/img/userProfile/default.png"); // 기본 이미지
+	        }
+	    } else {
+	        //카카오 로그인 회원가입 시 - 카카오 프사 URL 그대로 저장
+	        if (kakaouser.getKakaoAccount().getProfile().getThumbnailImageUrl() != null) {
+	            user.setProfileImg(kakaouser.getKakaoAccount().getProfile().getThumbnailImageUrl());
+	        } else {
+	            user.setProfileImg("/img/userProfile/default.png");
+	        }
+	        session.removeAttribute("kakaouser");
 	    }
 	    
 		service.insertUser(user);
