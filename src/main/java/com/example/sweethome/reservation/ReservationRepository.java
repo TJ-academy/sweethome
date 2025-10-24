@@ -24,4 +24,43 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 			""")
 	List<Reservation> findOverlappingByHostAndRange(@Param("host") User host, @Param("rangeStart") LocalDate rangeStart,
 			@Param("rangeEnd") LocalDate rangeEnd);
+	
+	// 호스트 기준, 해당 '날짜'가 체크인인 예약
+    @Query("""
+        select r from Reservation r
+        where r.reservedHome.host = :host
+          and r.startDate = :date
+    """)
+    List<Reservation> findCheckInsByHostAndDate(@Param("host") User host,
+                                                @Param("date") LocalDate date);
+
+    // 호스트 기준, 해당 '날짜'가 체크아웃인 예약
+    @Query("""
+        select r from Reservation r
+        where r.reservedHome.host = :host
+          and r.endDate = :date
+    """)
+    List<Reservation> findCheckOutsByHostAndDate(@Param("host") User host,
+                                                 @Param("date") LocalDate date);
+    
+ // ReservationRepository.java
+    @Query("""
+      select r.startDate from Reservation r
+      where r.reservedHome.host = :host
+        and r.startDate >= :start and r.startDate < :end
+    """)
+    List<LocalDate> findCheckInsBetween(@Param("host") User host,
+                                        @Param("start") LocalDate start,
+                                        @Param("end") LocalDate end);
+
+    @Query("""
+      select r.endDate from Reservation r
+      where r.reservedHome.host = :host
+        and r.endDate >= :start and r.endDate < :end
+    """)
+    List<LocalDate> findCheckOutsBetween(@Param("host") User host,
+                                         @Param("start") LocalDate start,
+                                         @Param("end") LocalDate end);
+
+
 }

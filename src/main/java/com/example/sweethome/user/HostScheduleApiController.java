@@ -5,16 +5,23 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.sweethome.reservation.CalendarEventDTO;
 import com.example.sweethome.reservation.DayScheduleItemDTO;
@@ -22,12 +29,48 @@ import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class HostScheduleApiController {
+	
+	@Data @AllArgsConstructor
+	static class DayMarkDTO {
+	    private LocalDate date;
+	    private boolean checkIn;
+	    private boolean checkOut;
+	}
+
+	@GetMapping("/schedules/marks")
+	public ResponseEntity<?> getDayMarks(
+	        HttpSession session,
+	        @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+	        @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+
+	    User host = (User) session.getAttribute("userProfile");
+	    if (host == null) return ResponseEntity.status(401).build();
+
+	    // 날짜 → 마커 집계
+	    Map<LocalDate, DayMarkDTO> map = new HashMap<>();
+
+	    reservationRepository.findCheckInsBetween(host, start, end).forEach(d ->
+	        map.merge(d, new DayMarkDTO(d, true, false),
+	                  (a,b) -> new DayMarkDTO(d, a.isCheckIn()  || b.isCheckIn(),
+	                                              a.isCheckOut() || b.isCheckOut()))
+	    );
+
+	    reservationRepository.findCheckOutsBetween(host, start, end).forEach(d ->
+	        map.merge(d, new DayMarkDTO(d, false, true),
+	                  (a,b) -> new DayMarkDTO(d, a.isCheckIn()  || b.isCheckIn(),
+	                                              a.isCheckOut() || b.isCheckOut()))
+	    );
+
+	    return ResponseEntity.ok(new ArrayList<>(map.values()));
+	}
 
     private final ReservationRepository reservationRepository;
 
@@ -104,41 +147,133 @@ public class HostScheduleApiController {
      * 우측 패널에 특정 날짜의 상세 일정을 띄우는 용도 (선택).
      * 예) /api/schedules/day?date=2025-10-02
      */
+
     @GetMapping("/schedules/day")
     public ResponseEntity<?> getDaySchedules(
             HttpSession session,
-            @RequestParam(value = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
         User host = (User) session.getAttribute("userProfile");
         if (host == null) return ResponseEntity.status(401).build();
 
-        // 하루치 범위 계산
-        LocalDate start = date;
-        LocalDate end   = date.plusDays(1);
-
-        List<Reservation> reservations = reservationRepository
-                .findOverlappingByHostAndRange(host, start, end);
+        // ✅ 정확히 일치로 분리 조회
+        List<Reservation> checkIns  = reservationRepository.findCheckInsByHostAndDate(host, date);
+        List<Reservation> checkOuts = reservationRepository.findCheckOutsByHostAndDate(host, date);
 
         List<DayScheduleItemDTO> items = new ArrayList<>();
-        for (Reservation r : reservations) {
-            LocalDateTime checkInTime  = r.getStartDate().atTime(15, 0);
-            LocalDateTime checkOutTime = r.getEndDate().atTime(11, 0);
 
+        for (Reservation r : checkIns) {
             items.add(new DayScheduleItemDTO(
-                    r.getReservationIdx(),
-                    r.getReservedHome().getTitle(),
-                    r.getBooker().getNickname(),
-                    r.getStartDate(),
-                    r.getEndDate(),
-                    checkInTime,
-                    checkOutTime,
-                    r.getMemoForHost(),
-                    String.valueOf(r.getReservationStatus())
+                r.getReservationIdx(), r.getReservedHome().getTitle(), r.getBooker().getNickname(),
+                r.getStartDate(), r.getEndDate(),
+                r.getStartDate().atTime(15, 0),   // checkInTime
+                null,                             // checkOutTime 없음
+                null,                             // memoForHost 안씀
+                r.getMemoForCheckIn(),            // ✅ 체크인 메모만
+                null,                             // 체크아웃 메모 없음
+                String.valueOf(r.getReservationStatus())
             ));
         }
-        // 시간순 정렬(체크인/체크아웃 시간 기준)
-        items.sort(Comparator.comparing(DayScheduleItemDTO::getCheckInTime));
+
+        for (Reservation r : checkOuts) {
+            items.add(new DayScheduleItemDTO(
+                r.getReservationIdx(), r.getReservedHome().getTitle(), r.getBooker().getNickname(),
+                r.getStartDate(), r.getEndDate(),
+                null,
+                r.getEndDate().atTime(11, 0),     // checkOutTime
+                null,
+                null,
+                r.getMemoForCheckOut(),           // ✅ 체크아웃 메모만
+                String.valueOf(r.getReservationStatus())
+            ));
+        }
+
+        items.sort(Comparator.comparing(i -> {
+            var t = i.getCheckInTime() != null ? i.getCheckInTime() : i.getCheckOutTime();
+            return t != null ? t : LocalDateTime.MIN;
+        }));
 
         return ResponseEntity.ok(items);
     }
+
+
+    
+    
+    /** 호스트 권한 확인 유틸 */
+    private void assertHostOwnership(User host, Reservation r) {
+        if (host == null) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        String hostEmail = r.getReservedHome().getHost().getEmail();
+        if (!hostEmail.equals(host.getEmail())) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        }
+    }
+
+    /** 메모 조회 (선택적) */
+    @GetMapping("/reservations/{id}/memo")
+    public ResponseEntity<?> getMemo(HttpSession session, @PathVariable("id") Integer id) {
+        User host = (User) session.getAttribute("userProfile");
+        Reservation r = reservationRepository.findById(id)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND));
+        assertHostOwnership(host, r);
+        return ResponseEntity.ok(Map.of("memo", Optional.ofNullable(r.getMemoForHost()).orElse("")));
+    }
+
+    @PutMapping("/reservations/{id}/memo")
+    public ResponseEntity<?> updateMemo(HttpSession session,
+            @PathVariable("id") Integer id,
+            @RequestParam("type") String type,
+            @RequestBody Map<String, String> body) {
+
+        User host = (User) session.getAttribute("userProfile");
+        Reservation r = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        assertHostOwnership(host, r); // ✅ 여기!
+
+        String memo = body.get("memo");
+        if ("CHECKIN".equalsIgnoreCase(type)) {
+            r.setMemoForCheckIn(memo);
+        } else if ("CHECKOUT".equalsIgnoreCase(type)) {
+            r.setMemoForCheckOut(memo);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid type");
+        }
+
+        reservationRepository.save(r);
+        return ResponseEntity.ok(Map.of("result", "ok"));
+    }
+
+    @DeleteMapping("/reservations/{id}/memo")
+    public ResponseEntity<?> deleteMemo(HttpSession session,
+            @PathVariable("id") Integer id,
+            @RequestParam("type") String type) {
+
+        User host = (User) session.getAttribute("userProfile");
+        Reservation r = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        assertHostOwnership(host, r); // ✅ 여기!
+
+        if ("CHECKIN".equalsIgnoreCase(type)) {
+            r.setMemoForCheckIn(null);
+        } else if ("CHECKOUT".equalsIgnoreCase(type)) {
+            r.setMemoForCheckOut(null);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid type");
+        }
+
+        reservationRepository.save(r);
+        return ResponseEntity.ok(Map.of("result", "deleted"));
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

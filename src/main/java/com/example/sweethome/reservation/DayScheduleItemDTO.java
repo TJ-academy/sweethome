@@ -17,5 +17,7 @@ public class DayScheduleItemDTO {
     private LocalDateTime checkInTime;      // 15:00 등
     private LocalDateTime checkOutTime;     // 11:00 등
     private String memoForHost;             // 호스트 메모
+    private String memoForCheckIn;
+    private String memoForCheckOut;
     private String status;                  // 예약상태
 }

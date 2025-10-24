@@ -86,4 +86,7 @@ public class Reservation {
     private LocalDate endDate;
     
     private String memoForHost;
+    
+    private String memoForCheckIn;
+    private String memoForCheckOut;
 }
