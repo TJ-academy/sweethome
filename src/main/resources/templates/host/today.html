@@ -1,63 +1,126 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>호스트 숙소 목록</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-	rel="stylesheet"
-	integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-	crossorigin="anonymous">
-<script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-	integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-	crossorigin="anonymous"></script>
-<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
-<link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
-<style>
-    .home-card { 
-        display: flex; 
-        align-items: center; 
-        border: 1px solid #ddd; 
-        border-radius: 8px; 
-        margin-bottom: 15px;
-        padding: 10px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .home-card:hover {
-        background-color: #f8f8f8;
-    }
-    .home-thumb { 
-        width: 80px; 
-        height: 80px; 
-        border-radius: 6px; 
-        object-fit: cover; 
-        margin-right: 15px; 
-    }
-    .home-info { line-height: 1.4; flex-grow: 1; }
-    .home-title { font-weight: 600; font-size: 1.1rem; }
-    .home-meta { font-size: 0.9rem; color: #666; }
-    .home-price { font-weight: 700; color: #007bff; }
-</style>
+  <meta charset="UTF-8" />
+  <title>투데이 일정 | 마이페이지</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 공통 스타일 -->
+  <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+  <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
+  <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+  <link rel="stylesheet" th:href="@{/css/host/today.css}">
 </head>
 <body>
-	<div th:insert="~{fragments/header :: menuBar}"></div>
-	<div class="mypage-layout-wrap container-fluid">
-		<div class="row">
-			<div class="mypage-sidebar-col">
-				<div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
-			</div>
-		
-			<div class="mypage-content-col">
-                <div class="mypage-content-area">
-                    <h1>투데이</h1>
-                    
+<div th:insert="~{fragments/header :: menuBar}"></div>
 
-                </div>
-            </div>
-        </div>
+<div class="mypage-layout-wrap container-fluid">
+  <div class="row">
+    <div class="mypage-sidebar-col">
+      <div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
     </div>
+
+    <div class="mypage-content-col">
+      <div class="mypage-content-area">
+
+        <!-- 상단 탭 -->
+        <div class="host-tabs">
+          <button class="tab-btn active">오늘</button>
+          <button class="tab-btn">예정</button>
+        </div>
+
+        <!-- 메인 보드 -->
+        <section class="host-board">
+          <div class="board-header">
+            <div class="board-date" th:text="${todayDate}">2025-10-24</div>
+            <div class="board-filter-pills">
+              <button class="pill active">체크인</button>
+              <button class="pill">체크아웃</button>
+              <button class="pill danger">새요청</button>
+            </div>
+          </div>
+
+          <!-- 통계 -->
+          <div class="board-stats">
+            <div class="stat-card">
+              <div class="stat-label">체크아웃</div>
+              <div class="stat-value" th:text="${checkoutCount}">1건</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">체크인</div>
+              <div class="stat-value" th:text="${checkinCount}">1건</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">숙박 중</div>
+              <div class="stat-value" th:text="${stayingCount}">1팀</div>
+            </div>
+          </div>
+
+          <!-- 숙소 필터 -->
+          <div class="chip-wrap">
+            <button class="chip active">전체 숙소</button>
+            <button class="chip">수원시의 아파트</button>
+            <button class="chip">포항시의 펜션</button>
+            <button class="chip">서울시의 숙소</button>
+          </div>
+
+          <!-- 예약 테이블 -->
+          <div class="board-table">
+            <table class="table booking-table">
+              <thead>
+              <tr>
+                <th>숙소</th>
+                <th>게스트</th>
+                <th>상태</th>
+                <th>체크인</th>
+                <th>체크아웃</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="r : ${todayList}">
+                <td>
+                  <div class="home-cell">
+                    <img th:src="${r.homeImage}" class="home-thumb" alt="">
+                    <div>
+                      <div class="home-title" th:text="${r.homeTitle}">평온한 집</div>
+                      <div class="home-meta" th:text="${r.homeLocation}">수원시</div>
+                    </div>
+                  </div>
+                </td>
+                <td th:text="${r.guestNickname}">ga희</td>
+                <td>
+                  <span th:if="${r.status == 'CHECKIN'}" class="badge-soft pink">체크인 예정</span>
+                  <span th:if="${r.status == 'CHECKOUT'}" class="badge-soft gray">체크아웃 예정</span>
+                  <span th:if="${r.status == 'STAYING'}" class="badge-soft gray">숙박 중</span>
+                </td>
+                <td>
+                  <span th:text="${#temporals.format(r.checkInDate, 'MM/dd')}">10/24</span><br>
+                  <span class="sub" th:text="${r.checkInTime}">15:00</span>
+                </td>
+                <td>
+                  <span th:text="${#temporals.format(r.checkOutDate, 'MM/dd')}">10/26</span><br>
+                  <span class="sub" th:text="${r.checkOutTime}">11:00</span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 버튼 토글 공통
+  document.querySelectorAll('.tab-btn, .pill, .chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
 </body>
 </html>
