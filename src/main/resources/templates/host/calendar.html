@@ -25,6 +25,9 @@
 
     .calendar-grid { padding: 20px; }
     .month-name { font-size: 24px; font-weight: 300; }
+    
+    /*마우스로 클릭 가능*/
+    .schedule-item { cursor: pointer; }
 
     /* 날짜칸 점(체크인/체크아웃 마커) */
     .fc-dotwrap { display:flex; gap:6px; align-items:center; margin-left:6px; }
@@ -195,9 +198,27 @@
         if (currentDateStr) loadSchedules(currentDateStr);
       }
 
+      // 우측 패널 클릭 이벤트
       document.querySelector('.schedule-detail').addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-memo-edit')) openMemoModal(e.target);
-      });
+    	  // 1) 메모 버튼이면 모달만 열고 카드 클릭 막기
+    	  const memoBtn = e.target.closest('.btn-memo-edit');
+    	  if (memoBtn) {
+    	    e.stopPropagation();
+    	    openMemoModal(memoBtn);
+    	    return;
+    	  }
+
+    	  // 2) 일정 카드 클릭 시 상세 페이지 이동
+    	  const item = e.target.closest('.schedule-item');
+    	  if (item) {
+    	    const rid = item.dataset.reservationId;
+    	    if (rid) {
+    	      window.location.href = `/host/reservation/detail/${rid}`;
+    	    }
+    	  }
+    	});
+      
+      
       document.getElementById('btnMemoSave').addEventListener('click', saveMemo);
       document.getElementById('btnMemoDelete').addEventListener('click', deleteMemo);
 
@@ -294,6 +315,13 @@
         headerToolbar: { left: 'prev', center: 'title', right: 'today,next' },
         events: '/api/schedules',
         dateClick: (info) => loadSchedules(info.dateStr),
+        
+        eventClick: function(info) {
+            const rid = info.event.extendedProps && info.event.extendedProps.reservationId;
+            if (rid) {
+              window.location.href = `/host/reservation/detail/${rid}`;
+            }
+          },
 
         // 뷰 범위가 바뀔 때 마커 불러오고 모든 셀 다시 장식
         datesSet: async (info) => {

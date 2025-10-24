@@ -29,6 +29,7 @@
         <div class="host-tabs">
           <button class="tab-btn active">오늘</button>
           <button class="tab-btn">예정</button>
+          <button class="tab-btn">예약</button>
         </div>
 
         <!-- 메인 보드 -->
@@ -38,25 +39,10 @@
             <div class="board-filter-pills">
               <button class="pill active">체크인</button>
               <button class="pill">체크아웃</button>
-              <button class="pill danger">새요청</button>
             </div>
           </div>
 
-          <!-- 통계 -->
-          <div class="board-stats">
-            <div class="stat-card">
-              <div class="stat-label">체크아웃</div>
-              <div class="stat-value" th:text="${checkoutCount}">1건</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">체크인</div>
-              <div class="stat-value" th:text="${checkinCount}">1건</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">숙박 중</div>
-              <div class="stat-value" th:text="${stayingCount}">1팀</div>
-            </div>
-          </div>
+			<br>
 
           <!-- 숙소 필터 -->
           <div class="chip-wrap">
@@ -74,8 +60,6 @@
                 <th>숙소</th>
                 <th>게스트</th>
                 <th>상태</th>
-                <th>체크인</th>
-                <th>체크아웃</th>
               </tr>
               </thead>
               <tbody>
@@ -94,14 +78,6 @@
                   <span th:if="${r.status == 'CHECKIN'}" class="badge-soft pink">체크인 예정</span>
                   <span th:if="${r.status == 'CHECKOUT'}" class="badge-soft gray">체크아웃 예정</span>
                   <span th:if="${r.status == 'STAYING'}" class="badge-soft gray">숙박 중</span>
-                </td>
-                <td>
-                  <span th:text="${#temporals.format(r.checkInDate, 'MM/dd')}">10/24</span><br>
-                  <span class="sub" th:text="${r.checkInTime}">15:00</span>
-                </td>
-                <td>
-                  <span th:text="${#temporals.format(r.checkOutDate, 'MM/dd')}">10/26</span><br>
-                  <span class="sub" th:text="${r.checkOutTime}">11:00</span>
                 </td>
               </tr>
               </tbody>
