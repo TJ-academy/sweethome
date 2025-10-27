@@ -26,8 +26,7 @@ public class ChatUser {
 	
 	@Id
 	@ManyToOne
-    @JoinColumn(name = "user_email")
     private User user;
 	
-	private Integer lastRead;
+	private Integer lastRead = 0;
 }

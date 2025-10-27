@@ -3,7 +3,6 @@ package com.example.sweethome.chat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,7 @@ public class ChatService {
 		
 	    urepo.save(new ChatUser(room.getId(), userOne, 0));
 	    urepo.save(new ChatUser(room.getId(), userTwo, 0));
-	    
+	    System.out.println("채팅방이 새로 만들어졌습니다.\n" + room);
 		return room;
 	}
 	
@@ -113,8 +112,24 @@ public class ChatService {
 	}
 	
 	//한 채팅방의 메시지 조회
-	public List<ChatMessage> getMessagesByChatRoom(Integer chatRoomId) {
-        return mrepo.findByChatRoom_IdOrderBySendedAtAsc(chatRoomId);
+	public List<ChatMessageDto> getMessagesByChatRoom(Integer chatRoomId) {
+		List<ChatMessage> cmlist =  mrepo.findByChatRoom_IdOrderBySendedAtAsc(chatRoomId);
+		
+		List<ChatMessageDto> dtolist = new ArrayList<ChatMessageDto>();
+		for (ChatMessage cm : cmlist) {
+			ChatMessageDto dto = new ChatMessageDto();
+			dto.setMsgId(cm.getIdx());
+			dto.setRoomId(chatRoomId);
+			dto.setSenderEmail(cm.getSender().getEmail());
+			dto.setSenderNickname(cm.getSender().getNickname());
+			dto.setContent(cm.getContent());
+			dto.setImg(cm.getImg() != null ? cm.getImg() : "-");
+			dto.setSendedAt(cm.getSendedAt());
+			
+			dtolist.add(dto);
+		}
+		
+		return dtolist;
     }
 	
 	//한 채팅방의 나 조회
@@ -140,6 +155,7 @@ public class ChatService {
 			Reservation reservation) {
 		//두사람의 채팅방이 있니?
 		Integer roomId = isExistTwoUserRoom(userOne, userTwo);
+		System.out.println("두 사람의 채팅방이 있니? : " + roomId);
 		ChatRoom room;
 
 		//채팅방이 있으면
@@ -155,10 +171,11 @@ public class ChatService {
 	//메시지 저장
 	public ChatMessage saveMessage(ChatMessageDto dto) {
 		ChatRoom chatRoom = findChatRoom(dto.getRoomId());
+		User sender = userrepo.findByEmail(dto.getSenderEmail()).get();
 		
 		ChatMessage message = ChatMessage.builder()
 				.chatRoom(chatRoom)
-				.sender(dto.getSender())
+				.sender(sender)
 				.content(dto.getContent())
 				.img(dto.getImg() != null ? dto.getImg() : "-")
 				.sendedAt(Instant.now())

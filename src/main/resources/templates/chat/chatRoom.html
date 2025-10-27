@@ -48,7 +48,7 @@
 </head>
 <body>
 <a class="nav-link" href="/chat/rooms">뒤로가기</a>
-<h2 th:text="${other.nickname}"></h2>
+<h2 th:text="${otherNickname}"></h2>
 
 <div id="chatBox">
     <div th:each="msg, iterStat : ${messageList}">
@@ -65,12 +65,12 @@
 					th:text="${#dates.format(msg.sendedAt, 'yyyy년 M월 d일 E요일')}"></p>
 				
 				<!-- 메시지 출력 -->
-				<div th:id="${'msg-' + msg.idx}"
-					th:class="${msg.sender == me} 
+				<div th:id="${'msg-' + msg.msgId}"
+					th:class="${msg.senderEmail == myEmail} 
 					? 'message message-out' 
 					: 'message message-in'">
 					<p>
-						<strong th:text="${msg.sender.nickname}"></strong>: 
+						<strong th:text="${msg.senderNickname}"></strong>: 
 						<span th:text="${msg.content}"></span><br>
 						<img th:if="${msg.img != '-'}" th:src="${msg.img}" width="200" alt="이미지">
 						<span class="message-time" 
@@ -79,8 +79,8 @@
 				</div>
 				
 				<!-- 읽음 표시 -->
-				<div th:if="${msg.idx == lastRead}
-					and ${lastRead < messageList[messageList.size() - 1].idx}">
+				<div th:if="${msg.msgId == lastRead}
+					and ${lastRead < messageList[messageList.size() - 1].msgId}">
 					<hr>
 					<p style="color: gray; font-style: italic; text-align:center;">
 						여기까지 읽으셨습니다.
@@ -100,15 +100,15 @@
 </form>
 
 <script>
-  let lastMessageIdx = [[${#lists.isEmpty(messageList) ? 0 : messageList[messageList.size() - 1].idx}]];
+  let lastMessageIdx = [[${#lists.isEmpty(messageList) ? 0 : messageList[messageList.size() - 1].msgId}]];
 </script>
 
 <script>
 const textarea = document.getElementById('messageInput');
 const form = document.getElementById('chatForm');
 const roomId = '[[${roomId}]]';
-const myNickname = '[[${me.nickname}]]';
-const otherNickname = '[[${other.nickname}]]';
+const myNickname = '[[${myNickname}]]';
+const otherNickname = '[[${otherNickname}]]';
 const lastRead = [[${lastRead}]];
 
 let stompClient = null;
@@ -123,7 +123,7 @@ textarea.addEventListener('keydown', function(event) {
 function connect() {
 	const socket = new SockJS('/ws');
 	stompClient = Stomp.over(socket);
-	console.log("lastRead: " + lastRead);
+	//console.log("lastRead: " + lastRead);
 	stompClient.connect({}, function (frame) {
 		console.log('Connected: ' + frame);
 		stompClient.subscribe('/topic/chat/' + roomId, function (messageOutput) {
@@ -139,7 +139,7 @@ let lastMessageDate = null;
 function showMessage(message) {
 	const chatBox = document.getElementById('chatBox');
 	const msgDate = new Date(message.sendedAt);
-	lastMessageIdx = message.idx;
+	lastMessageIdx = message.msgId;
 	
 	//yyyy년 mm월 dd일 w요일
 	const currentDateString = msgDate.toLocaleDateString('ko-KR', {
@@ -160,12 +160,12 @@ function showMessage(message) {
 	
 	//메시지 박스 생성
     const messageDiv = document.createElement('div');
-    const isMyMessage = message.sender.nickname === myNickname;
+    const isMyMessage = message.senderNickname === myNickname;
     messageDiv.className = isMyMessage ? 'message message-out' : 'message message-in';
 	
 	// 메시지 내용 구성
     let innerHTML = `<p>`;
-    innerHTML += `<strong>${message.sender.nickname}</strong>: ${message.content}<br>`;
+    innerHTML += `<strong>${message.senderNickname}</strong>: ${message.content}<br>`;
     
 	//이미지가 있으면 출력
 	if (message.img && message.img !== '-') {
@@ -190,19 +190,20 @@ function showMessage(message) {
     chatBox.scrollTop = chatBox.scrollHeight;
     
     //마지막 메시지 idx 서버에 알려주기
-    console.log("마지막으로 읽은 메시지: " + message.content);
-    updateLastRead(message.idx);
+    //console.log("마지막으로 읽은 메시지: " + message.content);
+    updateLastRead(message.msgId);
 }
 
 //메시지 보내기
 function sendMessage(content, img = '-') {
-	console.log("content : " + content + "\nimg : " + img)
+	//console.log("content : " + content + "\nimg : " + img)
 	if (stompClient && stompClient.connected) {
 		console.log("sendMessage 함수 실행");
 		stompClient.send("/app/message/send", {}, JSON.stringify({
 			roomId,
-			sender: '[[${me}]]',
-			receiver: '[[${other}]]',
+			senderNickname: myNickname,
+			senderEmail: '[[${myEmail}]]',
+			receiverEmail: '[[${otherEmail}]]',
 			content,
 			img
 		}));
@@ -218,7 +219,7 @@ form.addEventListener('submit', async function(e) {
 	let imageUrl = '-';
 
     if (imageInput.files.length > 0) {
-    	console.log("a");
+    	//console.log("a");
         const formData = new FormData();
         formData.append('image', imageInput.files[0]);
         formData.append('roomId', roomId);
@@ -239,7 +240,7 @@ form.addEventListener('submit', async function(e) {
     }
 	
 	const message = input.value.trim();
-	console.log("b");
+	//console.log("b");
 	if (message || imageUrl !== '-') {
 		sendMessage(message, imageUrl);
 		console.log("sendMessage 함수 실행 완료");
@@ -255,7 +256,7 @@ function updateLastRead(messageIdx) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `roomId=${roomId}&messageIdx=${messageIdx}`
+        body: `roomId=${roomId}&msgId=${messageIdx}`
     })
     .then(res => {
         if (!res.ok) {
