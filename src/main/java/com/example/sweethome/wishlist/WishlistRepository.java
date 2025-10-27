@@ -3,6 +3,7 @@ package com.example.sweethome.wishlist;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,4 +65,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
      */
     @Query("SELECT w.home.idx, COUNT(w) FROM Wishlist w WHERE w.home.idx IN :homeIds GROUP BY w.home.idx")
     List<Object[]> countWishlistsByHomeIds(@Param("homeIds") List<Integer> homeIds);
+    
+    @Modifying
+    void deleteByHome_Idx(int homeIdx);
 }

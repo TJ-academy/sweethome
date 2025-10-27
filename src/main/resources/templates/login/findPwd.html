@@ -4,24 +4,27 @@
 <meta charset="UTF-8">
 <title>비밀번호 찾기</title>
 
+<!-- 🔹 CSS 연결 -->
+<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+<link rel="stylesheet" th:href="@{/css/user/findPwd.css}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
 <script>
 function isValidEmail(email) {
-    // 이메일 유효성 검사
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
-//인증 코드 전송
+// 인증 코드 전송
 function sendVerificationCode() {
     const email = document.getElementById("email").value;
+    const result = document.getElementById("verificationResult");
 
- 	// 이메일 형식이 올바른지 확인
     if (!isValidEmail(email)) {
         alert("올바른 이메일 주소를 입력해주세요.");
         return;
     }
- 	
- 	// 이메일 중복 확인
+
     fetch("/user/checkEmailDuplicate", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -30,70 +33,95 @@ function sendVerificationCode() {
     .then(res => res.text())
     .then(status => {
         if (status === "ok") {
-        	document.getElementById("verificationResult").innerText = "존재하지 않는 이메일입니다.";
+            result.innerText = "존재하지 않는 이메일입니다.";
+            result.className = "result-msg error bold";
             return;
         }
-        
-        //이메일 인증 요청
-        document.getElementById("verificationResult").innerText = "인증 코드 보내는 중..";
-        
+
+        result.innerText = "인증 코드 보내는 중...";
+        result.className = "result-msg";
+
         return fetch("/user/mailConfirm", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: "email=" + encodeURIComponent(email)
         });
     })
-	.then(res => res.text())
-	.then(msg => {
-		document.getElementById("verificationResult").innerText = msg;
-	});
+    .then(res => res ? res.text() : null)
+    .then(msg => {
+        if (!msg) return;
+
+        if (msg.includes("존재하지 않습니다")) {
+            result.className = "result-msg error bold";
+        } else if (msg.includes("인증이 완료되었습니다")) {
+            result.className = "result-msg ok";
+        } else {
+            result.className = "result-msg";
+        }
+        result.innerText = msg;
+    });
 }
 
-//인증 코드 확인 함수
+// 인증 코드 확인
 function verifyCode() {
     const code = document.getElementById("emailCode").value;
+    const result = document.getElementById("verificationResult");
 
-    fetch("/user/verifyEmailCode?inputCode=" + code, {
-        method: "POST"
-    })
+    fetch("/user/verifyEmailCode?inputCode=" + code, { method: "POST" })
     .then(res => res.text())
     .then(msg => {
-        document.getElementById("verificationResult").innerText = msg;
-        
+        if (msg.includes("존재하지 않습니다") || msg.includes("일치하지 않습니다")) {
+            result.className = "result-msg error bold";
+        } else if (msg.includes("인증이 완료되었습니다")) {
+            result.className = "result-msg.ok";
+        } else {
+            result.className = "result-msg";
+        }
+
+        result.innerText = msg;
+
         if (msg === "인증이 완료되었습니다.") {
-            //비밀번호 재설정 페이지로..
             window.location.href = "/user/resetPassword?email=" + encodeURIComponent(document.getElementById("email").value);
         }
     });
 }
 </script>
-
-<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
+
 <body>
 <div th:insert="fragments/header :: menuBar"></div>
 
-<label for="email">이메일:</label><br>
-<input type="email" id="email" name="email" required>
+<div class="find-page">
+  <div class="find-card">
+    <h2 class="find-title">비밀번호 찾기</h2>
 
-<button type="button" id="emailBtn"
-	th:disabled="${kakaouser != null}"
-	onclick="sendVerificationCode()"
->인증 코드 전송</button>
+    <div class="find-form">
+      <!-- 이메일 입력칸 + 인증 코드 전송 버튼 -->
+      <div class="input-group-row">
+        <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+        <button type="button" class="btn-side"
+          id="emailBtn"
+          th:disabled="${kakaouser != null}"
+          onclick="sendVerificationCode()">인증 코드 전송</button>
+      </div>
 
-<input type="text" id="emailCode" 
-	placeholder="인증 코드 입력"
-	th:value="${kakaouser != null} ? '인증완료' : ''" 
-	th:disabled="${kakaouser != null}"
->
-<button type="button" id="codeBtn"
-	onclick="verifyCode()"
-	th:disabled="${kakaouser != null}"
->코드 확인</button>
+      <!-- 인증코드 입력칸 + 코드확인 버튼 -->
+      <div class="input-group-row">
+        <input type="text" id="emailCode"
+          placeholder="인증 코드 입력"
+          th:value="${kakaouser != null} ? '인증완료' : ''"
+          th:disabled="${kakaouser != null}">
+        <button type="button" class="btn-side"
+          id="codeBtn"
+          onclick="verifyCode()"
+          th:disabled="${kakaouser != null}">코드 확인</button>
+      </div>
 
-<!-- 인증 상태 표시 -->
-<p id="verificationResult"></p>
+      <!-- 인증 상태 메시지 -->
+      <p id="verificationResult" class="result-msg"></p>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

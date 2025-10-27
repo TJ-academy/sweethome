@@ -15,4 +15,5 @@ public interface FileHandlerService {
      */
     String saveFile(MultipartFile file);
     String saveFile(MultipartFile file, String subDir);
+    String saveChatImage(MultipartFile file, String subDir);
 }

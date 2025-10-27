@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
+import com.example.sweethome.user.UserRepository;
 import com.example.sweethome.util.FileHandlerService;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/chat")
 public class ChatController {
 	private final ChatService service;
+	private final UserRepository userrepo;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final FileHandlerService fileHandlerService;
 	
@@ -48,8 +50,9 @@ public class ChatController {
 	@PostMapping("/room/question")
     public String createQuestionChatRoom(Model model, 
     		HttpSession session,
-    		@RequestParam("host") User host) {
+    		@RequestParam("host") String hostEmail) {
 		User guest = (User) session.getAttribute("userProfile");
+		User host = userrepo.findByEmail(hostEmail).get();
 		
 		//두사람의 채팅방
 		ChatRoom room = service.getChatRoom(guest, host, null);
@@ -66,13 +69,20 @@ public class ChatController {
         ChatRoom room = service.getChatRoom(guest, host, reservation);
 
         //자동 메시지 전송
-        ChatMessage saved = new ChatMessage();
-        saved.setChatRoom(room);
-        saved.setSender(host);
-        saved.setContent("예약이 완료되었습니다. 감사합니다!");
+        ChatMessageDto dto = new ChatMessageDto();
+        dto.setRoomId(room.getId());
+        dto.setSenderEmail(host.getEmail());
+        dto.setSenderNickname(host.getEmail());
+        dto.setReceiverEmail(guest.getEmail());
+        dto.setContent("예약이 완료되었습니다. 감사합니다!");
+        
+        ChatMessage saved = service.saveMessage(dto);
+        
+        dto.setMsgId(saved.getIdx());
+        dto.setSendedAt(saved.getSendedAt());
         
         //실시간 메시지 전송
-        messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), saved);
+        messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), dto);
 
         return "ok";
     }
@@ -85,16 +95,18 @@ public class ChatController {
 		User user = (User) session.getAttribute("userProfile");
 		
 		//채팅방 메시지 조회
-		List<ChatMessage> messageList = service.getMessagesByChatRoom(roomId);
+		List<ChatMessageDto> messageList = service.getMessagesByChatRoom(roomId);
 		//채팅방 내 정보 조회
 		ChatUser me = service.findChatUser(roomId, user);
 		//채팅방 상대 정보 조회
 		ChatUser other = service.findChatOtherUser(roomId, user);
 		
-		model.addAttribute("me", user);
+		model.addAttribute("myEmail", user.getEmail());
+		model.addAttribute("myNickname", user.getNickname());
         model.addAttribute("roomId", roomId);
         model.addAttribute("lastRead", me.getLastRead());
-        model.addAttribute("other", other.getUser());
+        model.addAttribute("otherEmail", other.getUser().getEmail());
+        model.addAttribute("otherNickname", other.getUser().getNickname());
 		model.addAttribute("messageList", messageList);
 		
 		return "chat/chatRoom";
@@ -104,7 +116,12 @@ public class ChatController {
 	@MessageMapping("/message/send")
     public void handleChatMessage(ChatMessageDto dto) {
         ChatMessage savedMessage = service.saveMessage(dto);
-        messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), savedMessage);
+        
+        dto.setMsgId(savedMessage.getIdx());
+        dto.setSendedAt(savedMessage.getSendedAt());
+        dto.setSenderNickname(savedMessage.getSender().getNickname());
+        
+        messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
     }
 	
 	//이미지 전송
@@ -116,8 +133,11 @@ public class ChatController {
 			throws IOException {
 		String savedUrl = fileHandlerService.saveFile(file, "chat/room_" + roomId);
 		
+		// 브라우저 캐시 방지용 쿼리 스트링 추가
+	    String cacheBustedUrl = savedUrl + "?t=" + System.currentTimeMillis();
+		
 	    Map<String, Object> map = new HashMap<>();
-	    map.put("imgUrl", savedUrl);
+	    map.put("imgUrl", cacheBustedUrl);
 	    map.put("success", "이미지가 저장되었습니다.");
 
 	    return map;
@@ -127,7 +147,7 @@ public class ChatController {
 	@ResponseBody
 	@PostMapping("/updateLastRead")
 	public String updateLastRead(@RequestParam("roomId") Integer roomId,
-	                             @RequestParam("messageIdx") Integer messageIdx,
+	                             @RequestParam("msgId") Integer messageIdx,
 	                             HttpSession session) {
 	    User user = (User) session.getAttribute("userProfile");
 
