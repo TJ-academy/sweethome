@@ -8,14 +8,14 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class ChatUserId implements Serializable {
 	private Integer roomId;
-    private String nickname;
+    private String user;
 
     // 기본 생성자
     public ChatUserId() {}
 
-    public ChatUserId(Integer roomId, String nickname) {
+    public ChatUserId(Integer roomId, String userEmail) {
         this.roomId = roomId;
-        this.nickname = nickname;
+        this.user = userEmail;
     }
 
     @Override
@@ -24,11 +24,11 @@ public class ChatUserId implements Serializable {
         if (!(o instanceof ChatUserId)) return false;
         ChatUserId that = (ChatUserId) o;
         return Objects.equals(roomId, that.roomId) &&
-               Objects.equals(nickname, that.nickname);
+               Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roomId, nickname);
+        return Objects.hash(roomId, user);
     }
 }

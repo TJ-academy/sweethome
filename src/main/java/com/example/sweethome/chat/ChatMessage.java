@@ -2,6 +2,8 @@ package com.example.sweethome.chat;
 
 import java.time.Instant;
 
+import com.example.sweethome.user.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +33,9 @@ public class ChatMessage {
     @JoinColumn(name = "chatRoomId", nullable = false)
     private ChatRoom chatRoom;
 
-    private String sender;
+    @ManyToOne
+    private User sender;
+    
     private String content;
     
     @Column(length = 100, columnDefinition = "varchar(100) default '-'")

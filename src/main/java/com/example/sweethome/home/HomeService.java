@@ -1,5 +1,7 @@
 package com.example.sweethome.home;
 
+import com.example.sweethome.reservation.ReservationRepository;
+import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
 import com.example.sweethome.util.FileHandlerService;
@@ -16,7 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import java.util.Set;    
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;  
 
 @Service
@@ -32,6 +36,8 @@ public class HomeService {
     private final HashtagRepository hashtagRepository;
     private final FileHandlerService fileHandlerService;
     private final WishlistRepository wishlistRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * ✅ 전체 숙소 목록 조회 (좋아요 개수 포함)
@@ -284,5 +290,297 @@ public class HomeService {
                 .collect(Collectors.toList());
     }
     
+    public Home getHomeById(int homeIdx) {
+        return homeRepository.findById(homeIdx).orElse(null);
+    }
     
+    //수정폼으로 데이터보내는 메서드
+    @Transactional(readOnly = true)
+    public HomeWriteDTO getHomeWriteDTOForUpdate(Home home) {
+        if (home == null) return null;
+
+        // 1️ 기존 옵션 ID 리스트 조회
+        List<Long> optionIds = accommodationOptionRepository.findByHome(home).stream()
+                .filter(AccommodationOption::isExist)
+                .map(ao -> Long.valueOf(ao.getOption().getOptionId()))
+                .collect(Collectors.toList());
+
+        // 2️ 해시태그 조회
+        Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
+        
+        // 3️ HomePhoto 엔티티 조회 (사진 경로를 가져오기 위함)
+        HomePhoto homePhoto = homePhotoRepository.findByHome(home);
+
+        // 4️ DTO 생성 및 기본 데이터 매핑
+        HomeWriteDTO dto = new HomeWriteDTO();
+        dto.setIdx(home.getIdx());
+        dto.setHostId(home.getHost().getEmail());
+        dto.setTitle(home.getTitle());
+        dto.setDescription(home.getDescription());
+        dto.setLocation(home.getLocation());
+
+        // ⭐️ 주소 분리 로직 수정 시작 ⭐️
+        String fullAddress = home.getAddress() != null ? home.getAddress().trim() : "";
+        String basicAddress = fullAddress; // 기본 주소
+        String detailAddress = "";         // 상세 주소
+
+        // 공백을 기준으로 문자열을 분리합니다.
+        String[] parts = fullAddress.split("\\s+");
+        
+        // 최소 두 개 이상의 단어가 있어야 상세 주소 분리가 의미 있음
+        if (parts.length > 1) {
+            // 상세 주소: 가장 마지막 단어
+            detailAddress = parts[parts.length - 1];
+            
+            // 기본 주소: 나머지 단어들을 공백으로 다시 연결
+            basicAddress = String.join(" ", Arrays.copyOf(parts, parts.length - 1));
+        } else {
+            // 공백이 없거나 단어 하나면 전체를 기본 주소로 유지
+            basicAddress = fullAddress;
+            detailAddress = "";
+        }
+
+        dto.setAddress(basicAddress);
+        dto.setDetailAddress(detailAddress);
+        // ⭐️ 주소 분리 로직 수정 끝 ⭐️
+
+        dto.setCostBasic(home.getCostBasic());
+        dto.setCostExpen(home.getCostExpen());
+        dto.setHomeType(home.getHomeType() != null ? home.getHomeType().name() : "");
+        dto.setThumbnail(null); // MultipartFile은 null 처리
+
+        // ⭐️ 5️⃣ 기존 이미지 경로 로딩 ⭐️
+        // 썸네일 경로: Home 엔티티의 필드를 바로 사용
+        dto.setCurrentThumbnailPath(home.getThumbnail());
+
+        // 숙소 사진 경로: HomePhoto 엔티티의 개별 필드를 수동으로 읽어 리스트에 추가
+        List<String> imagePaths = new ArrayList<>();
+        if (homePhoto != null) {
+            // HomePhoto 엔티티의 필드들을 순서대로 리스트에 추가
+            if (homePhoto.getImgOne() != null && !homePhoto.getImgOne().isEmpty()) { imagePaths.add(homePhoto.getImgOne()); }
+            if (homePhoto.getImgTwo() != null && !homePhoto.getImgTwo().isEmpty()) { imagePaths.add(homePhoto.getImgTwo()); }
+            if (homePhoto.getImgThree() != null && !homePhoto.getImgThree().isEmpty()) { imagePaths.add(homePhoto.getImgThree()); }
+            if (homePhoto.getImgFour() != null && !homePhoto.getImgFour().isEmpty()) { imagePaths.add(homePhoto.getImgFour()); }
+            if (homePhoto.getImgFive() != null && !homePhoto.getImgFive().isEmpty()) { imagePaths.add(homePhoto.getImgFive()); }
+            if (homePhoto.getImgSix() != null && !homePhoto.getImgSix().isEmpty()) { imagePaths.add(homePhoto.getImgSix()); }
+            if (homePhoto.getImgSeven() != null && !homePhoto.getImgSeven().isEmpty()) { imagePaths.add(homePhoto.getImgSeven()); }
+            if (homePhoto.getImgEight() != null && !homePhoto.getImgEight().isEmpty()) { imagePaths.add(homePhoto.getImgEight()); }
+            if (homePhoto.getImgNine() != null && !homePhoto.getImgNine().isEmpty()) { imagePaths.add(homePhoto.getImgNine()); }
+            if (homePhoto.getImgTen() != null && !homePhoto.getImgTen().isEmpty()) { imagePaths.add(homePhoto.getImgTen()); }
+        }
+        dto.setCurrentHomeImagePaths(imagePaths);
+        // --------------------------------------------------------
+
+        dto.setMaxPeople(home.getMaxPeople());
+        dto.setRoom(home.getRoom());
+        dto.setBath(home.getBath() != null ? home.getBath() : 0);
+        dto.setBed(home.getBed() != null ? home.getBed() : 0);
+        dto.setCheckIn(String.format("%02d:00", home.getCheckIn()));
+        dto.setCheckOut(String.format("%02d:00", home.getCheckOut()));
+        dto.setOptionIds(optionIds);
+
+        // 해시태그 매핑
+        if (hashtag != null) {
+            dto.setWifi(hashtag.isWifi());
+            dto.setTv(hashtag.isTv());
+            dto.setKitchen(hashtag.isKitchen());
+            dto.setFreePark(hashtag.isFreePark());
+            dto.setSelfCheckin(hashtag.isSelfCheckin());
+            dto.setColdWarm(hashtag.isColdWarm());
+            dto.setPetFriendly(hashtag.isPetFriendly());
+            dto.setBarrierFree(hashtag.isBarrierFree());
+            dto.setElevator(hashtag.isElevator());
+        }
+
+        return dto;
+    }
+    
+    @Transactional // 수정 트랜잭션
+    public void updateHome(int homeIdx, HomeWriteDTO dto, User currentUser) {
+        
+        // 1. Home 엔티티 조회 및 권한 확인
+        Home home = homeRepository.findById(homeIdx)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 숙소입니다."));
+        
+        // 권한 확인: 숙소의 호스트와 현재 사용자가 일치하는지 확인
+        if (!home.getHost().getEmail().equals(currentUser.getEmail())) {
+            throw new IllegalArgumentException("숙소 수정 권한이 없습니다.");
+        }
+
+        // 2. 파일 처리
+        
+        // 2-1. 썸네일 처리 (변경 없음: 새 파일 없으면 기존 경로 유지)
+        String newThumbnailPath = home.getThumbnail(); 
+        if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
+            newThumbnailPath = fileHandlerService.saveFile(dto.getThumbnail()); 
+        } else if (dto.getCurrentThumbnailPath() != null) {
+            newThumbnailPath = dto.getCurrentThumbnailPath();
+        } 
+        
+        // 2-2. 숙소 사진 처리
+        List<String> finalHomePhotoPaths; // ⭐️ 최종적으로 DB에 저장할 사진 경로 리스트 ⭐️
+        
+        // 새 이미지가 업로드되었는지 확인
+        boolean hasNewImages = dto.getHomeImages() != null && dto.getHomeImages().stream().anyMatch(f -> f != null && !f.isEmpty());
+        
+        if (hasNewImages) {
+            // 새 파일이 있으면 새로 저장하여 최종 경로 리스트 구성
+            List<String> uploadedPaths = new ArrayList<>();
+            for (MultipartFile file : dto.getHomeImages()) {
+                if (file != null && !file.isEmpty()) {
+                    uploadedPaths.add(fileHandlerService.saveFile(file));
+                }
+            }
+            finalHomePhotoPaths = uploadedPaths;
+        } else {
+            // ⭐️ 새 파일이 없으면 DTO에 담겨온 기존 경로를 그대로 최종 경로로 사용 ⭐️
+            // (DTO의 currentHomeImagePaths 필드가 폼에서 Hidden Field로 넘어와야 함)
+            finalHomePhotoPaths = dto.getCurrentHomeImagePaths() != null ? dto.getCurrentHomeImagePaths() : new ArrayList<>();
+        }
+        
+        // 3. Home 엔티티 업데이트
+        home.setTitle(dto.getTitle());
+        home.setDescription(dto.getDescription());
+        home.setLocation(dto.getLocation());
+        
+        // 주소 재조합 (기본주소 + 상세주소)
+        String fullAddress = dto.getAddress().trim() + (dto.getDetailAddress().isEmpty() ? "" : " " + dto.getDetailAddress().trim());
+        home.setAddress(fullAddress);
+        
+        home.setCostBasic(dto.getCostBasic());
+        home.setCostExpen(dto.getCostExpen());
+        if (dto.getHomeType() != null && !dto.getHomeType().isEmpty()) {
+            home.setHomeType(HomeType.valueOf(dto.getHomeType()));
+        } else {
+            home.setHomeType(null);
+        }
+
+        home.setThumbnail(newThumbnailPath); 
+        home.setMaxPeople(dto.getMaxPeople());
+        home.setRoom(dto.getRoom());
+        home.setBath(dto.getBath());
+        home.setBed(dto.getBed());
+        
+        // 시간 포맷팅 및 변환 로직
+        try {
+            home.setCheckIn(LocalTime.parse(dto.getCheckIn()).getHour()); 
+            home.setCheckOut(LocalTime.parse(dto.getCheckOut()).getHour());
+        } catch (Exception e) {
+            // 오류 시 기본값 설정 (혹은 예외를 던지거나 유효성 검사 필요)
+            home.setCheckIn(15); 
+            home.setCheckOut(11);
+        }
+
+        homeRepository.save(home); // Home 엔티티 저장 (업데이트)
+
+
+        // 4. HomePhoto 엔티티 업데이트 (숙소 사진)
+        HomePhoto homePhoto = homePhotoRepository.findByHome(home);
+        if (homePhoto == null) {
+            homePhoto = HomePhoto.builder().home(home).build();
+        }
+
+        // ⭐️⭐️⭐️ finalHomePhotoPaths 리스트를 사용하여 필드 업데이트 (NULL 초기화 방지) ⭐️⭐️⭐️
+        // 리스트 크기에 맞춰 할당하고, 리스트에 포함되지 않은 필드는 명시적으로 NULL 처리합니다.
+        homePhoto.setImgOne(finalHomePhotoPaths.size() > 0 ? finalHomePhotoPaths.get(0) : null);
+        homePhoto.setImgTwo(finalHomePhotoPaths.size() > 1 ? finalHomePhotoPaths.get(1) : null);
+        homePhoto.setImgThree(finalHomePhotoPaths.size() > 2 ? finalHomePhotoPaths.get(2) : null);
+        homePhoto.setImgFour(finalHomePhotoPaths.size() > 3 ? finalHomePhotoPaths.get(3) : null);
+        homePhoto.setImgFive(finalHomePhotoPaths.size() > 4 ? finalHomePhotoPaths.get(4) : null);
+        homePhoto.setImgSix(finalHomePhotoPaths.size() > 5 ? finalHomePhotoPaths.get(5) : null);
+        homePhoto.setImgSeven(finalHomePhotoPaths.size() > 6 ? finalHomePhotoPaths.get(6) : null);
+        homePhoto.setImgEight(finalHomePhotoPaths.size() > 7 ? finalHomePhotoPaths.get(7) : null);
+        homePhoto.setImgNine(finalHomePhotoPaths.size() > 8 ? finalHomePhotoPaths.get(8) : null);
+        homePhoto.setImgTen(finalHomePhotoPaths.size() > 9 ? finalHomePhotoPaths.get(9) : null);
+        
+        homePhotoRepository.save(homePhoto); // HomePhoto 업데이트
+
+
+        // 5. AccommodationOption 업데이트 (옵션)
+        
+        // 기존 옵션 삭제
+        List<AccommodationOption> existingOptions = accommodationOptionRepository.findByHome(home);
+        accommodationOptionRepository.deleteAll(existingOptions);
+
+        // 새 옵션 등록
+        if (dto.getOptionIds() != null) {
+            List<AccommodationOption> newOptions = dto.getOptionIds().stream()
+                .map(optionId -> {
+                    Option option = optionRepository.findById(optionId.intValue())
+                        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 옵션 ID입니다: " + optionId));
+                    return AccommodationOption.builder()
+                            .home(home)
+                            .option(option)
+                            .exist(true)
+                            .build();
+                })
+                .collect(Collectors.toList());
+            accommodationOptionRepository.saveAll(newOptions);
+        }
+
+
+        // 6. Hashtag 엔티티 업데이트
+        Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
+        if (hashtag == null) {
+            hashtag = new Hashtag();
+            hashtag.setHome(home);
+        }
+
+        hashtag.setWifi(dto.isWifi());
+        hashtag.setTv(dto.isTv());
+        hashtag.setKitchen(dto.isKitchen());
+        hashtag.setFreePark(dto.isFreePark());
+        hashtag.setSelfCheckin(dto.isSelfCheckin());
+        hashtag.setColdWarm(dto.isColdWarm());
+        hashtag.setPetFriendly(dto.isPetFriendly());
+        hashtag.setBarrierFree(dto.isBarrierFree());
+        hashtag.setElevator(dto.isElevator());
+        
+        hashtagRepository.save(hashtag); // Hashtag 업데이트
+    }
+    
+    //숙소삭제
+    @Transactional 
+    public void deleteHome(int homeIdx, User userProfile) {
+        
+        // 1. Home 엔티티 조회 및 존재 여부 확인
+        Home home = homeRepository.findById(homeIdx)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 숙소를 찾을 수 없습니다."));
+
+        // 2. 🔑 호스트 권한 확인
+        if (!home.getHost().getEmail().equals(userProfile.getEmail())) {
+            throw new IllegalStateException("숙소 삭제 권한이 없습니다.");
+        }
+
+        // 3. 외래 키 제약 조건이 있는 테이블부터 역순으로 삭제 (순서 중요!)
+        
+        // 3-1. Review 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 ReviewRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        reviewRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-2. Reservation 테이블 삭제 (reserved_home 컬럼 참조)
+        // 💡 ReservationRepository에 deleteByReservedHome_Idx(int homeIdx) 메서드가 필요합니다.
+        reservationRepository.deleteByReservedHome_Idx(homeIdx); 
+
+        // 3-3. Wishlist 테이블 삭제 (wisilist폴더)
+        // 💡 WishlistRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        wishlistRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-4. Accommodation_Option 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 AccommodationOptionRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        accommodationOptionRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-5. Home_Photo 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 HomePhotoRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        // (선택 사항: 파일 삭제 로직을 FileHandlerService를 통해 먼저 실행할 수 있습니다.)
+        homePhotoRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-6. Hashtag 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 HashtagRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        hashtagRepository.deleteByHome_Idx(homeIdx); 
+
+        // 4. 최종적으로 Home 테이블 레코드 삭제
+        homeRepository.delete(home);
+    }  
+      
 }

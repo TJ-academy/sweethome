@@ -37,9 +37,8 @@ public class ChatController {
 	public String getChatRooms(Model model, 
 			HttpSession session) {
 		User user = (User) session.getAttribute("userProfile");
-		String userNickname = user.getNickname();
 		
-		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByNickname(userNickname);
+		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByUser(user);
 		
 		model.addAttribute("roomsList", roomsList);
 		return "chat/chatList";
@@ -49,32 +48,29 @@ public class ChatController {
 	@PostMapping("/room/question")
     public String createQuestionChatRoom(Model model, 
     		HttpSession session,
-    		@RequestParam("nickname") String hostNickname) {
+    		@RequestParam("host") User host) {
 		User guest = (User) session.getAttribute("userProfile");
-		String guestNickname = guest.getNickname();
 		
 		//두사람의 채팅방
-		ChatRoom room = service.getChatRoom(guestNickname, hostNickname, null);
+		ChatRoom room = service.getChatRoom(guest, host, null);
 		
 		return "redirect:/chat/room/" + room.getId();
     }
 	
 	//예약 후 채팅방 생성 또는 조회 + 자동 메시지 전송
     public String createReservationChat(Reservation reservation) {
-        String guest = reservation.getBooker().getNickname();
-        String host = reservation.getReservedHome().getHost().getNickname();
+    	User guest = reservation.getBooker();
+    	User host = reservation.getReservedHome().getHost();
 
         //두사람의 채팅방
         ChatRoom room = service.getChatRoom(guest, host, reservation);
 
         //자동 메시지 전송
-        ChatMessageDto autoMsg = new ChatMessageDto();
-        autoMsg.setRoomId(room.getId());
-        autoMsg.setSender(host);
-        autoMsg.setContent("예약이 완료되었습니다. 감사합니다!");
-
-        ChatMessage saved = service.saveMessage(autoMsg);
-
+        ChatMessage saved = new ChatMessage();
+        saved.setChatRoom(room);
+        saved.setSender(host);
+        saved.setContent("예약이 완료되었습니다. 감사합니다!");
+        
         //실시간 메시지 전송
         messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), saved);
 
@@ -87,19 +83,18 @@ public class ChatController {
 			Model model, 
 			HttpSession session) {
 		User user = (User) session.getAttribute("userProfile");
-		String userNickname = user.getNickname();
 		
 		//채팅방 메시지 조회
 		List<ChatMessage> messageList = service.getMessagesByChatRoom(roomId);
 		//채팅방 내 정보 조회
-		ChatUser me = service.findChatUser(roomId, userNickname);
+		ChatUser me = service.findChatUser(roomId, user);
 		//채팅방 상대 정보 조회
-		ChatUser other = service.findChatOtherUser(roomId, userNickname);
+		ChatUser other = service.findChatOtherUser(roomId, user);
 		
-		model.addAttribute("myNickname", userNickname);
+		model.addAttribute("me", user);
         model.addAttribute("roomId", roomId);
         model.addAttribute("lastRead", me.getLastRead());
-        model.addAttribute("otherNickname", other.getNickname());
+        model.addAttribute("other", other.getUser());
 		model.addAttribute("messageList", messageList);
 		
 		return "chat/chatRoom";
@@ -135,9 +130,8 @@ public class ChatController {
 	                             @RequestParam("messageIdx") Integer messageIdx,
 	                             HttpSession session) {
 	    User user = (User) session.getAttribute("userProfile");
-	    String nickname = user.getNickname();
 
-	    service.updateLastRead(roomId, nickname, messageIdx);
+	    service.updateLastRead(roomId, user, messageIdx);
 	    return "ok";
 	}
 }
