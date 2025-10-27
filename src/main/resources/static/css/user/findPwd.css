@@ -1,0 +1,102 @@
+.find-page {
+  --find-bg: #F5F5F5;
+  --find-card: #FFFFFF;
+  --find-line: #B1B1B1;
+  --find-text: #000;
+  --find-blue: #4DB2FF;
+  --find-shadow: 0 0 10px rgba(0,0,0,.10);
+  --find-header-h: 72px;
+}
+
+/* 전체 배경 */
+.find-page {
+  background: var(--find-bg);
+  min-height: calc(100vh - var(--find-header-h));
+  display: grid;
+  place-items: center;
+  padding: 24px 0;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 카드 */
+.find-card {
+  width: 520px;
+  background: var(--find-card);
+  border-radius: 25px;
+  padding: 50px 40px 40px;
+  box-shadow: var(--find-shadow);
+  border: 1px solid #D5D5D5;
+}
+
+/* 타이틀 */
+.find-title {
+  margin-bottom: 35px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--find-text);
+}
+
+/* 폼 전체 */
+.find-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+.input-group-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 입력칸 */
+.input-group-row input {
+  flex: 1;
+  border: 1px solid var(--find-line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--find-text);
+  background: #fff;
+  transition: border-color .2s;
+}
+.input-group-row input:focus {
+  outline: none;
+  border-color: var(--find-blue);
+}
+
+
+.btn-side {
+  background: var(--find-blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .2s, transform .02s;
+  white-space: nowrap;
+}
+.btn-side:hover { background: #3d96f0; }
+.btn-side:active { transform: translateY(1px); }
+
+/* 결과 메시지 */
+.result-msg {
+  text-align: left;       
+  font-size: 14px;
+  margin-top: 10px;
+  color: #000;           
+}
+.result-msg.error {
+  color: #d32f2f;         
+  font-weight: 600;       
+}
+.result-msg.ok {
+  color: #2e7d32;        
+}
+.result-msg.bold {
+  font-weight: 600;       
+}

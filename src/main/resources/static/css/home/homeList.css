@@ -1,0 +1,111 @@
+/* ===============================
+   홈 숙소 목록 (피그마 스타일)
+   =============================== */
+:root {
+  --home-bg: #f8f8f8;
+  --home-text: #222;
+  --home-sub: #6b7280;
+  --home-red: #ff385c;
+  --home-radius: 20px;
+}
+
+body {
+  background: var(--home-bg);
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--home-text);
+  margin: 0;
+  padding: 0;
+}
+
+/* 메인 컨테이너 */
+.container {
+  width: 1380px;
+  margin: 60px auto;
+}
+
+/* 제목 */
+h2 {
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: 28px;
+}
+
+/* 숙소 목록 그리드 */
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 40px;
+  justify-items: center;
+}
+
+/* 숙소 아이템 */
+.home-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 240px;
+}
+
+/* 이미지 */
+.home-link {
+  display: block;
+  width: 240px;
+  height: 240px;
+  overflow: hidden;
+  border-radius: var(--home-radius);
+  background: #eaeaea;
+}
+
+.home-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--home-radius);
+  transition: transform 0.3s ease;
+}
+
+.home-link:hover .home-img {
+  transform: scale(1.05);
+}
+
+/* 텍스트 */
+.home-text {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.home-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.home-desc {
+  font-size: 14px;
+  color: var(--home-sub);
+  margin-bottom: 4px;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.home-like {
+  font-size: 13px;
+  color: var(--home-red);
+}
+
+/* 숙소 없음 */
+.no-home {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--home-sub);
+  font-size: 14px;
+  margin-top: 40px;
+}

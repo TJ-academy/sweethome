@@ -5,56 +5,36 @@
 <title>홈 스윗 홈</title>
 
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" 
-      crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" 
-        crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" th:href="@{/css/home/homeList.css}">
 </head>
+
 <body>
 <div th:insert="fragments/header :: menuBar"></div>
 <div th:insert="fragments/search :: searchSection"></div>
 
-<div class="container my-5">
+<div class="container">
     <h2 th:text="${param.keyword != null ? '검색 결과' : '전체 숙소 목록'}">전체 숙소 목록</h2>
-    <hr>
-    
-    <!-- 숙소 목록 카드 그리드 -->
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        <!-- homeList (HomeResponseDto 리스트) 순회 -->
-        <div class="col" th:each="homeDto : ${homeList}">
-            <div class="card h-100 shadow-sm">
-                <!-- 썸네일 이미지 -->
-                <img th:src="@{${homeDto.home.thumbnail}}" class="card-img-top" 
-                     alt="숙소 썸네일" style="height: 200px; object-fit: cover;">
-                
-                <div class="card-body">
-                    <!-- 제목 -->
-                    <h5 class="card-title text-truncate" th:text="${homeDto.home.title}">[숙소 제목]</h5>
-                    
-                    <!-- 주소 -->
-                    <p class="card-text text-muted mb-2 text-truncate" th:text="${homeDto.home.address}">[숙소 주소]</p>
-                    
-                    <!-- 좋아요 수 -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-danger">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M8 1.314C3.868-1.55 1.55 3.313 8 7.5c6.45-4.187 4.132-9.05 0-6.186z"/>
-                            </svg>
-                            <span th:text="${homeDto.likeCount}">0</span>
-                        </span>
-                        
-                        <a th:href="@{/home/detail/{homeIdx}(homeIdx=${homeDto.home.idx})}" 
-                           class="btn btn-sm btn-outline-primary">
-                           자세히 보기
-                        </a>
-                    </div>
-                </div>
+
+    <div class="row">
+        <!-- 숙소 카드 반복 -->
+        <div class="home-item" th:each="homeDto : ${homeList}">
+            <a th:href="@{/home/detail/{homeIdx}(homeIdx=${homeDto.home.idx})}" class="home-link">
+                <img th:src="${homeDto.home.thumbnail != null && !homeDto.home.thumbnail.isEmpty() ? homeDto.home.thumbnail : '/images/no-image.jpg'}"
+                     alt="숙소 이미지" class="home-img">
+            </a>
+            <div class="home-text">
+                <h3 class="home-title" th:text="${homeDto.home.title}">숙소 제목</h3>
+                <p class="home-desc" th:text="${homeDto.home.address}">숙소 주소</p>
+                <p class="home-like">❤️ <span th:text="${homeDto.likeCount}">0</span></p>
             </div>
         </div>
-        
-        <!-- 목록이 비어 있을 때 -->
-        <div class="col-12" th:if="${#lists.isEmpty(homeList)}">
-            <p class="text-center text-muted">등록된 숙소가 없습니다.</p>
+
+        <!-- 숙소가 없을 때 -->
+        <div th:if="${#lists.isEmpty(homeList)}" class="no-home">
+            <p>등록된 숙소가 없습니다.</p>
         </div>
     </div>
 </div>
