@@ -22,4 +22,6 @@ public interface AccommodationOptionRepository extends JpaRepository<Accommodati
      */
     @Query("SELECT ao FROM AccommodationOption ao JOIN FETCH ao.home h JOIN FETCH ao.option o WHERE h.idx IN :homeIds")
     List<AccommodationOption> findOptionsByHomeIds(@Param("homeIds") List<Integer> homeIds);
+    
+    List<AccommodationOption> findByHome_Idx(int homeIdx);
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class HomeWriteDTO {
-
+	private int idx;
     private String hostId;
     private String title;
     private String description;
@@ -26,6 +26,10 @@ public class HomeWriteDTO {
 
     private List<MultipartFile> homeImages;
 
+    private String currentThumbnailPath; // URL 대신 Path라는 용어를 사용하겠습니다.
+    
+    private List<String> currentHomeImagePaths;
+    
     // 체크박스 값이 Integer든 Long이든 service에서 변환 가능
     private List<Long> optionIds;  
     
