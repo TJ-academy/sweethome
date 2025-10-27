@@ -49,11 +49,11 @@ public class KakaoService {
                 .block();
 
 
-        log.info("[KakaoService] Access Token: {}", kakaoTokenResponseDto.getAccessToken());
-        log.info("[KakaoService] Refresh Token: {}", kakaoTokenResponseDto.getRefreshToken());
-        //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
-        log.info("[KakaoService] ID Token: {}", kakaoTokenResponseDto.getIdToken());
-        log.info("[KakaoService] Scope: {}", kakaoTokenResponseDto.getScope());
+//        log.info("[KakaoService] Access Token: {}", kakaoTokenResponseDto.getAccessToken());
+//        log.info("[KakaoService] Refresh Token: {}", kakaoTokenResponseDto.getRefreshToken());
+//        //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
+//        log.info("[KakaoService] ID Token: {}", kakaoTokenResponseDto.getIdToken());
+//        log.info("[KakaoService] Scope: {}", kakaoTokenResponseDto.getScope());
 
         return kakaoTokenResponseDto.getAccessToken();
     }
@@ -76,11 +76,22 @@ public class KakaoService {
                 .bodyToMono(KakaoProfile.class)
                 .block();
 
-    	log.info("[KakaoService] User Info: {}", userInfo);
-        log.info("[KakaoService] Kakao ID: {}", userInfo.getId());
-        log.info("[KakaoService] Nickname: {}", userInfo.getKakaoAccount().getProfile().getNickname());
-        log.info("[KakaoService] Profile Image: {}", userInfo.getKakaoAccount().getProfile().getThumbnailImageUrl());
+//    	log.info("[KakaoService] User Info: {}", userInfo);
+//        log.info("[KakaoService] Kakao ID: {}", userInfo.getId());
+//        log.info("[KakaoService] Nickname: {}", userInfo.getKakaoAccount().getProfile().getNickname());
+//        log.info("[KakaoService] Profile Image: {}", userInfo.getKakaoAccount().getProfile().getThumbnailImageUrl());
 
         return userInfo;
+    }
+    
+    public void unlinkKakao(String accessToken) {
+        WebClient.create(KAUTH_USER_URL_HOST)
+                .post()
+                .uri("/v1/user/unlink")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        log.info("[KakaoService] Kakao account unlinked successfully");
     }
 }

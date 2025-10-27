@@ -104,24 +104,34 @@ public class UserController {
 	public String createForm(HttpSession session, Model model) {
 		KakaoProfile kakaouser = (KakaoProfile) session.getAttribute("kakaouser");
 		session.setAttribute("emailVerified", false);
+		
+		UserDTO userDTO = new UserDTO();
+		
 	    if(kakaouser != null) {
 	    	session.setAttribute("emailVerified", true);
-	    	model.addAttribute("kakaouser", kakaouser);
+	    	userDTO.setEmail(kakaouser.getKakaoAccount().getEmail());
+	        userDTO.setKakaoUser(true);
+	        if (!kakaouser.getKakaoAccount().getProfileImageNeedsAgreement()) {
+	            userDTO.setKakaoProfileUrl(kakaouser.getKakaoAccount().getProfile().getThumbnailImageUrl());
+	        }
+	        if (!kakaouser.getKakaoAccount().getProfileNicknameNeedsAgreement()) {
+	            userDTO.setNickname(kakaouser.getKakaoAccount().getProfile().getNickname());
+	        }
 	    }
+	    model.addAttribute("userDTO", userDTO);
 		return "login/join";
 	}
 
 	@PostMapping("/join")
-	public String insertUser(@ModelAttribute User user,
-			@RequestParam(value = "profileImgFile", required = false) MultipartFile profileImg,
+	public String insertUser(@ModelAttribute UserDTO userDTO,
 			HttpSession session,
 			Model model) {
 		Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
 		Boolean nicknameVerified = (Boolean) session.getAttribute("nicknameVerified");
 		String verifiedNickname = (String) session.getAttribute("verifiedNickname");
-		KakaoProfile kakaouser = (KakaoProfile) session.getAttribute("kakaouser");
-		model.addAttribute("user", user);
-		System.out.println("입력된 값 : \n" + user);
+		
+		model.addAttribute("userDTO", userDTO);
+		System.out.println("입력된 값 : \n" + userDTO);
 
 	    if (emailVerified == null || !emailVerified) {
 	        model.addAttribute("message", "이메일 인증을 완료해주세요.");
@@ -129,27 +139,26 @@ public class UserController {
 	    }
 	    
 	    if (nicknameVerified == null || !nicknameVerified || 
-	            !user.getNickname().equals(verifiedNickname)) {
+	            !userDTO.getNickname().equals(verifiedNickname)) {
 	        model.addAttribute("message", "닉네임 중복 확인을 완료해주세요.");
 	        return "login/join"; // 인증 안 된 경우, 회원가입 페이지로 돌아감
 	    }
 	    
-	    //일반 회원가입이면
-	    if (kakaouser == null) {
-	        if (profileImg != null && !profileImg.isEmpty()) {
-	            String savedPath = fileHandlerService.saveFile(profileImg, "userProfile");
-	            user.setProfileImg(savedPath);
-	        } else {
-	            user.setProfileImg("/img/userProfile/default.png"); // 기본 이미지
-	        }
+	    String savedProfilePath = null;
+	    if(userDTO.isKakaoUser() && userDTO.getKakaoProfileUrl() != null) {
+	    	savedProfilePath = userDTO.getKakaoProfileUrl();
+	    } else if (userDTO.getProfileImgFile() != null && !userDTO.getProfileImgFile().isEmpty()) {
+	    	savedProfilePath = fileHandlerService.saveFile(userDTO.getProfileImgFile(), "userProfile");
 	    } else {
-	        //카카오 로그인 회원가입 시 - 카카오 프사 URL 그대로 저장
-	        if (kakaouser.getKakaoAccount().getProfile().getThumbnailImageUrl() != null) {
-	            user.setProfileImg(kakaouser.getKakaoAccount().getProfile().getThumbnailImageUrl());
-	        } else {
-	            user.setProfileImg("/img/userProfile/default.png");
-	        }
-	        session.removeAttribute("kakaouser");
+	    	savedProfilePath = "/img/userProfile/default.png";
+	    }
+	    
+	    // DTO → Entity 변환
+	    User user = userDTO.toEntity();
+	    user.setProfileImg(savedProfilePath);
+	    
+	    if(userDTO.isKakaoUser()) {
+	    	session.removeAttribute("kakaouser");
 	    }
 	    
 		service.insertUser(user);
