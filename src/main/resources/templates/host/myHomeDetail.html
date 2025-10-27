@@ -72,13 +72,16 @@
                         <div class="card p-3 mb-4">
                             <p th:utext="*{description}">여기는 숙소에 대한 긴 상세 설명이 들어가는 곳입니다.</p>
                         </div>
-                        
-                        <div class="text-end">
-                            <a th:href="@{/host/edit/{idx}(idx=*{idx})}" class="btn btn-warning me-2">숙소 정보 수정</a>
-                            <a th:href="@{/host/delete/{idx}(idx=*{idx})}" class="btn btn-danger">숙소 삭제</a>
-                        </div>
-                    </div>
-                    
+						<div class="text-end">
+						    <a th:href="@{/host/edit/{idx}(idx=*{idx})}" class="btn btn-warning me-2">숙소 정보 수정</a>
+						    
+						    <form th:action="@{/host/delete/{idx}(idx=*{idx})}" method="post" 
+						          style="display:inline;"
+						          onsubmit="return confirm('정말로 숙소를 삭제하시겠습니까? 숙소와 관련된 모든 예약, 리뷰, 사진 정보가 영구히 삭제되며, 이 작업은 되돌릴 수 없습니다.');">
+						        <button type="submit" class="btn btn-danger">숙소 삭제</button>
+						    </form>
+						</div>                      
+                    </div>   
                 </div>
             </div>
         </div>

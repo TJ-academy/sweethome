@@ -264,4 +264,41 @@ public class HostController {
             return "redirect:/host/edit/" + homeIdx;
         }
     }
+	
+	//숙소 삭제
+	@PostMapping("/delete/{homeIdx}")
+    public String deleteHome(@PathVariable("homeIdx") int homeIdx,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
+        // 1. 호스트 로그인 상태 확인
+        User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+
+        try {
+            // 2. Service 호출하여 숙소 및 연관 데이터 삭제 로직 실행
+            // HomeService에서 권한 체크 및 트랜잭션 처리가 모두 이루어집니다.
+            homeService.deleteHome(homeIdx, userProfile);
+
+            // 3. 성공 메시지 담고 호스트의 숙소 목록 페이지로 리다이렉트
+            redirectAttributes.addFlashAttribute("message", "숙소가 성공적으로 삭제되었습니다.");
+            return "redirect:/host/list";
+
+        } catch (IllegalArgumentException e) {
+            // 숙소가 존재하지 않는 경우 (HomeService에서 발생)
+            redirectAttributes.addFlashAttribute("error", "삭제하려는 숙소를 찾을 수 없습니다.");
+            return "redirect:/host/list";
+        } catch (IllegalStateException e) {
+            // 권한 오류 (HostController의 detail과 같이 HomeService에서 호스트 불일치 시 발생)
+            redirectAttributes.addFlashAttribute("error", "해당 숙소의 삭제 권한이 없습니다.");
+            return "redirect:/host/detail/" + homeIdx;
+        } catch (RuntimeException e) {
+            // 기타 DB 처리 오류
+            redirectAttributes.addFlashAttribute("error", "숙소 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/host/detail/" + homeIdx;
+        }
+    }
+	
 }
