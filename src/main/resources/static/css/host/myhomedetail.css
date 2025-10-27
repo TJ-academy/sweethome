@@ -1,0 +1,147 @@
+/* ===============================
+   myHomeDetail.css (숙소 상세 페이지)
+   =============================== */
+
+:root {
+  --detail-bg: #f8f9fb;
+  --detail-card: #ffffff;
+  --detail-border: #e5e7eb;
+  --detail-text: #222;
+  --detail-sub: #6b7280;
+  --detail-blue: #4DB2FF;
+  --detail-blue-hover: #3d96f0;
+  --detail-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --detail-radius: 18px;
+}
+
+body {
+  background: var(--detail-bg);
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--detail-text);
+  margin: 0;
+  padding: 0;
+}
+
+/* 전체 레이아웃 */
+.mypage-layout-wrap {
+  margin-top: 40px;
+  padding-bottom: 80px;
+}
+
+/* 상세 정보 메인 영역 */
+.mypage-content-area {
+  background: var(--detail-card);
+  border-radius: var(--detail-radius);
+  box-shadow: var(--detail-shadow);
+  padding: 40px 50px;
+}
+
+/* 제목 */
+.mypage-content-area h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--detail-text);
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--detail-blue);
+  padding-bottom: 8px;
+}
+
+/* 숙소 제목 */
+.mypage-content-area h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+/* 이미지 */
+.mypage-content-area img {
+  border-radius: 14px;
+  box-shadow: var(--detail-shadow);
+  max-height: 400px;
+  object-fit: cover;
+}
+
+/* 정보 카드 */
+.card {
+  border-radius: var(--detail-radius);
+  border: 1px solid var(--detail-border);
+  background: var(--detail-card);
+  box-shadow: none;
+}
+
+/* 항목 */
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--detail-border);
+}
+
+.item-label {
+  color: var(--detail-sub);
+  font-weight: 600;
+  flex: 0 0 140px;
+}
+
+.item-value {
+  font-weight: 500;
+  color: var(--detail-text);
+}
+
+/* 요금 강조 */
+.text-primary {
+  color: var(--detail-blue) !important;
+  font-weight: 700;
+}
+
+.text-danger {
+  color: #ff4b4b !important;
+  font-weight: 700;
+}
+
+/* 상세 설명 */
+h4.h5 {
+  margin-top: 36px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--detail-text);
+}
+
+.card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* 버튼 영역 */
+.text-end {
+  margin-top: 28px;
+}
+
+.btn-warning {
+  background: #8DCEFF;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 8px 16px;
+  transition: background .2s;
+}
+.btn-warning:hover {
+  background: #4DB2FF;
+  color: #fff;
+  }
+
+
+.btn-danger {
+  background: #DEDEDE;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 8px 16px;
+  transition: background .2s;
+}
+.btn-danger:hover {
+  background: #000;
+}
