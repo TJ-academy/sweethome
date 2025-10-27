@@ -1,5 +1,7 @@
 package com.example.sweethome.home;
 
+import com.example.sweethome.reservation.ReservationRepository;
+import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
 import com.example.sweethome.util.FileHandlerService;
@@ -34,6 +36,8 @@ public class HomeService {
     private final HashtagRepository hashtagRepository;
     private final FileHandlerService fileHandlerService;
     private final WishlistRepository wishlistRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * ✅ 전체 숙소 목록 조회 (좋아요 개수 포함)
@@ -535,9 +539,48 @@ public class HomeService {
         hashtagRepository.save(hashtag); // Hashtag 업데이트
     }
     
-    
-    
-    
-    
-    
+    //숙소삭제
+    @Transactional 
+    public void deleteHome(int homeIdx, User userProfile) {
+        
+        // 1. Home 엔티티 조회 및 존재 여부 확인
+        Home home = homeRepository.findById(homeIdx)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 숙소를 찾을 수 없습니다."));
+
+        // 2. 🔑 호스트 권한 확인
+        if (!home.getHost().getEmail().equals(userProfile.getEmail())) {
+            throw new IllegalStateException("숙소 삭제 권한이 없습니다.");
+        }
+
+        // 3. 외래 키 제약 조건이 있는 테이블부터 역순으로 삭제 (순서 중요!)
+        
+        // 3-1. Review 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 ReviewRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        reviewRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-2. Reservation 테이블 삭제 (reserved_home 컬럼 참조)
+        // 💡 ReservationRepository에 deleteByReservedHome_Idx(int homeIdx) 메서드가 필요합니다.
+        reservationRepository.deleteByReservedHome_Idx(homeIdx); 
+
+        // 3-3. Wishlist 테이블 삭제 (wisilist폴더)
+        // 💡 WishlistRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        wishlistRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-4. Accommodation_Option 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 AccommodationOptionRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        accommodationOptionRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-5. Home_Photo 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 HomePhotoRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        // (선택 사항: 파일 삭제 로직을 FileHandlerService를 통해 먼저 실행할 수 있습니다.)
+        homePhotoRepository.deleteByHome_Idx(homeIdx); 
+
+        // 3-6. Hashtag 테이블 삭제 (home_idx 컬럼 참조)
+        // 💡 HashtagRepository에 deleteByHome_Idx(int homeIdx) 메서드가 필요합니다.
+        hashtagRepository.deleteByHome_Idx(homeIdx); 
+
+        // 4. 최종적으로 Home 테이블 레코드 삭제
+        homeRepository.delete(home);
+    }  
+      
 }
