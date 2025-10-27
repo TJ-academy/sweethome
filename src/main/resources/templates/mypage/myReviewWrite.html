@@ -12,7 +12,6 @@
     .star-group input{ display:none; }
     .star-group label{ cursor:pointer; font-size:1.8rem; margin-right:6px; color:#ddd; }
     .star-group label.active{ color:#ffc107; }
-    .keyword-badge{ margin-right:8px; margin-bottom:8px; }
   </style>
 </head>
 <body>
@@ -44,7 +43,7 @@
                 <span th:text="|${targetLabel}: ${targetUser.nickname} (${targetUser.email})|">대상 표시</span>
               </div>
 
-              <form th:action="@{/review/write}" method="post" enctype="multipart/form-data">
+              <form th:action="@{/mypage/review/write}" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="reservationId" th:value="${reservation.reservationIdx}">
                 <!-- ✅ 방향 고정 전송: GUEST_TO_HOST 또는 HOST_TO_GUEST -->
                 <input type="hidden" name="direction" th:value="${direction}">
@@ -66,22 +65,6 @@
                 <div class="mb-3">
                   <label class="form-label">후기 내용</label>
                   <textarea class="form-control" name="content" rows="6" placeholder="후기를 남겨주세요." required></textarea>
-                </div>
-
-                <!-- 키워드 -->
-                <div class="mb-3" th:if="${keywordGroups}">
-                  <label class="form-label">키워드(선택)</label>
-                  <div class="row g-3">
-                    <div class="col-12" th:each="entry : ${keywordGroups}">
-                      <div class="fw-semibold mb-1" th:text="${entry.key}">카테고리</div>
-                      <div>
-                        <label class="badge rounded-pill text-bg-light keyword-badge" th:each="kw : ${entry.value}">
-                          <input class="form-check-input me-1" type="checkbox" name="keywordIds" th:value="${kw.categoryIdx}">
-                          <span th:text="${kw.goodthing}">키워드</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <!-- 이미지(선택) -->
