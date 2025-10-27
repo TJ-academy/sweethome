@@ -1,0 +1,181 @@
+/* ===============================
+   deleteReal.css
+   =============================== */
+
+/* 전체 레이아웃 */
+.mypage-layout-wrap {
+  padding: 60px 0;
+  background-color: #f9fafb;
+  min-height: 80vh;
+}
+
+/* 콘텐츠 영역 */
+.mypage-content-area {
+  background: #fff;
+  border-radius: 25px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  padding: 60px 80px;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 제목 */
+.mypage-content-area h1 {
+  font-size: 21px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 35px;
+}
+
+/* 입력 폼 */
+.mypage-content-area form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.mypage-content-area label {
+  align-self: flex-start;
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+  margin-top: 8px;
+}
+
+.mypage-content-area input {
+  width: 100%;
+  max-width: 420px;
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #333;
+  transition: all 0.2s ease-in-out;
+}
+
+.mypage-content-area input:focus {
+  outline: none;
+  border-color: #dc3545;
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15);
+}
+
+/* 에러 메시지 */
+.mypage-content-area p {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #dc3545;
+}
+
+/* 버튼 영역 */
+.button-wrap {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px; /* 버튼 사이 간격 */
+}
+
+/* 버튼 공통 */
+.button-wrap button {
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 24px;
+  min-width: 130px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 탈퇴 버튼 */
+.button-wrap button[type="submit"] {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.button-wrap button[type="submit"]:hover {
+  background-color: #c82333;
+}
+
+/* 뒤로가기 버튼 */
+.button-wrap button[type="button"] {
+  background-color: #adb5bd;
+  color: #fff;
+}
+.button-wrap button[type="button"]:hover {
+  background-color: #9ca3af; /* hover 시 약간 어두워짐 */
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .mypage-content-area {
+    padding: 40px 25px;
+  }
+
+  .mypage-content-area h1 {
+    font-size: 18px;
+  }
+
+  .mypage-content-area input {
+    max-width: 100%;
+  }
+
+  .button-wrap {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+
+
+/* ===============================
+   탈퇴 완료 페이지용 스타일
+   =============================== */
+.delete-complete-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9fafb;
+}
+
+.delete-complete-card {
+  background: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  padding: 80px 100px;
+  max-width: 600px;
+}
+
+.delete-complete-card h2 {
+  font-size: 21px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.delete-complete-card p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.back-home-btn {
+  display: inline-block;
+  background-color: #3da9fc;  /* 파란 버튼 (회원가입 완료 화면 느낌) */
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.back-home-btn:hover {
+  background-color: #2f8be0;
+}
