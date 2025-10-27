@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.sweethome.kakao.KakaoService;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
 import com.example.sweethome.user.UserService;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
 public class MypageController {
+	private final KakaoService kakaoService;
 	
 	private User getLoggedInUser(HttpSession session) {
 		// 세션에서 userProfile (User 객체)을 가져와 형 변환
@@ -74,8 +76,17 @@ public class MypageController {
 		User user = (User) session.getAttribute("userProfile");
 		if(userService.loginUser(email, password) && 
 				(user.getEmail().equals(email))) {
+			System.out.println("아이디와 비번이 일치합니다.");
+			
+			//카카오 계정 연결되어 있으면 unlink
+			String accesToken = (String) session.getAttribute("kakaoAccessToken");
+			if(accesToken != null) {
+				System.out.println("카카오 계정이 연결되어있군요.");
+				kakaoService.unlinkKakao(accesToken);
+			}
 			service.deleteUserByEmail(email);
 			session.invalidate();
+			System.out.println("회원탈퇴가 되었습니다.");
 			return "mypage/deleteFinish";
         } else {
         	model.addAttribute("email", email);

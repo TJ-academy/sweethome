@@ -48,7 +48,7 @@
 </head>
 <body>
 <a class="nav-link" href="/chat/rooms">뒤로가기</a>
-<h2 th:text="${otherNickname}"></h2>
+<h2 th:text="${other.nickname}"></h2>
 
 <div id="chatBox">
     <div th:each="msg, iterStat : ${messageList}">
@@ -66,11 +66,11 @@
 				
 				<!-- 메시지 출력 -->
 				<div th:id="${'msg-' + msg.idx}"
-					th:class="${msg.sender == myNickname} 
+					th:class="${msg.sender == me} 
 					? 'message message-out' 
 					: 'message message-in'">
 					<p>
-						<strong th:text="${msg.sender}"></strong>: 
+						<strong th:text="${msg.sender.nickname}"></strong>: 
 						<span th:text="${msg.content}"></span><br>
 						<img th:if="${msg.img != '-'}" th:src="${msg.img}" width="200" alt="이미지">
 						<span class="message-time" 
@@ -107,9 +107,9 @@
 const textarea = document.getElementById('messageInput');
 const form = document.getElementById('chatForm');
 const roomId = '[[${roomId}]]';
-const myNickname = '[[${myNickname}]]';
-const otherNickname = '[[${otherNickname}]]';
-const lastRead = [[${lastRead != null ? lastRead : 0}]];
+const myNickname = '[[${me.nickname}]]';
+const otherNickname = '[[${other.nickname}]]';
+const lastRead = [[${lastRead}]];
 
 let stompClient = null;
 
@@ -160,12 +160,12 @@ function showMessage(message) {
 	
 	//메시지 박스 생성
     const messageDiv = document.createElement('div');
-    const isMyMessage = message.sender === myNickname;
+    const isMyMessage = message.sender.nickname === myNickname;
     messageDiv.className = isMyMessage ? 'message message-out' : 'message message-in';
 	
 	// 메시지 내용 구성
     let innerHTML = `<p>`;
-    innerHTML += `<strong>${message.sender}</strong>: ${message.content}<br>`;
+    innerHTML += `<strong>${message.sender.nickname}</strong>: ${message.content}<br>`;
     
 	//이미지가 있으면 출력
 	if (message.img && message.img !== '-') {
@@ -201,8 +201,8 @@ function sendMessage(content, img = '-') {
 		console.log("sendMessage 함수 실행");
 		stompClient.send("/app/message/send", {}, JSON.stringify({
 			roomId,
-			sender: myNickname,
-			receiver: otherNickname,
+			sender: '[[${me}]]',
+			receiver: '[[${other}]]',
 			content,
 			img
 		}));

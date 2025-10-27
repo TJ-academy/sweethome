@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.sweethome.reservation.Reservation;
+import com.example.sweethome.user.User;
+import com.example.sweethome.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,17 +19,18 @@ public class ChatService {
 	private final ChatMessageRepository mrepo;
 	private final ChatRoomRepository rrepo;
 	private final ChatUserRepository urepo;
+	private final UserRepository userrepo;
 	
 	//두 사람이 포함된 채팅방이 있는가
-	public Integer isExistTwoUserRoom(String nicknameOne,
-			String nicknameTwo) {
-		return urepo.findRoomIdWithBothUsers(nicknameOne, nicknameTwo)
+	public Integer isExistTwoUserRoom(User userOne,
+			User userTwo) {
+		return urepo.findRoomIdWithBothUsers(userOne, userTwo)
 	            .orElse(0);
 	}
 	
 	//새로운 채팅방 만들기
-	public ChatRoom createNewChatRoom(String nicknameOne, 
-			String nicknameTwo, 
+	public ChatRoom createNewChatRoom(User userOne, 
+			User userTwo, 
 			Reservation reservation) {
 		var room = new ChatRoom();
 		if(reservation == null) {
@@ -37,16 +40,16 @@ public class ChatService {
 			rrepo.save(room);
 		}
 		
-	    urepo.save(new ChatUser(room.getId(), nicknameOne, null));
-	    urepo.save(new ChatUser(room.getId(), nicknameTwo, null));
+	    urepo.save(new ChatUser(room.getId(), userOne, 0));
+	    urepo.save(new ChatUser(room.getId(), userTwo, 0));
 	    
 		return room;
 	}
 	
 	//내 채팅방 목록 조회
-	public List<ChatRoomPreviewDTO> getChatRoomsByNickname(String nickname) {
+	public List<ChatRoomPreviewDTO> getChatRoomsByUser(User user) {
 		//사용자의 모든 채팅방 조회
-		List<ChatUser> userRooms = urepo.findByNickname(nickname);
+		List<ChatUser> userRooms = urepo.findByUser(user);
 		
 		//채팅방이 없으면 빈 리스트 반환
 		if (userRooms.isEmpty()) {
@@ -60,11 +63,11 @@ public class ChatService {
 			//채팅방 번호
 			Integer roomId = userRoom.getRoomId();
 	        
-	        //채팅 상대 닉네임
-			ChatUser otherUser = findChatOtherUser(roomId, nickname);
+	        //채팅 상대
+			ChatUser otherUser = findChatOtherUser(roomId, user);
 	        String roomName = "-";
 	        if (otherUser != null) {
-	            roomName = otherUser.getNickname();
+	            roomName = otherUser.getUser().getNickname();
 	        }
 
 	        //마지막 메시지 가져오기
@@ -116,14 +119,14 @@ public class ChatService {
 	
 	//한 채팅방의 나 조회
 	public ChatUser findChatUser(Integer roomId, 
-			String myNickname) {
-		return urepo.findByRoomIdAndNickname(roomId, myNickname).get();
+			User user) {
+		return urepo.findByRoomIdAndUser(roomId, user).get();
 	}
 	
 	//한 채팅방의 채팅 상대 조회
 	public ChatUser findChatOtherUser(Integer roomId, 
-			String myNickname) {
-		return urepo.findByRoomIdAndNicknameNot(roomId, myNickname).orElse(null);
+			User user) {
+		return urepo.findByRoomIdAndUserNot(roomId, user).orElse(null);
 	}
 	
 	//한 채팅방 조회
@@ -132,18 +135,18 @@ public class ChatService {
 	}
 	
 	//두사람이 있는 채팅방이 있으면 그걸 반환, 없으면 새로 생성
-	public ChatRoom getChatRoom(String nicknameOne,
-			String nicknameTwo, 
+	public ChatRoom getChatRoom(User userOne,
+			User userTwo, 
 			Reservation reservation) {
 		//두사람의 채팅방이 있니?
-		Integer roomId = isExistTwoUserRoom(nicknameOne, nicknameTwo);
+		Integer roomId = isExistTwoUserRoom(userOne, userTwo);
 		ChatRoom room;
 
 		//채팅방이 있으면
         if (roomId != 0) {
             room = findChatRoom(roomId);
         } else { //채팅방이 없으면
-            room = createNewChatRoom(nicknameOne, nicknameTwo, reservation);
+            room = createNewChatRoom(userOne, userTwo, reservation);
         }
         
         return room;
@@ -165,11 +168,11 @@ public class ChatService {
 	}
 	
 	//마지막으로 읽은 메시지 업데이트
-	public void updateLastRead(Integer roomId, String nickname, Integer messageIdx) {
-	    ChatUser user = urepo.findByRoomIdAndNickname(roomId, nickname).get();
-	    if (user != null) {
-	        user.setLastRead(messageIdx);
-	        urepo.save(user);
+	public void updateLastRead(Integer roomId, User user, Integer messageIdx) {
+	    ChatUser userChat = urepo.findByRoomIdAndUser(roomId, user).get();
+	    if (userChat != null) {
+	        userChat.setLastRead(messageIdx);
+	        urepo.save(userChat);
 	    }
 	}
 }

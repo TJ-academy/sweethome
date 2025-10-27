@@ -1,8 +1,12 @@
 package com.example.sweethome.chat;
 
+import com.example.sweethome.user.User;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +25,9 @@ public class ChatUser {
 	private Integer roomId;
 	
 	@Id
-	private String nickname;
+	@ManyToOne
+    @JoinColumn(name = "user_email")
+    private User user;
 	
 	private Integer lastRead;
 }

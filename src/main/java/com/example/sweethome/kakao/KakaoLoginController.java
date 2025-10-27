@@ -29,24 +29,24 @@ public class KakaoLoginController {
 	@GetMapping("/callback")
 	public String callback(@RequestParam("code") String code,
 			Model model, HttpSession session) throws IOException {
-		System.out.println("a");
 		//카카오에서 엑세스 토큰 받기
 		String accessToken = kakaoService.getAccessTokenFromKakao(code);
-		System.out.println("b");
+		session.setAttribute("kakaoAccessToken", accessToken);
+		
 		//액세스 토큰으로 사용자 정보 받아오기
 		KakaoProfile userInfo = kakaoService.getUserInfo(accessToken);
-		System.out.println("c");
+		
 		//이메일로 회원 검색
 		Optional<User> isUser = userRepo.findByEmail(userInfo.getKakaoAccount().getEmail());
-		System.out.println("d");
+		
 		//회원이 아니라면 회원가입
 		if (isUser.isEmpty()) {
-			System.out.println("e");
+			System.out.println("당신의 카카오 정보 : " + userInfo);
 			session.setAttribute("kakaouser", userInfo);
 			return "redirect:/user/join";
 		} else {
-			System.out.println("f");
 			//회원이면 home.html로 이동
+			System.out.println("당신의 정보 : " + isUser.get().toString());
 			session.setAttribute("userProfile", isUser.get());
 	        return "redirect:/";
 		}
