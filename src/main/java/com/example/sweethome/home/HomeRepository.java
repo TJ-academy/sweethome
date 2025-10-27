@@ -11,4 +11,7 @@ public interface HomeRepository extends JpaRepository<Home, Integer> {
 	
 	// 호스트(User 엔티티)를 기준으로 숙소 목록을 조회하는 메서드
     List<Home> findByHost(User host);
+    
+    //검색
+    List<Home> findByLocationContainingIgnoreCaseAndMaxPeopleGreaterThanEqual(String locationKeyword, int maxPeople);
 }

@@ -49,17 +49,29 @@ public class HomeController {
         return "redirect:/";
     }
 
-    /** ✅ 여행지 검색 */
+    //여행지 검색
     @GetMapping("/search")
     public String searchHomes(@RequestParam("keyword") String keyword,
+                              @RequestParam(value = "adults", defaultValue = "0") int adults,
+                              @RequestParam(value = "checkin", required = false) String checkin, // ✅ [추가]
+                              @RequestParam(value = "checkout", required = false) String checkout, // ✅ [추가]
+                              @RequestParam(value = "children", defaultValue = "0") int children, // ✅ [추가]
                               HttpSession session,
                               Model model) {
-        // 검색어를 기반으로 숙소 검색 (location 컬럼 기준)
-        List<HomeResponseDto> searchResults = homeService.searchHomesByLocation(keyword);
+        
+        // 이전에 HomeService에 추가 요청했던 메서드로 가정합니다.
+        // 현재는 인원수 필터링까지만 구현 요청되었으므로, 날짜 필터링은 제외하고 호출합니다.
+        List<HomeResponseDto> searchResults = homeService.searchHomesByLocationAndMaxPeople(keyword, adults);
 
         // 검색 결과 모델에 추가
         model.addAttribute("homeList", searchResults);
+        
+        // ✅ [추가] 모든 검색 조건을 Model에 추가하여 HTML로 전달합니다.
         model.addAttribute("keyword", keyword);
+        model.addAttribute("checkin", checkin);
+        model.addAttribute("checkout", checkout);
+        model.addAttribute("adults", adults);
+        model.addAttribute("children", children);
 
         // 세션에서 사용자 프로필 추가 (일관성 유지)
         User userProfile = (User) session.getAttribute("userProfile");

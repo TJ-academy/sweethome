@@ -86,6 +86,28 @@ public class HomeService {
                 ))
                 .collect(Collectors.toList());
     }
+    
+    public List<HomeResponseDto> searchHomesByLocationAndMaxPeople(String keyword, int adults) {
+        // 1️⃣ location 및 maxPeople 필터링 조건을 적용하여 Home 목록을 가져옵니다.
+        List<Home> homes = homeRepository.findByLocationContainingIgnoreCaseAndMaxPeopleGreaterThanEqual(keyword, adults);
+
+        // 2️⃣ 각 숙소의 좋아요 개수 조회
+        List<Object[]> likeCounts = wishlistRepository.countWishlistsByHome();
+
+        Map<Integer, Long> likeCountMap = likeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 3️⃣ Home + 좋아요 결합 → DTO 반환
+        return homes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+    }
 
     // 🔽 이하 기존 메서드 그대로 유지 🔽
 

@@ -10,7 +10,7 @@
 			<div class="search-container">
 				<div class="search-item" id="destination-search-item">
 					<label for="destination" class="search-label">여행지</label> <input
-						type="text" id="destination" placeholder="여행지 검색" />
+						type="text" id="destination" placeholder="여행지 검색" th:value="${keyword}" />
 					<div class="recommendation-list" id="recommendation-list">
 						<div class="recommendation-item" data-region="서울">
 							<div class="item-icon icon-city">🏛️</div>
@@ -150,18 +150,19 @@
 
 				<div class="search-item">
 					<label for="checkin" class="search-label">체크인</label> <input
-						type="date" id="checkin" placeholder="날짜 추가" />
+						type="date" id="checkin" placeholder="날짜 추가" th:value="${checkin}" />
 				</div>
 				<div class="search-item">
 					<label for="checkout" class="search-label">체크아웃</label> <input
-						type="date" id="checkout" placeholder="날짜 추가" />
+						type="date" id="checkout" placeholder="날짜 추가" th:value="${checkout}" />
 				</div>
-				<div
-					class="search-item d-flex align-items-center justify-content-between">
+				
+				<div class="search-item" id="guest-search-item">
 					<div style="flex-grow: 1;">
-						<label for="guests" class="search-label">여행자</label> <input
-							type="text" id="guests" placeholder="게스트 추가" readonly
-							style="cursor: pointer;" />
+						<label for="guests" class="search-label">여행자</label> 
+						<input type="text" id="guests" placeholder="게스트 추가" readonly
+							style="cursor: pointer; background-color: transparent;" th:value="${(adults != 0 or children != 0) ? 
+        '성인 ' + adults + '명' + (children != 0 ? ', 어린이 ' + children + '명' : '') : ''}" />
 					</div>
 
 					<div class="search-button-wrap">
@@ -173,104 +174,232 @@
                     </svg>
 						</button>
 					</div>
+					
+					<div class="guest-settings" id="guest-settings">
+						<div class="guest-item">
+							<div class="guest-info">
+								<h4>성인</h4>
+								<p>13세 이상</p>
+							</div>
+							<div class="guest-controls">
+								<button class="decrement-btn" data-type="adult" disabled>-</button>
+								<span class="count" id="adult-count">0</span>
+								<button class="increment-btn" data-type="adult">+</button>
+							</div>
+						</div>
+						<div class="guest-item">
+							<div class="guest-info">
+								<h4>어린이</h4>
+								<p>2~12세</p>
+							</div>
+							<div class="guest-controls">
+								<button class="decrement-btn" data-type="child" disabled>-</button>
+								<span class="count" id="child-count">0</span>
+								<button class="increment-btn" data-type="child">+</button>
+							</div>
+						</div>
+					</div>
+					
 				</div>
 			</div>
 		</div>
 
-<script>
+<script th:inline="javascript">
 	document.addEventListener('DOMContentLoaded', function() {
-	    const searchItem = document.getElementById('destination-search-item');
-	    const inputField = document.getElementById('destination');
-	    const list = document.getElementById('recommendation-list');
+	    // Controller에서 전달받은 값 (초기화, 값이 없으면 0으로 설정)
+	    // 안전한 인라인 주석 형태를 사용하여 JavaScript 문법 오류를 방지합니다.
+	    const initialAdults = /*[[${adults != null ? adults : 0}]]*/ 0; 
+	    const initialChildren = /*[[${children != null ? children : 0}]]*/ 0;
+	    
+	    // 여행지 검색 관련 요소
+	    const destinationSearchItem = document.getElementById('destination-search-item');
+	    const destinationInput = document.getElementById('destination');
+	    const recommendationList = document.getElementById('recommendation-list');
 	    const recommendationItems = document.querySelectorAll('.recommendation-item');
-	    const searchButton = document.querySelector('.search-button'); // 검색 버튼
+	    const searchButton = document.querySelector('.search-button');
 	
-	    // 목록 표시/숨김
-	    function toggleList(show) {
+	    // ✅ 여행자 검색 관련 요소
+	    const guestSearchItem = document.getElementById('guest-search-item');
+	    const guestInput = document.getElementById('guests');
+	    const guestSettings = document.getElementById('guest-settings');
+	    const adultCountSpan = document.getElementById('adult-count');
+	    const childCountSpan = document.getElementById('child-count');
+	    const incrementButtons = document.querySelectorAll('.increment-btn');
+	    const decrementButtons = document.querySelectorAll('.decrement-btn');
+	
+	    // ✅ Controller에서 받은 초기값으로 변수 초기화
+	    let adultCount = initialAdults;
+	    let childCount = initialChildren;
+	
+	    // --- 여행지 목록 표시/숨김 함수 ---
+	    function toggleDestinationList(show) {
 	        if (show) {
-	            list.style.display = 'block';
-	            list.style.visibility = 'visible';
-	            searchItem.classList.add('active');
+	            recommendationList.style.display = 'block';
+	            recommendationList.style.visibility = 'visible';
+	            destinationSearchItem.classList.add('active');
+	            toggleGuestSettings(false); // 여행지 목록 표시 시 인원수 팝업 숨김
 	        } else {
-	            list.style.display = 'none';
-	            list.style.visibility = 'hidden';
-	            searchItem.classList.remove('active');
+	            recommendationList.style.display = 'none';
+	            recommendationList.style.visibility = 'hidden';
+	            destinationSearchItem.classList.remove('active');
+	        }
+	    }
+	    
+	    // --- ✅ 인원수 팝업 표시/숨김 함수 ---
+	    function toggleGuestSettings(show) {
+	        if (show) {
+	            guestSettings.style.display = 'block';
+	            guestSettings.style.visibility = 'visible';
+	            guestSearchItem.classList.add('active');
+	            toggleDestinationList(false); // 인원수 팝업 표시 시 여행지 목록 숨김
+	        } else {
+	            guestSettings.style.display = 'none';
+	            guestSettings.style.visibility = 'hidden';
+	            guestSearchItem.classList.remove('active');
 	        }
 	    }
 	
-	    // 검색 실행 함수
+	    // --- ✅ 인원수 업데이트 및 UI 반영 함수 ---
+	    function updateGuestCount() {
+	        const total = adultCount + childCount;
+	        
+	        // input 값 업데이트
+	        if (total === 0) {
+	            guestInput.value = '';
+	            guestInput.placeholder = '게스트 추가';
+	        } else if (childCount === 0) {
+	            guestInput.value = `성인 ${adultCount}명`;
+	        } else {
+	            guestInput.value = `성인 ${adultCount}명, 어린이 ${childCount}명`;
+	        }
+	
+	        // 팝업 내부의 숫자 업데이트
+	        adultCountSpan.textContent = adultCount;
+	        childCountSpan.textContent = childCount;
+	        
+	        // 버튼 비활성화/활성화 로직
+	        document.querySelector('.decrement-btn[data-type="adult"]').disabled = adultCount === 0;
+	        document.querySelector('.decrement-btn[data-type="child"]').disabled = childCount === 0;
+	    }
+	
+	    // --- 검색 실행 함수 (쿼리 파라미터에 모든 검색 조건 추가) ---
 	    function performSearch() {
-	        const keyword = inputField.value.trim();
+	        const keyword = destinationInput.value.trim();
+	        
+	        /*
 	        if (keyword === '') {
 	            alert('여행지를 입력해주세요.');
-	            inputField.focus();
+	            destinationInput.focus();
 	            return;
 	        }
+	        */
+	        
+	        const checkin = document.getElementById('checkin').value;
+	        const checkout = document.getElementById('checkout').value;
 	
-	        // 👉 실제 검색 동작 (여기서 원하는 URL로 이동하거나 AJAX 호출 가능)
-	        // 예시: 특정 URL로 이동
-	        window.location.href = `/search?keyword=${encodeURIComponent(keyword)}`;
-	
-	        // 또는 AJAX 사용 시:
-	        // fetch(`/search?keyword=${encodeURIComponent(keyword)}`)
-	        //     .then(res => res.json())
-	        //     .then(data => console.log(data));
+	        // 여행자 정보를 포함한 검색
+	        const searchParams = new URLSearchParams();
+	        searchParams.append('keyword', keyword);
+	        searchParams.append('adults', adultCount);
+	        searchParams.append('children', childCount); // children 값 추가
+	        if(checkin) searchParams.append('checkin', checkin);
+	        if(checkout) searchParams.append('checkout', checkout);
+	        
+	        // 실제 검색 URL로 이동
+	        window.location.href = `/search?${searchParams.toString()}`;
 	    }
+	    
+	    // --- ✅ 이벤트 리스너: 여행자 항목 클릭 시 팝업 표시 ---
+	    guestSearchItem.addEventListener('click', function(event) {
+	    	event.stopPropagation();
+	        toggleGuestSettings(true);
+	    });
 	
-	    // 입력 필드 클릭 시 목록 표시
-	    inputField.addEventListener('click', function(event) {
+	    // --- ✅ 이벤트 리스너: 인원수 증가/감소 버튼 ---
+	    document.querySelectorAll('.guest-controls button').forEach(button => {
+	        button.addEventListener('click', function(event) {
+	            event.stopPropagation(); // 팝업이 닫히지 않도록 막음
+	            const type = this.getAttribute('data-type');
+	            const isIncrement = this.classList.contains('increment-btn');
+	            
+	            if (type === 'adult') {
+	                if (isIncrement) {
+	                    adultCount++;
+	                } else if (adultCount > 0) {
+	                    adultCount--;
+	                }
+	            } else if (type === 'child') {
+	                if (isIncrement) {
+	                    childCount++;
+	                } else if (childCount > 0) {
+	                    childCount--;
+	                }
+	            }
+	            updateGuestCount();
+	        });
+	    });
+	
+	    // --- 이벤트 리스너: 입력 필드 클릭/포커스 시 목록 표시 (여행지) ---
+	    destinationInput.addEventListener('click', function(event) {
 	        event.stopPropagation();
-	        toggleList(true);
+	        toggleDestinationList(true);
 	    });
 	
-	    inputField.addEventListener('focus', function() {
-	        toggleList(true);
+	    destinationInput.addEventListener('focus', function() {
+	        toggleDestinationList(true);
 	    });
 	
-	    // 외부 클릭 시 목록 숨김
+	    // --- 이벤트 리스너: 외부 클릭 시 모든 팝업 숨김 ---
 	    document.addEventListener('click', function(event) {
-	        if (!searchItem.contains(event.target)) {
-	            toggleList(false);
+	        // 여행지 목록 외부 클릭
+	        if (!destinationSearchItem.contains(event.target)) {
+	            toggleDestinationList(false);
+	        }
+	        // 인원수 팝업 외부 클릭
+	        if (!guestSearchItem.contains(event.target)) {
+	            toggleGuestSettings(false);
 	        }
 	    });
 	
-	    // 지역 항목 클릭 시 입력 필드 값 변경
+	    // --- 이벤트 리스너: 지역 항목 클릭 시 입력 필드 값 변경 ---
 	    recommendationItems.forEach(item => {
 	        item.addEventListener('click', function(event) {
 	            const regionName = item.querySelector('.item-title').textContent;
-	            inputField.value = regionName;
-	            toggleList(false);
+	            destinationInput.value = regionName;
+	            toggleDestinationList(false);
 	            document.getElementById('checkin').focus();
 	            event.stopPropagation();
 	        });
 	    });
 	
-	    // 입력 시 필터링
-	    inputField.addEventListener('input', function() {
-	        const filter = inputField.value.toLowerCase();
+	    // --- 이벤트 리스너: 입력 시 필터링 (여행지) ---
+	    destinationInput.addEventListener('input', function() {
+	        const filter = destinationInput.value.toLowerCase();
 	        recommendationItems.forEach(item => {
 	            const title = item.querySelector('.item-title').textContent.toLowerCase();
 	            item.style.display = title.includes(filter) ? 'flex' : 'none';
 	        });
 	    });
 	
-	    // ✅ 검색 버튼 클릭 시 검색 실행
+	    // --- 이벤트 리스너: 검색 버튼 클릭 시 검색 실행 ---
 	    searchButton.addEventListener('click', function(event) {
 	        event.preventDefault();
 	        performSearch();
 	    });
 	
-	    // ✅ 엔터 키로 검색 실행
-	    inputField.addEventListener('keypress', function(event) {
+	    // --- 이벤트 리스너: 엔터 키로 검색 실행 (여행지 입력 필드) ---
+	    destinationInput.addEventListener('keypress', function(event) {
 	        if (event.key === 'Enter') {
 	            event.preventDefault();
 	            performSearch();
 	        }
 	    });
+	    
+	    // DOM 로드 후 Controller에서 받은 초기값으로 UI를 업데이트합니다.
+	    updateGuestCount();
 	});
 </script>
-		
-	</div>
+</div>
 
 </body>
 </html>

@@ -164,3 +164,96 @@
 .icon-island {
 	background-color: #ffd6a5;
 }
+
+/* 레이아웃 문제 해결을 위한 추가/수정 스타일 */
+
+/* 여행자 항목 (마지막 search-item) 레이아웃 설정 */
+.search-item:last-child {
+	display: flex; 
+	align-items: center; 
+	justify-content: space-between; 
+}
+
+/* 여행자 항목 내부의 인풋/레이블 영역이 공간을 최대한 차지하도록 */
+.search-item:last-child > div:first-child {
+	flex-grow: 1; 
+}
+
+/* ⭐ 인원수 설정 팝업 스타일 추가 ⭐ */
+.guest-settings {
+	position: absolute;
+	top: 65px;
+	right: 5px; /* search-container 오른쪽 끝에 맞춰지도록 조정 */
+	width: 320px;
+	background-color: white;
+	border-radius: 20px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+	z-index: 20;
+	padding: 20px;
+	border: 1px solid #ddd;
+	display: none; /* 초기 숨김 */
+	visibility: hidden; /* 초기 숨김 처리 */
+}
+
+.guest-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0;
+}
+
+.guest-item:not(:last-child) {
+	border-bottom: 1px solid #eee;
+	margin-bottom: 10px;
+}
+
+.guest-info h4 {
+	font-weight: bold;
+	font-size: 16px;
+	color: #333;
+	margin: 0;
+}
+
+.guest-info p {
+	font-size: 13px;
+	color: #777;
+	margin: 2px 0 0 0;
+}
+
+.guest-controls {
+	display: flex;
+	align-items: center;
+}
+
+.guest-controls button {
+	width: 32px;
+	height: 32px;
+	border: 1px solid #b0b0b0;
+	border-radius: 50%;
+	background-color: white;
+	color: #333;
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s;
+}
+
+.guest-controls button:hover {
+	border-color: #333;
+}
+
+.guest-controls button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.guest-controls .count {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0 15px;
+	width: 20px;
+	text-align: center;
+}
