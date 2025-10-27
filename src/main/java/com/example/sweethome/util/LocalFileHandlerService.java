@@ -79,4 +79,9 @@ public class LocalFileHandlerService implements FileHandlerService {
     public String saveFile(MultipartFile file) {
         return saveFile(file, "home");
     }
+    
+    @Override
+    public String saveChatImage(MultipartFile file, String subDir) {
+    	return saveFile(file, "chat/" + subDir);
+    }
 }
