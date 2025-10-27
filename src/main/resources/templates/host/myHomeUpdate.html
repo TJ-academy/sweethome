@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>숙소 수정</title>
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
+
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<style>
+    /* 이미지 미리보기가 줄바꿈 없이 보이도록 스타일 추가 */
+    .image-previews {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 5px;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    // Summernote 활성화
+    $('#description').summernote({
+        height: 300,
+        width: 800,
+        placeholder: '숙소에 대한 상세 설명을 입력하세요.'
+    });
+
+    // 오류 메시지가 있다면 표시
+    var errorMessage = "[[${error}]]";
+    if (errorMessage && errorMessage !== "") {
+        alert(errorMessage);
+    }
+});
+
+// 주소 검색 함수
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            let addr = data.roadAddress;
+            if (data.userSelectedType === 'J') {
+                addr = data.jibunAddress;
+            }
+            document.getElementById("address").value = addr;
+            document.getElementById("detailAddress").focus();
+        }
+    }).open();
+}
+</script>
+</head>
+
+<body>
+<h2>숙소 수정</h2>
+
+<form th:action="@{/host/edit/{idx}(idx=*{idx})}" method="post" enctype="multipart/form-data" th:object="${homeWriteDTO}">
+
+<input type="hidden" th:field="*{idx}">
+<input type="hidden" th:field="*{hostId}">
+
+<input type="hidden" name="currentThumbnailPath" th:value="*{currentThumbnailPath}">
+
+<div>
+<label for="title">제목</label><br>
+<input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요" required>
+</div>
+
+<div>
+<label for="description">상세 설명</label>
+<textarea id="description" th:field="*{description}"></textarea>
+</div>
+
+<div>
+<label for="location">지역</label><br>
+<select th:field="*{location}" id="location">
+    <option value="서울">서울</option>
+    <option value="경기">경기</option>
+    <option value="인천">인천</option>
+    <option value="대전">대전</option>
+    <option value="세종">세종</option>
+    <option value="충남">충남</option>
+    <option value="충북">충북</option>
+    <option value="광주">광주</option>
+    <option value="전남">전남</option>
+    <option value="전북">전북</option>
+    <option value="대구">대구</option>
+    <option value="경북">경북</option>
+    <option value="부산">부산</option>
+    <option value="울산">울산</option>
+    <option value="경남">경남</option>
+    <option value="강원">강원</option>
+    <option value="제주">제주</option>
+</select>
+</div>
+
+<div>
+<label for="address">주소</label><br>
+<input type="text" id="address" th:field="*{address}" placeholder="주소를 입력하세요" readonly>
+<button type="button" onclick="execDaumPostcode()">주소 검색</button>
+
+<label for="detailAddress">상세주소</label>
+<input type="text" id="detailAddress" th:field="*{detailAddress}" placeholder="상세주소를 입력하세요">
+</div>
+
+<div>
+<label for="cost">요금</label><br>
+기본요금: <input type="number" th:field="*{costBasic}"><br>
+주말요금: <input type="number" th:field="*{costExpen}">
+</div>
+
+<div>
+<label for="homeType">숙소타입</label><br>
+<select th:field="*{homeType}">
+    <option value="PENSION">펜션</option>
+    <option value="DETACHED_HOUSE">단독주택</option>
+    <option value="APARTMENT">아파트</option>
+    <option value="HOTEL">호텔</option>
+    <option value="MOTEL">모텔</option>
+    <option value="VILLA">빌라</option>
+</select>
+</div>
+
+<div>
+<label for="thumbnail">썸네일</label><br>
+    
+<div th:if="*{currentThumbnailPath != null and !currentThumbnailPath.isEmpty()}" 
+     class="existing-thumbnail-area" style="margin-bottom: 10px;">
+    
+    <p>현재 썸네일:</p>
+    <img th:src="*{currentThumbnailPath}" 
+         alt="현재 썸네일" 
+         style="max-width: 150px; height: auto; border: 1px solid #ccc;">
+</div>
+
+<p>새 파일을 업로드하여 썸네일 이미지를 **변경/대체**합니다.</p>
+<input type="file" th:field="*{thumbnail}" id="thumbnail">
+</div>
+<div>
+<label for="maxPeople">최대인원</label><br>
+<input type="number" th:field="*{maxPeople}">
+</div>
+
+<div>
+<label for="room">방갯수</label><br>
+<input type="number" th:field="*{room}">
+</div>
+
+<div>
+<label for="bath">욕실갯수</label><br>
+<input type="number" th:field="*{bath}">
+</div>
+
+<div>
+<label for="bed">침대갯수</label><br>
+<input type="number" th:field="*{bed}">
+</div>
+
+<div>
+<label for="checkIn">체크인 시간</label><br>
+<input type="time" th:field="*{checkIn}">
+</div>
+<div>
+<label for="checkOut">체크아웃 시간</label><br>
+<input type="time" th:field="*{checkOut}">
+</div>
+
+<div>
+<label for="homeImages">숙소 사진</label>
+
+<div th:if="${!#lists.isEmpty(homeWriteDTO.currentHomeImagePaths)}" 
+     class="existing-images-area" style="margin-bottom: 10px;">
+    
+    <th:block th:each="path : *{currentHomeImagePaths}">
+        <input type="hidden" name="currentHomeImagePaths" th:value="${path}" />
+    </th:block>
+    <p>현재 숙소 사진:</p>
+    <div class="image-previews">
+        <div th:each="imgPath : *{currentHomeImagePaths}">
+            
+            <img th:src="${imgPath}" 
+                 alt="숙소 사진" 
+                 style="max-width: 100px; height: 100px; object-fit: cover; border: 1px solid #ccc;">
+        </div>
+    </div>
+    <p>새로운 사진을 업로드하면 기존 사진들은 **모두 삭제되고** 업로드된 파일들로 **대체**됩니다. (사진을 유지하려면 업로드 필드를 비워두세요.)</p>
+</div>
+
+<input type="file" th:field="*{homeImages}" id="homeImages" multiple>
+</div>
+<div>
+<label>옵션 선택</label><br>
+<div th:each="groupEntry : ${groupedOptions}">
+    <h4 th:text="${groupEntry.key}"></h4>
+    <div th:each="opt : ${groupEntry.value}">
+        <label>
+            <input type="checkbox" th:field="*{optionIds}" th:value="${opt.optionId}">
+            <span th:text="${opt.optionName}"></span>
+        </label><br>
+    </div>
+</div>
+</div>
+<div>
+<label>해시태그 등록</label><br>
+<div class="hashtag-group">
+    <div>
+		<input type="checkbox" id="wifi" th:field="*{wifi}">
+		<label for="wifi">와이파이</label>
+	</div>
+	<div>
+		<input type="checkbox" id="tv" th:field="*{tv}">
+		<label for="tv">TV</label>
+	</div>
+	<div>
+		<input type="checkbox" id="kitchen" th:field="*{kitchen}">
+		<label for="kitchen">주방</label>
+	</div>
+	<div>
+		<input type="checkbox" id="freePark" th:field="*{freePark}">
+		<label for="freePark">무료주차</label>
+	</div>
+	<div>
+		<input type="checkbox" id="selfCheckin" th:field="*{selfCheckin}">
+		<label for="selfCheckin">셀프 체크인</label>
+	</div>
+	<div>
+		<input type="checkbox" id="coldWarm" th:field="*{coldWarm}">
+		<label for="coldWarm">냉난방</label>
+	</div>
+	<div>
+		<input type="checkbox" id="petFriendly" th:field="*{petFriendly}">
+		<label for="petFriendly">애견동반 가능</label>
+	</div>
+	<div>
+		<input type="checkbox" id="barrierFree" th:field="*{barrierFree}">
+		<label for="barrierFree">장애물 없는 시설</label>
+	</div>
+	<div>
+		<input type="checkbox" id="elevator" th:field="*{elevator}">
+		<label for="elevator">엘리베이터</label>
+	</div>	
+</div>
+</div>
+
+<button type="submit">수정 완료</button>
+</form>
+</body>
+</html>

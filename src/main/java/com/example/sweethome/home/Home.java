@@ -85,6 +85,7 @@ public class Home {
 }
 
 // HomeType의 ENUM 타입 정의 (숙소 타입 반영)
+/*
 enum HomeType {
     PENSION, // 펜션
     DETACHED_HOUSE, // 단독 주택
@@ -92,4 +93,4 @@ enum HomeType {
     HOTEL, // 호텔
     MOTEL, // 모텔
     VILLA // 빌라
-}
+}*/

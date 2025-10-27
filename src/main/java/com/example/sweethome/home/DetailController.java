@@ -61,12 +61,13 @@ public class DetailController {
                             folder -> wishlistRepository.findByFolderWithHome(folder)
                     ));
             model.addAttribute("folderWishlists", folderWishlists);
-            //나래추가끝
+            
 	         // 로그 찍기
 	            folderWishlists.forEach((folderId, wishlists) -> {
 	                System.out.println("폴더ID: " + folderId + ", 위시리스트 개수: " + wishlists.size());
 	                wishlists.forEach(w -> System.out.println("  - " + w.getHome().getTitle()));
 	            });
+	          //나래추가끝
 
         }
         
