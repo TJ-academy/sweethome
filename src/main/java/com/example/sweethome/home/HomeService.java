@@ -605,5 +605,44 @@ public class HomeService {
         homeRepository.delete(home);
     } 
     
+    public List<HomeResponseDto> getSeoulPopularHomesWithLikeCounts() {
+        // 1️⃣ location이 "서울"인 Home 목록 조회
+        List<Home> seoulHomes = homeRepository.findByLocationContainingIgnoreCase("서울");
+        
+        // 서울 숙소가 없는 경우 빈 리스트 반환
+        if (seoulHomes.isEmpty()) {
+            return List.of();
+        }
+
+        // 2️⃣ 각 숙소의 좋아요 개수 조회
+        // 조회된 서울 숙소 ID 리스트 추출
+        List<Integer> seoulHomeIds = seoulHomes.stream()
+            .map(Home::getIdx)
+            .collect(Collectors.toList());
+
+        // WishlistRepository에 homeIds를 기반으로 좋아요 수를 조회하는 메서드가 필요하다고 가정하고 호출합니다.
+        // 기존의 countWishlistsByHome()을 재사용하는 경우:
+        List<Object[]> allLikeCounts = wishlistRepository.countWishlistsByHome();
+        
+        Map<Integer, Long> likeCountMap = allLikeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 3️⃣ Home + 좋아요 개수 결합 및 좋아요 수 기준으로 내림차순 정렬
+        List<HomeResponseDto> seoulHomeList = seoulHomes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+
+        // 4️⃣ 좋아요 개수(likeCount) 기준으로 내림차순 정렬
+        seoulHomeList.sort((dto1, dto2) -> Long.compare(dto2.getLikeCount(), dto1.getLikeCount()));
+
+        return seoulHomeList;
+    }
+    
       
 }

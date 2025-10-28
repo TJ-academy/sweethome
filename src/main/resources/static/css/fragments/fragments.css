@@ -257,3 +257,39 @@
 	width: 20px;
 	text-align: center;
 }
+
+.search-controls {
+    display: flex;
+    align-items: center;
+    padding: 10px 0 10px 50px; /* 검색바와의 간격 */
+    margin: 10px 0;
+    border-top: 1px solid #D4D4D4; /* 구분선 */
+    border-bottom:1px solid #D4D4D4;
+}
+
+.filter-button, .hashtag-item {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.filter-button:hover, .hashtag-item:hover {
+    background-color: #f0f0f0;
+}
+
+.filter-button-icon {
+    margin-right: 5px;
+}
+
+.separator {
+    width: 1px;
+    height: 20px;
+    background-color: #ddd;
+    margin: 0 10px;
+}
