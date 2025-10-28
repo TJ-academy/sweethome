@@ -86,8 +86,8 @@ public class ChatService {
 	                lastMsgPreview = "이미지";
 	            }
 	        	
-	        	int unreadCount = countUnreadMessages(roomId, userRoom.getLastRead());
-	        	
+	        	int unreadCount = countUnreadMessages(roomId, userRoom.getLastRead(), user);
+
 	        	ChatRoomPreviewDTO preview = new ChatRoomPreviewDTO(roomId, roomName, lastMsgPreview, lastMessage.getSendedAt(), unreadCount);
 		        previews.add(preview);
 	        }
@@ -104,12 +104,10 @@ public class ChatService {
     }
 	
 	//안읽은 메시지 수 계산하기
-	public int countUnreadMessages(Integer roomId, Integer lastRead) {
-		if (lastRead == null) {
-            lastRead = 0; // 초기값 설정 (읽은 메시지 없음)
-        }
-        return mrepo.countByChatRoom_IdAndIdxGreaterThan(roomId, lastRead);
-	}
+	public int countUnreadMessages(Integer roomId, Integer lastRead, User currentUser) {
+	    if (lastRead == null) lastRead = 0;
+	    return mrepo.countByChatRoom_IdAndIdxGreaterThanAndSender_EmailNot(
+	            roomId, lastRead, currentUser.getEmail());	}
 	
 	//한 채팅방의 메시지 조회
 	public List<ChatMessageDto> getMessagesByChatRoom(Integer chatRoomId) {
@@ -169,20 +167,43 @@ public class ChatService {
 	}
 	
 	//메시지 저장
+//	public ChatMessage saveMessage(ChatMessageDto dto) {
+//		ChatRoom chatRoom = findChatRoom(dto.getRoomId());
+//		User sender = userrepo.findByEmail(dto.getSenderEmail()).get();
+//		
+//		ChatMessage message = ChatMessage.builder()
+//				.chatRoom(chatRoom)
+//				.sender(sender)
+//				.content(dto.getContent())
+//				.img(dto.getImg() != null ? dto.getImg() : "-")
+//				.sendedAt(Instant.now())
+//				.build();
+//		
+//		return mrepo.save(message);
+//	}
+	// 메시지 저장
 	public ChatMessage saveMessage(ChatMessageDto dto) {
-		ChatRoom chatRoom = findChatRoom(dto.getRoomId());
-		User sender = userrepo.findByEmail(dto.getSenderEmail()).get();
-		
-		ChatMessage message = ChatMessage.builder()
-				.chatRoom(chatRoom)
-				.sender(sender)
-				.content(dto.getContent())
-				.img(dto.getImg() != null ? dto.getImg() : "-")
-				.sendedAt(Instant.now())
-				.build();
-		
-		return mrepo.save(message);
+	    ChatRoom chatRoom = findChatRoom(dto.getRoomId());
+
+	    // ⚙️ 따옴표 제거 + 공백 제거
+	    String senderEmail = dto.getSenderEmail().replace("\"", "").trim();
+
+	    // ✅ sender null-safe 처리
+	    User sender = userrepo.findByEmail(senderEmail)
+	            .orElseThrow(() -> new IllegalArgumentException("❌ Sender not found: " + senderEmail));
+
+	    ChatMessage message = ChatMessage.builder()
+	            .chatRoom(chatRoom)
+	            .sender(sender)
+	            .content(dto.getContent())
+	            .img(dto.getImg() != null ? dto.getImg() : "-")
+	            .sendedAt(Instant.now())
+	            .build();
+
+	    return mrepo.save(message);
 	}
+
+
 	
 	//마지막으로 읽은 메시지 업데이트
 	public void updateLastRead(Integer roomId, User user, Integer messageIdx) {
