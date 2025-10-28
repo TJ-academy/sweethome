@@ -71,4 +71,6 @@ public class SweetHomeController {
         redirectAttributes.addFlashAttribute("homeWriteDTO", homeWriteDTO);
         return "redirect:/home/write";
     }
+    
+   
 }
