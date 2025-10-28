@@ -21,11 +21,13 @@ import com.example.sweethome.home.Home;
 import com.example.sweethome.home.HomeRepository;
 import com.example.sweethome.home.HomeService;
 import com.example.sweethome.home.HomeWriteDTO;
+import com.example.sweethome.home.Option;
 import com.example.sweethome.home.OptionRepository;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
-import com.example.sweethome.home.Option;
+import com.example.sweethome.review.ReviewDirection;
+import com.example.sweethome.review.ReviewRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class HostController {
 	private final AccommodationOptionRepository accommodationOptionRepository;
 	private final OptionRepository optionRepository;
 	private final HomeService homeService;
+	private final ReviewRepository reviewRepository;
 
 
     @GetMapping("/list")
@@ -108,7 +111,30 @@ public class HostController {
 		if (user == null)
 			return "redirect:/user/login";
 
-		model.addAttribute("user", user);
+		// 1. 호스트의 모든 숙소 목록 조회 (숙소 필터링용)
+		// 🌟 추가된 부분
+        List<Home> myHomes = homeRepository.findByHost(user);
+        
+        // 2. 오늘 날짜 예약 내역 조회 (오늘 체크인, 체크아웃, 숙박 중인 예약)
+        // 이 부분은 서비스 레이어에서 처리하는 것이 좋으나, 임시로 리포지토리 메서드를 가정합니다.
+        // 현재 코드로만 판단할 때, '오늘의 예약 리스트'를 가져오는 로직이 필요합니다.
+        // 임시로 모든 예약을 가져오는 것으로 대체하고, 실제 구현 시 날짜 기반 쿼리로 변경해야 합니다.
+        // List<Reservation> todayReservations = reservationRepository.findTodayBookingsForHost(user.getEmail()); 
+        // findTodayBookingsForHost 메서드가 없다고 가정하고, 일단 모든 예약을 가져와서 템플릿에서 테스트할 수 있도록 합니다.
+        // List<Reservation> todayReservations = reservationRepository.findByReservedHome_Host(user);
+        
+        // 실제 운영 환경에서는 오늘 날짜에 해당하는 예약만 필터링해야 합니다.
+        // 임시로 호스트의 모든 확정된 예약을 가져와 템플릿에 전달합니다. (정확한 '오늘'의 예약 구현은 서비스 레이어에서 별도의 날짜 쿼리 필요)
+        List<Reservation> todayReservations = reservationRepository.findByReservedHome_Host(user);
+
+        model.addAttribute("user", user);
+        // 🌟 숙소 필터링용 목록 추가
+        model.addAttribute("myHomes", myHomes); 
+        // 🌟 오늘의 예약 목록 추가
+        model.addAttribute("todayReservations", todayReservations); 
+        
+        // 오늘 날짜 (템플릿에 전달)
+        model.addAttribute("todayDate", java.time.LocalDate.now());
 
 		return "host/today";
 	}
@@ -182,9 +208,15 @@ public class HostController {
 	    }
 
 	    // ---- GET: 상세 화면 렌더 ----
+	    
+	 // ✅ 리뷰 작성 여부 확인 로직 추가
+	    boolean hasHostReviewedGuest = reviewRepository
+	            .existsByReservationAndDirection(r, ReviewDirection.HOST_TO_GUEST);
+	    
 	    model.addAttribute("user", host);
 	    model.addAttribute("reservation", r);
 	    model.addAttribute("home", r.getReservedHome());
+	    model.addAttribute("hasHostReviewedGuest", hasHostReviewedGuest);
 	    return "host/reservationDetail";
 	}
 	

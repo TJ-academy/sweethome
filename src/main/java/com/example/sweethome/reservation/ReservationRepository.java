@@ -65,5 +65,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     @Modifying
     void deleteByReservedHome_Idx(int homeIdx);
+    
+    
+    // ✅ 호스트(User)를 통해 해당 호스트의 모든 예약을 찾는 올바른 쿼리 메서드
+    List<Reservation> findByReservedHome_Host(User host);
 
 }
