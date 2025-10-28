@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
+import com.example.sweethome.user.noti.NotificationService;
 import com.example.sweethome.util.FileHandlerService;
 
 import jakarta.servlet.http.HttpSession;
@@ -33,6 +34,7 @@ public class ChatController {
 	private final UserRepository userrepo;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final FileHandlerService fileHandlerService;
+	private final NotificationService notiservice;
 	
 	//내 채팅방 리스트
 	@GetMapping("/rooms")
@@ -122,6 +124,21 @@ public class ChatController {
         dto.setSenderNickname(savedMessage.getSender().getNickname());
         
         messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+        
+        User receiver = userrepo.findByEmail(dto.getReceiverEmail()).get();
+        String message = "";
+        if (dto.getContent() != null && 
+    			!dto.getContent().isEmpty()) {
+            String content = dto.getContent();
+            message = content.length() > 10 
+            		? content.substring(0, 10) + "..." 
+            		: content;
+        } else {
+        	message = "이미지";
+        }
+        notiservice.sendNotification(receiver, 
+        		dto.getSenderNickname() + "님에게 메시지가 왔어요!", 
+        		message);
     }
 	
 	//이미지 전송
