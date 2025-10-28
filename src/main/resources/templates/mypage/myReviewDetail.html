@@ -1,106 +1,128 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>리뷰 상세 | 마이페이지</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-  <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
-  <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
-  <style>
-    .star-badge{ font-weight:600; }
-    .img-grid img{ max-width:100%; border-radius:12px; }
-    .info-line{ color:#6c757d; }
-  </style>
+<meta charset="UTF-8" />
+<title>리뷰 상세 | 마이페이지</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet" crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+	crossorigin="anonymous"></script>
+<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+<link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
+<link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+<style>
+.star-badge {
+	font-weight: 600;
+}
+
+.info-line {
+	color: #6c757d;
+}
+</style>
 </head>
 <body>
-<div th:insert="~{fragments/header :: menuBar}"></div>
+	<div th:insert="~{fragments/header :: menuBar}"></div>
 
-<div class="mypage-layout-wrap container-fluid">
-  <div class="row">
-    <div class="mypage-sidebar-col">
-      <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
-    </div>
+	<div class="mypage-layout-wrap container-fluid">
+		<div class="row">
+			<div class="mypage-sidebar-col">
+				<div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
+			</div>
 
-    <div class="mypage-content-col">
-      <div class="mypage-content-area">
+			<div class="mypage-content-col">
+				<div class="mypage-content-area">
 
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <h2 class="mb-0">리뷰 상세</h2>
-          <div>
-            <a class="btn btn-outline-secondary btn-sm" th:href="@{/mypage/review}">목록</a>
-            <a class="btn btn-primary btn-sm"
-               th:if="${isWriter}"
-               th:href="@{|/mypage/review/edit?reservationId=${reservation.reservationIdx}&direction=${direction}|}">
-              수정
-            </a>
-          </div>
-        </div>
+					<div class="d-flex align-items-center justify-content-between mb-3">
+						<h2 class="mb-0">리뷰 상세</h2>
+						<div>
+							<a class="btn btn-outline-secondary btn-sm"
+								th:href="@{/mypage/review}">목록</a> <a
+								class="btn btn-primary btn-sm" th:if="${isWriter}"
+								th:href="@{|/mypage/review/edit?reservationId=${reservation.reservationIdx}&direction=${direction.name()}|}">
+								수정 </a>
+						</div>
+					</div>
 
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <!-- 상단 메타 -->
-            <div class="mb-3">
-              <div class="small text-muted">숙소</div>
-              <div class="fs-5" th:text="${home.title}">숙소 제목</div>
-              <div class="info-line" th:text="|체크인 ${reservation.startDate} · 체크아웃 ${reservation.endDate}|">2025-01-01 ~ 2025-01-03</div>
-            </div>
+					<div class="card shadow-sm">
+						<div class="card-body">
+							<div class="mb-3">
+								<div class="small text-muted">숙소</div>
+								<div class="fs-5" th:text="${home.title}">숙소 제목</div>
+								<div class="info-line"
+									th:text="|체크인 ${reservation.startDate} · 체크아웃 ${reservation.endDate}|">2025-01-01
+									~ 2025-01-03</div>
+							</div>
 
-            <div class="mb-3">
-              <span class="badge text-bg-secondary me-2">방향</span>
-              <span th:text="${direction == T(com.example.sweethome.review.ReviewDirection).GUEST_TO_HOST ? '게스트 → 호스트' : '호스트 → 게스트'}">방향</span>
-            </div>
+							<div class="mb-3">
+								<span class="badge text-bg-secondary me-2">방향</span> <span
+									th:text="${directionLabel}">방향</span>
+							</div>
 
-            <div class="mb-3">
-              <span class="badge text-bg-secondary me-2">작성자</span>
-              <span th:text="|${writer.nickname} (${writer.email})|">작성자 표시</span>
-            </div>
+							<div class="mb-3">
+								<span class="badge text-bg-secondary me-2">대상</span> <span
+									th:text="|${targetLabel}: ${targetUser.nickname} (${targetUser.email})|">대상
+									표시</span>
+							</div>
 
-            <div class="mb-3">
-              <span class="badge text-bg-secondary me-2">대상</span>
-              <span th:text="|${targetLabel}: ${targetUser.nickname} (${targetUser.email})|">대상 표시</span>
-            </div>
+							<div
+								class="d-flex align-items-center justify-content-between mb-2">
+								<div class="star-badge">
+									<span class="badge text-bg-warning"
+										th:text="|★ ${review.star}|">★ 5</span>
+								</div>
+								<small class="text-muted"
+									th:text="${#temporals.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.01
+									12:00</small>
+							</div>
 
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <div class="star-badge">
-                <span class="badge text-bg-warning" th:text="|★ ${review.star}|">★ 5</span>
-              </div>
-              <small class="text-muted" th:text="${#temporals.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.01 12:00</small>
-            </div>
+							<hr />
 
-            <hr/>
+							<div class="mb-4">
+								<h6 class="text-muted">후기 내용</h6>
+								<p class="mb-0" th:text="${review.content}">후기 본문</p>
+							</div>
 
-            <!-- 내용 -->
-            <div class="mb-4">
-              <h6 class="text-muted">후기 내용</h6>
-              <p class="mb-0" th:text="${review.content}">후기 본문</p>
-            </div>
+							<div class="mt-4">
+								<div
+									th:if="${reply == null and isHost and direction.name() == 'GUEST_TO_HOST'}">
+									<a
+										th:href="@{|/mypage/host/reply/write?reviewId=${review.reviewIdx}|}"
+										class="btn btn-sm btn-outline-info"> 호스트 답글 작성 </a>
+								</div>
 
-            <!-- 이미지들(있을 때만) -->
-            <div class="img-grid">
-              <div class="row g-3">
-                <div class="col-12 col-md-6" th:if="${review.reviewThumb}">
-                  <img th:src="@{|/uploads/${review.reviewThumb}|}" alt="대표 이미지"/>
-                </div>
-                <div class="col-6 col-md-4" th:if="${review.imgOne}">
-                  <img th:src="@{|/uploads/${review.imgOne}|}" alt="이미지 1"/>
-                </div>
-                <div class="col-6 col-md-4" th:if="${review.imgTwo}">
-                  <img th:src="@{|/uploads/${review.imgTwo}|}" alt="이미지 2"/>
-                </div>
-                <div class="col-6 col-md-4" th:if="${review.imgThree}">
-                  <img th:src="@{|/uploads/${review.imgThree}|}" alt="이미지 3"/>
-                </div>
-              </div>
-            </div>
+								<div th:if="${reply != null}">
+									<hr />
+									<div
+										class="d-flex justify-content-between align-items-center mb-2">
+										<h6 class="mb-0">
+											<span class="badge text-bg-info">호스트 답글</span> <span
+												class="ms-2" th:text="${reply.host.nickname}">호스트 닉네임</span>
+										</h6>
+										<div class="text-muted small">
+											<span
+												th:text="${#temporals.format(reply.updatedAt, 'yyyy.MM.dd HH:mm')}">2025.01.01
+												12:00</span>
+										</div>
+									</div>
+									<div class="card bg-light border-0 p-3">
+										<p class="mb-0" th:text="${reply.content}">호스트 답글 내용</p>
+									</div>
 
-          </div>
-        </div>
+									<div class="mt-2 text-end" th:if="${isHost}">
+										<a
+											th:href="@{|/mypage/host/reply/edit?replyId=${reply.replyIdx}|}"
+											class="btn btn-sm btn-outline-secondary"> 답글 수정 </a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-      </div>
-    </div>
-  </div>
-</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
