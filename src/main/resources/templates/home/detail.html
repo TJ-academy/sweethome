@@ -538,8 +538,7 @@
          */
         function toggleCompareSelection(element) {
             const homeIdx = element.getAttribute('data-home-idx');
-            const compareButton = document.getElementById('compareButton');
-            
+			const compareButton = document.getElementById('nextOrCompareBtn');
             // 현재 보고 있는 숙소는 모달에서 선택할 수 없도록 제외
             if (homeIdx === currentHomeId) {
                 alert("현재 보고 있는 숙소는 비교 대상에 자동 포함됩니다.");
@@ -561,8 +560,9 @@
             }
 
             // 비교 버튼 활성화/비활성화 (선택된 숙소가 1개 이상일 때)
-            compareButton.disabled = selectedHomeIds.length === 0;
-            
+		if (compareButton) {
+		  compareButton.disabled = selectedHomeIds.length === 0;
+		}
             console.log("선택된 비교 숙소 ID들:", selectedHomeIds);
         }
 
@@ -591,54 +591,176 @@
             window.location.href = `/compare?ids=${urlIds}`;
         }
 	</script>
-	<!-- 비교하기 모달 -->
-	<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
-	    <div class="modal-dialog modal-lg modal-dialog-centered">
-	        <div class="modal-content">
+<!-- 비교하기 모달 -->
+<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content compare-modal">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="compareModalLabel">위시리스트에서 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+
+      <!-- ✅ 현재 숙소 미리보기 영역 -->
+      <div class="current-home-preview">
+        <div id="selectedHomesPreview" class="d-flex flex-wrap justify-content-center gap-3">          <img th:src="${homePhoto.images != null and !#lists.isEmpty(homePhoto.images) ? homePhoto.images[0] : '/images/default_main_image.jpg'}"
+               src="/images/sample_main.jpg"
+               alt="현재 숙소 썸네일"
+               class="current-home-img">
+          <div class="current-home-info">
+            <p class="current-home-title" th:text="${home.title}">숙소 제목</p>
+            <span class="badge bg-primary-subtle text-primary fw-semibold">현재 숙소</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body pt-0">
+
+        <!-- ✅ STEP 1: 위시리스트 폴더 목록 -->
+        <div id="wishlistStep1" th:if="${folders != null and !#lists.isEmpty(folders)}">
+          <div class="row g-4">
+            <div class="col-md-4" th:each="folder : ${folders}">
+              <div class="wishlist-card"
+                   th:attr="data-folder-id=${folder.idx}, data-folder-name=${folder.folderName}"
+                   onclick="selectFolder(this)">
+                <div class="wishlist-image-grid">
+                  <img th:each="wish, iterStat : ${folderWishlists[folder.idx]}"
+                       th:if="${iterStat.index < 4 and wish.home != null}"
+                       th:src="@{${wish.home.thumbnail}}"
+                       alt="썸네일"
+                       class="wishlist-thumb" />
+                </div>
+                <div class="wishlist-info mt-2">
+                  <p class="fw-semibold mb-0" th:text="${folder.folderName}">폴더 이름</p>
+                  <small class="text-muted"
+                         th:text="|저장된 항목 ${#lists.size(folderWishlists[folder.idx])}개|">
+                    저장된 항목 3개
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div th:if="${folders == null or #lists.isEmpty(folders)}" class="text-center text-muted">
+          <p>등록된 위시리스트 폴더가 없습니다.</p>
+        </div>
+
+        <!-- ✅ STEP 2: 선택한 폴더의 숙소 목록 -->
+        <div id="wishlistStep2" style="display:none;">
+          <div class="d-flex align-items-center mb-3">
+            <button type="button" class="btn btn-link p-0 me-2" onclick="goBackToFolders()">←</button>
+            <h6 id="selectedFolderName" class="fw-bold mb-0">폴더 이름</h6>
+          </div>
+          <div class="row g-4" id="selectedFolderHomes"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 d-flex flex-column align-items-center">
+        <p class="text-muted mb-2 small">
+          현재 숙소를 포함해 최대 3곳까지 비교 가능합니다.
+        </p>
+        <button id="nextOrCompareBtn" type="button"
+                class="btn btn-primary w-50 rounded-pill"
+                onclick="goNextStep()">다음으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script th:inline="javascript">
+  // 서버에서 전달된 folderWishlists 데이터를 JS로 안전하게 받기
+  const folderWishlists = /*[[${folderWishlists}]]*/ {};
+  let selectedFolderId = null;
+  let selectedFolderName = null;
+
+  /** ✅ 폴더 클릭 시 선택 처리 */
+  function selectFolder(element) {
+    selectedFolderId = element.getAttribute("data-folder-id");
+    selectedFolderName = element.getAttribute("data-folder-name");
+
+    // 시각적으로 선택 표시
+    document.querySelectorAll(".wishlist-card").forEach(el => el.classList.remove("selected"));
+    element.classList.add("selected");
+  }
+
+  /** ✅ “다음으로” 버튼 클릭 시 */
+  function goNextStep() {
+    if (!selectedFolderId) {
+      alert("먼저 폴더를 선택해주세요.");
+      return;
+    }
+
+    // Step1 숨기고 Step2 보이기
+    document.getElementById("wishlistStep1").style.display = "none";
+    document.getElementById("wishlistStep2").style.display = "block";
+    document.getElementById("selectedFolderName").textContent = selectedFolderName;
+
+    // 버튼 문구 변경 (다음으로 → 비교하기)
+    const nextBtn = document.getElementById("nextOrCompareBtn");
+    nextBtn.textContent = "비교하기";
+    nextBtn.onclick = startComparison;
+
+    // 폴더 안의 숙소 목록 렌더링
+    renderFolderHomes(selectedFolderId);
+  }
+
+  /** ✅ 선택한 폴더 안의 숙소 목록 렌더링 */
+  function renderFolderHomes(folderId) {
+    const container = document.getElementById("selectedFolderHomes");
+    container.innerHTML = "";
+
+    const homes = folderWishlists[folderId];
+    if (!homes || homes.length === 0) {
+      container.innerHTML = "<p class='text-center text-muted'>이 폴더에 저장된 숙소가 없습니다.</p>";
+      return;
+    }
+
+    homes.forEach(wish => {
+      if (!wish.home) return;
+      const thumb = wish.home.thumbnail || '/images/default_main_image.jpg';
+      const title = wish.home.title || '숙소 이름 없음';
+      const homeIdx = wish.home.idx;
+
+      const html = `
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm" style="cursor:pointer;"
+               data-home-idx="${homeIdx}" onclick="toggleCompareSelection(this)">
+            <img src="${thumb}" class="card-img-top rounded-3" style="aspect-ratio:1/1; object-fit:cover;">
+            <div class="card-body p-2 text-center">
+              <p class="small fw-semibold mb-0">${title}</p>
+            </div>
+          </div>
+        </div>`;
+      container.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  /** ✅ 폴더 목록으로 돌아가기 */
+function goBackToFolders() {
+  // 단계 전환
+  document.getElementById("wishlistStep2").style.display = "none";
+  document.getElementById("wishlistStep1").style.display = "block";
+
+  // 버튼 초기화
+  const nextBtn = document.getElementById("nextOrCompareBtn");
+  nextBtn.textContent = "다음으로";
+  nextBtn.onclick = goNextStep;
 	
-	            <div class="modal-header">
-	                <h5 class="modal-title" id="compareModalLabel">위시리스트 비교하기</h5>
-	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-	            </div>
-	
-	            <div class="modal-body">
-	                <p>비교할 숙소를 선택하세요 (최대 2개)</p>	
-	                <div class="folder-list" th:if="${folders != null and !#lists.isEmpty(folders)}">
-	                    <div class="row g-3">
-	                        <div class="col-md-4" th:each="folder : ${folders}">
-	                            <div class="card folder-card" th:attr="data-id=${folder.idx}">
-	                                <div class="card-body text-center">
-	                                    <h6 th:text="${folder.folderName}">폴더 이름</h6>  <p th:text="|${#lists.size(folderWishlists[folder.idx])}개의 숙소|">0개의 숙소</p>
-	                                    <ul class="folder-homes-list" style="text-align: left; font-size: 0.85em; margin-top: 5px;">
-	                                        <li th:each="wish : ${folderWishlists[folder.idx]}" 
-	                                            th:if="${wish.home != null}" 
-	                                            class="compare-item" 
-	                                            th:attr="data-home-idx=${wish.home.idx}" 
-	                                            onclick="toggleCompareSelection(this)">
-	                                            
-	                                            <img th:src="@{${wish.home.thumbnail}}" alt="썸네일" style="width: 50px; height: 50px; margin-right: 5px;">
-	                                            
-	                                            <span th:text="${wish.home.title}">숙소 제목</span>
-	                                        </li>
-	                                    </ul>
-	                                </div>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </div>
-	
-	                <div th:if="${folders == null or #lists.isEmpty(folders)}" class="text-center text-muted">
-	                    <p>등록된 위시리스트 폴더가 없습니다.</p>
-	                </div>
-	
-	            </div>
-	
-	            <div class="modal-footer">
-	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-	                <button type="button" id="compareButton" class="btn btn-primary" disabled onclick="startComparison()">비교하기</button>
-	            </div>
-	        </div>
-	    </div>
-	</div>	
+// ✅ 버튼 다시 활성화
+  nextBtn.disabled = false;
+
+  // ✅ 선택 상태 전부 초기화
+  selectedHomeIds = [];
+  document.querySelectorAll("#selectedFolderHomes .card.selected")
+    .forEach(card => card.classList.remove("selected"));
+
+  // ✅ 상단 미리보기 다시 그리기 (현재 숙소만 표시)
+  updateSelectedHomesPreview();
+
+  console.log("뒤로가기 시 비교 선택 초기화 완료");
+}
+</script>
+
 </body>
 </html>

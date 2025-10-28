@@ -1,104 +1,123 @@
+/* ===============================
+   기본 스타일
+   =============================== */
 body {
-	font-family: Arial, sans-serif;
-	line-height: 1.6;
-	margin: 0;
-	padding: 20px;
-	background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
 }
 
 .container {
-	max-width: 1200px;
-	margin: auto;
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* ===============================
+   갤러리
+   =============================== */
 .gallery {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .main-img, .sub-img {
-	flex: 1;
-	min-width: 200px;
-	max-height: 300px;
-	overflow: hidden;
+  flex: 1;
+  min-width: 200px;
+  max-height: 300px;
+  overflow: hidden;
 }
 
 .main-img img, .sub-img img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border-radius: 5px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 .main-img {
-	flex-basis: 50%;
+  flex-basis: 50%;
 }
 
+/* ===============================
+   숙소 상세 정보
+   =============================== */
 .info-section {
-	display: flex;
-	justify-content: space-between;
-	gap: 40px;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
 }
 
 .description-box, .booking-box {
-	flex: 1;
+  flex: 1;
 }
 
 .booking-box {
-	border: 1px solid #ddd;
-	padding: 20px;
-	border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .price {
-	font-size: 2em;
-	font-weight: bold;
-	color: #333;
-	margin-bottom: 20px;
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
 }
 
+/* ===============================
+   호스트 정보
+   =============================== */
 .host-info {
-	display: flex;
-	align-items: center;
-	margin-top: 20px;
-	padding-top: 20px;
-	border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
 .host-img {
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	margin-right: 10px;
-	object-fit: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
 }
 
+/* ===============================
+   지도, 리뷰, 정책
+   =============================== */
 #map {
-            width: 100%;
-            height: 400px;
-        }
+  width: 100%;
+  height: 400px;
+}
+
 .review-card {
-	border-bottom: 1px solid #eee;
-	padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
 }
 
 .facility-group {
-	display: flex;
-	justify-content: space-between;
-	margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .policy-item {
-	flex: 1;
-	padding: 0 10px;
+  flex: 1;
+  padding: 0 10px;
 }
 
+/* ===============================
+   선택 카드 (일반 효과)
+   =============================== */
 .select-card {
   transition: transform 0.2s, box-shadow 0.2s;
   border: 2px solid transparent;
@@ -106,30 +125,266 @@ body {
 }
 .select-card:hover {
   transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 .select-card.selected {
   border-color: #0d6efd;
-  box-shadow: 0 0 12px rgba(13,110,253,0.5);
+  box-shadow: 0 0 12px rgba(13, 110, 253, 0.5);
 }
 
+/* ===============================
+   비교 항목 (작은 리스트용)
+   =============================== */
 .compare-item {
-    cursor: pointer;
-    padding: 5px;
-    border: 1px solid #ddd; /* 기본 테두리 */
-    margin-bottom: 5px;
-    border-radius: 5px;
-    transition: all 0.2s;
-    display: flex; /* 이미지를 옆에 두기 위해 */
-    align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  
 }
 
 .compare-item:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .compare-item.selected {
-    border: 2px solid #007bff; /* 선택 시 파란색 테두리 */
-    background-color: #e6f7ff; /* 선택 시 배경색 */
+  border: 2px solid #007bff;
+  background-color: #e6f7ff;
 }
 
+/* ===============================
+   위시리스트 폴더 카드
+   =============================== */
+.wishlist-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+  padding: 10px;
+  display: block; /* ✅ flex 제거 */
+  flex-direction: column;
+  justify-content: space-between;
+  height: 230px; /* ✅ 카드 높이 고정 */
+}
+
+.wishlist-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+.wishlist-card.selected {
+  border: 2px solid #3399ff;
+  box-shadow: 0 0 8px rgba(51, 153, 255, 0.3);
+}
+
+.wishlist-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 4px;
+  height: 130px; /* ✅ 이미지 영역 높이 고정 */
+  margin-bottom: 40px; /* ✅ 아래 텍스트와 간격 확보 */
+}
+
+.wishlist-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.wishlist-info {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.wishlist-info p {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  white-space: nowrap;      /* ✅ 줄바꿈 방지 */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* ✅ 말줄임 */
+}
+
+.wishlist-info small {
+  color: #777;
+}
+
+/* ===============================
+   숙소 비교 Step2 - 숙소 카드 균일화
+   =============================== */
+.card[data-home-idx] {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 280px; /* ✅ 카드 높이 통일 */
+}
+
+.card[data-home-idx]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ✅ 숙소 선택 시 실선 테두리 표시 */
+.card[data-home-idx].selected {
+  border: 2px solid #007bff !important;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  transition: all 0.2s ease-in-out;
+  padding: 8px; /* ✅ 실선 안쪽 여백 추가 */
+  box-sizing: border-box; /* ✅ padding이 전체 크기에 포함되게 */
+}
+.card[data-home-idx] img {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* ✅ 이미지 비율 고정 */
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.card[data-home-idx] .card-body {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* 숙소 이름 줄 수 제한 + 말줄임 처리 */
+.card[data-home-idx] p.small {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #222;
+  text-align: center;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;     /* ✅ 최대 2줄 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: keep-all;
+   margin-bottom: 8px;
+}
+
+/* ===============================
+   비교하기 모달
+   =============================== */
+.compare-modal {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* --- 현재 숙소 미리보기 --- */
+.current-home-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fafafa;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.current-home-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 90%;
+  max-width: 420px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.current-home-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.current-home-info {
+  flex: 1;
+}
+
+.current-home-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: #222;
+  line-height: 1.3;
+}
+
+.current-home-info .badge {
+  font-size: 0.75rem;
+  background-color: #e8f0ff;
+  color: #3569f1;
+}
+
+/* --- 미리보기 카드 (현재 + 선택 숙소) --- */
+.compare-preview-container {
+  background-color: #fafafa;
+  border-bottom: 1px solid #eee;
+  padding: 12px 0 18px;
+}
+
+.mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.mini-card:hover {
+  transform: translateY(-3px);
+}
+
+.mini-card-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 6px;
+}
+
+.mini-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: #222;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.mini-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background-color: #e8f0ff;
+  color: #3569f1;
+  font-weight: 500;
+}
+
+.mini-badge.selected {
+  background-color: #e9f7e7;
+  color: #2d8a36;
+}
+
+.mini-card.current-home .mini-badge {
+  background-color: #dfe8ff;
+  color: #1b49e2;
+}
