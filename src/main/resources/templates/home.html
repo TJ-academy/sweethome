@@ -35,7 +35,13 @@
     <div id="homeListContainer" class="row">
         <div class="home-item" th:each="homeDto, iterStat : ${homeList}" 
              th:classappend="${iterStat.index >= 10} ? 'hidden-item'">
-            <a th:href="@{/home/detail/{homeIdx}(homeIdx=${homeDto.home.idx})}" class="home-link">
+            <a th:href="@{/home/detail/{homeIdx}(
+			    homeIdx=${homeDto.home.idx}, 
+			    keyword=${keyword}, 
+			    checkin=${checkin}, 
+			    checkout=${checkout}, 
+			    adults=${adults}, 
+			    children=${children})}" class="home-link">
                 <img th:src="${homeDto.home.thumbnail != null && !homeDto.home.thumbnail.isEmpty() ? homeDto.home.thumbnail : '/images/no-image.jpg'}"
                      alt="숙소 이미지" class="home-img">
             </a>

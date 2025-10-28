@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.sweethome.user.User;
 import com.example.sweethome.wishlist.Wishlist;
@@ -40,8 +41,8 @@ public class DetailController {
 
     /** 상세 페이지: /home/detail/{idx} */
     @GetMapping("/{idx}")
-    public String show(@PathVariable("idx") int idx, Model model, HttpSession session) {
-
+    public String show(@PathVariable("idx") int idx, Model model, HttpSession session, @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value = "checkin", required = false) String checkin, @RequestParam(value = "checkout", required = false) String checkout, @RequestParam(value = "adults", required = false, defaultValue = "0") Integer adults, @RequestParam(value = "children", required = false, defaultValue = "0") Integer children) {
+    	
     	// ******************** 수정된 부분: userProfile 추가 ********************
         Object userProfile = session.getAttribute("userProfile");
         model.addAttribute("userProfile", userProfile); // userProfile이 null일 수 있습니다.
@@ -164,6 +165,13 @@ public class DetailController {
         model.addAttribute("hashtag", hashtag);         // wifi, tv, kitchen, freePark, selfCheckin, coldWarm, petFriendly, barrierFree, elevator
         model.addAttribute("optionsByGroup", existingOptionsByGroup);
         model.addAttribute("homePhoto", homePhoto); // 이미 위에서 바인딩했으므로 중복 제거 (아래 코드는 삭제)
+        
+        //검색조건
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("checkin", checkin);
+        model.addAttribute("checkout", checkout);
+        model.addAttribute("adults", adults);
+        model.addAttribute("children", children);
 
         return "home/detail";
     }

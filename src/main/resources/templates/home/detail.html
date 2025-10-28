@@ -49,7 +49,12 @@
 </head>
 <body>
 	<div th:insert="fragments/header :: menuBar"></div>
-	<div th:insert="fragments/search :: searchSection"></div>
+	<div th:insert="fragments/search :: searchSection(
+    keyword=${keyword}, 
+    checkin=${checkin}, 
+    checkout=${checkout}, 
+    adults=${adults}, 
+    children=${children})"></div>
 
 	<div class="container">
 
@@ -175,31 +180,42 @@
 						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">720,000원</span>
 					<span> · 1박 기준</span>
 				</div>
-
 				<div class="dates">
-					<label for="startDate">체크인</label> <input type="date"
-						id="startDate" name="startDate"
-						th:value="${startDate != null} ? ${#temporals.format(startDate,'yyyy-MM-dd')} : ''"
-						th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" /> <label
-						for="endDate">체크아웃</label> <input type="date" id="endDate"
-						name="endDate"
-						th:value="${endDate != null} ? ${#temporals.format(endDate,'yyyy-MM-dd')} : ''"
-						th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
+					<label for="startDate">체크인</label> 
+					<input type="date"
+					    id="startDate" 
+					    name="startDate"
+					    th:value="${checkin}" 
+					    th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" />
+				    
+					<label for="endDate">체크아웃</label> 
+					<input type="date" 
+					    id="endDate"
+					    name="endDate"
+					    th:value="${checkout}"
+					    th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
 				</div>
-
 				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|"
 					style="font-size: 0.9em; margin-bottom: 5px; color: #555;">이
 					숙소의 최대 인원은 10명 (어린이 제외)입니다.</p>
 
 				<select name="adult" id="guests">
-					<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
-						th:value="${guest}" th:text="|성인 ${guest}명|">성인 2명</option>
-				</select> <select name="child" id="children" style="margin-top: 10px;">
-					<option value="0">어린이 0명</option>
-					<option th:each="child : ${#numbers.sequence(1, 5)}"
-						th:value="${child}" th:text="|어린이 ${child}명|">어린이 1명</option>
+				    <option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
+				        th:value="${guest}" 
+				        th:text="|성인 ${guest}명|"
+				        th:selected="${guest == adults}"> 성인 2명
+				    </option>
+				</select> 
+				
+				<select name="child" id="children" style="margin-top: 10px;">
+				    <option value="0" th:selected="${children == null or children == 0}">어린이 0명</option> 
+				    
+				    <option th:each="child : ${#numbers.sequence(1, 5)}"
+				        th:value="${child}" 
+				        th:text="|어린이 ${child}명|"
+				        th:selected="${child == children}"> 어린이 1명
+				    </option>
 				</select>
-
 				<div id="total-price-box"
 					style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
 					<p id="totalPriceDisplay"
