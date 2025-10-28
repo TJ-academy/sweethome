@@ -59,56 +59,125 @@
         <p>현재 서울의 인기 숙소가 없습니다.</p>
     </div>
 </div>
+
+<div class="container long-term-list-container" th:if="${param.keyword == null}">
+    <div class="list-header-toggle" id="longTermListHeaderToggle">
+        <h2>장기 숙박 인기 숙소</h2>
+        <span class="toggle-arrow"></span>
+    </div>
+    
+    <div class="row long-term-home-list" id="longTermHomeListContainer">
+        <div class="home-item" th:each="homeDto, iterStat : ${longTermHomeList}" 
+             th:classappend="${iterStat.index >= 10} ? 'hidden-item-long-term'">
+            <a th:href="@{/home/detail/{homeIdx}(homeIdx=${homeDto.home.idx})}" class="home-link">
+                <img th:src="${homeDto.home.thumbnail != null && !homeDto.home.thumbnail.isEmpty() ? homeDto.home.thumbnail : '/images/no-image.jpg'}"
+                     alt="숙소 이미지" class="home-img">
+            </a>
+            <div class="home-text">
+                <h3 class="home-title" th:text="${homeDto.home.title}">장기 숙박 숙소 제목</h3>
+                <p class="home-desc" th:text="${homeDto.home.address}">장기 숙박 숙소 주소</p>
+                <p class="home-like">❤️ <span th:text="${homeDto.likeCount}">0</span></p>
+            </div>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(longTermHomeList)}" class="no-home">
+        <p>현재 장기 숙박 인기 숙소가 없습니다.</p>
+    </div>
+</div>
+
+<div class="container large-group-list-container" th:if="${param.keyword == null}">
+    <div class="list-header-toggle" id="largeGroupListHeaderToggle">
+        <h2>단체로 놀기 좋은 넓은 숙소</h2>
+        <span class="toggle-arrow"></span>
+    </div>
+    
+    <div class="row large-group-home-list" id="largeGroupHomeListContainer">
+        <div class="home-item" th:each="homeDto, iterStat : ${largeHomeList}" 
+             th:classappend="${iterStat.index >= 10} ? 'hidden-item-large-group'">
+            <a th:href="@{/home/detail/{homeIdx}(homeIdx=${homeDto.home.idx})}" class="home-link">
+                <img th:src="${homeDto.home.thumbnail != null && !homeDto.home.thumbnail.isEmpty() ? homeDto.home.thumbnail : '/images/no-image.jpg'}"
+                     alt="숙소 이미지" class="home-img">
+            </a>
+            <div class="home-text">
+                <h3 class="home-title" th:text="${homeDto.home.title}">단체 숙소 제목</h3>
+                <p class="home-desc" th:text="${homeDto.home.address}">단체 숙소 주소</p>
+                <p class="home-like">❤️ <span th:text="${homeDto.likeCount}">0</span></p>
+            </div>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(largeHomeList)}" class="no-home">
+        <p>현재 단체 숙소 인기 숙소가 없습니다.</p>
+    </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const listHeaderToggle = document.getElementById('listHeaderToggle');
-    const homeListContainer = document.getElementById('homeListContainer');
-    const toggleArrow = listHeaderToggle.querySelector('.toggle-arrow');
-    const allHomeItems = document.querySelectorAll('#homeListContainer .home-item');
-    const initialHomeCount = allHomeItems.length;
+    
+    // ==========================================================
+    // 공통 토글 설정 함수
+    // ==========================================================
+    function setupToggle(headerId, containerId, hiddenItemClassSuffix) {
+        const headerToggle = document.getElementById(headerId);
+        if (!headerToggle) return; 
 
-    // 숙소가 10개 이하일 경우 토글 기능은 필요 없으므로 숨깁니다.
-    if (initialHomeCount <= 10) {
-        if (toggleArrow) toggleArrow.style.display = 'none';
-        return; 
-    }
+        const arrow = headerToggle.querySelector('.toggle-arrow');
+        // containerId 내의 모든 home-item을 선택
+        const items = document.querySelectorAll('#' + containerId + ' .home-item');
+        const initialCount = items.length;
 
-    // 초기 상태: 10개까지만 보이고, 11번째부터는 'hidden-item' 클래스로 숨겨진 상태 (펼쳐진 상태)
-    let isExpanded = true; 
+        // 숙소가 10개 이하일 경우 토글 기능은 필요 없으므로 숨깁니다.
+        if (initialCount <= 10) {
+            if (arrow) arrow.style.display = 'none';
+            return; 
+        }
 
-    // 목록 접기 함수 (11개 이후 항목 숨기기)
-    function collapseList() {
-        allHomeItems.forEach((item, index) => {
-            if (index >= 10) {
-                item.style.display = 'none';
+        // 초기 상태: 접혀 있음 (11번째부터 숨김)
+        let isExpanded = false; 
+
+        // 목록 접기 함수 (11개 이후 항목 숨기기)
+        function collapseList() {
+            items.forEach((item, index) => {
+                if (index >= 10) {
+                    item.style.display = 'none';
+                }
+            });
+            if (arrow) arrow.classList.add('collapsed');
+            isExpanded = false;
+        }
+
+        // 목록 펼치기 함수 (모든 항목 보이기)
+        function expandList() {
+            items.forEach(item => {
+                // 부트스트랩 그리드 환경을 고려하여 display: block으로 설정
+                item.style.display = 'block'; 
+            });
+            if (arrow) arrow.classList.remove('collapsed');
+            isExpanded = true;
+        }
+        
+        // 초기에는 목록을 접어두기
+        collapseList();
+
+        // 헤더 클릭 이벤트 
+        headerToggle.addEventListener('click', function() {
+            if (isExpanded) {
+                collapseList();
+            } else {
+                expandList();
             }
         });
-        toggleArrow.classList.add('collapsed');
-        isExpanded = false;
     }
 
-    // 목록 펼치기 함수 (모든 항목 보이기)
-    function expandList() {
-        allHomeItems.forEach(item => {
-            // 'hidden-item' 클래스를 가진 요소의 기본 display 속성을 'block' 또는 'flex' 등으로 설정
-            item.style.display = 'block'; 
-        });
-        toggleArrow.classList.remove('collapsed');
-        isExpanded = true;
-    }
+    // ==========================================================
+    // 토글 설정 적용
+    // ==========================================================
+    // 1. 전체 숙소 목록 토글
+    setupToggle('listHeaderToggle', 'homeListContainer', 'hidden-item');
     
-    // 초기에는 목록을 접어두기
-    collapseList();
-
-
-    // 헤더 클릭 이벤트 
-    listHeaderToggle.addEventListener('click', function() {
-        if (isExpanded) {
-            collapseList();
-        } else {
-            expandList();
-        }
-    });
+    // 2. 장기 숙박 목록 토글
+    setupToggle('longTermListHeaderToggle', 'longTermHomeListContainer', 'hidden-item-long-term');
+    
+    // 3. ⭐️ 단체 숙소 목록 토글 ⭐️
+    setupToggle('largeGroupListHeaderToggle', 'largeGroupHomeListContainer', 'hidden-item-large-group');
 });
 </script>
 

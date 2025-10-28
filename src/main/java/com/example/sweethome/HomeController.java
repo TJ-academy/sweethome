@@ -24,25 +24,6 @@ public class HomeController {
         this.homeService = homeService;
     }
 
-    /**  기본 홈 페이지 
-    @GetMapping("/")
-    public String basic(HttpSession session, Model model) {
-        // 숙소 리스트(좋아요 개수 포함) 조회
-        List<HomeResponseDto> homeList = homeService.getHomeListWithLikeCounts();
-        model.addAttribute("homeList", homeList);
-
-        // 사용자 프로필 세션 처리
-        User userProfile = (User) session.getAttribute("userProfile");
-        if (session.getAttribute("kakaouser") != null) {
-            session.removeAttribute("kakaouser");
-        }
-        if (userProfile != null) {
-            model.addAttribute("userProfile", userProfile);
-        }
-
-        return "home";
-    }
-    */
     @GetMapping("/")
     public String basic(HttpSession session, Model model) {
         // 1. 전체 숙소 리스트(좋아요 개수 포함) 조회
@@ -52,7 +33,15 @@ public class HomeController {
         // 2. 서울의 인기 숙소 조회
         List<HomeResponseDto> seoulHomeList = homeService.getSeoulPopularHomesWithLikeCounts();
         model.addAttribute("seoulHomeList", seoulHomeList); 
-
+        
+        // 3. 장기숙박 인기 숙소 조회
+        List<HomeResponseDto> longTermHomeList = homeService.getLongTermPopularHomesWithLikeCounts();
+        model.addAttribute("longTermHomeList", longTermHomeList);
+        
+	    // 4. 단체 숙소 인기 목록 조회 
+        List<HomeResponseDto> largeHomeList = homeService.getLargePopularHomesWithLikeCounts();
+        model.addAttribute("largeHomeList", largeHomeList);
+        
         // 사용자 프로필 세션 처리
         User userProfile = (User) session.getAttribute("userProfile");
         if (session.getAttribute("kakaouser") != null) {
