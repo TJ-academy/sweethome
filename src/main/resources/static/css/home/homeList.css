@@ -144,3 +144,28 @@ h2 {
 .toggle-arrow.collapsed {
     border-top-color: #666;
 }
+
+/* 룰렛 포인터를 담는 div의 스타일 */
+.roulette-display {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+/* 룰렛 포인터 스타일 */
+#roulette-pointer {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid #dc3545; /* 빨간색 화살표 */
+    position: absolute;
+    top: 0px; /* 룰렛 디스플레이 상단 중앙에 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* 캔버스 자체 스타일 */
+#regionRoulette {
+    border: none;
+    display: block; /* 캔버스 하단 여백 제거 */
+}
