@@ -87,6 +87,10 @@ public class Reservation {
     
     private String memoForHost;
     
+    // 💡 추가: 취소 신청 사유 필드
+    @Column(length = 500) // 넉넉하게 500자로 설정
+    private String cancelMessage;
+    
     private String memoForCheckIn;
     private String memoForCheckOut;
 }

@@ -122,7 +122,7 @@ public class MyReservationController {
      */
     @PostMapping("/reservation/cancel/{reservationIdx}")
     @Transactional
-    public String cancelReservation(@PathVariable("reservationIdx") int reservationIdx, HttpSession session) {
+    public String cancelReservation(@PathVariable("reservationIdx") int reservationIdx, @RequestParam("cancelMessage") String cancelMessage,HttpSession session) {
         
     	User user = (User) session.getAttribute("userProfile");
         if (user == null) return "redirect:/user/login";
@@ -139,6 +139,8 @@ public class MyReservationController {
         ReservationStatus status = reservation.getReservationStatus();
         if (status == ReservationStatus.CONFIRMED || status == ReservationStatus.REQUESTED) {
             reservation.setReservationStatus(ReservationStatus.CANCEL_REQUESTED);
+            // 💡 추가: 취소 메시지 저장
+            reservation.setCancelMessage(cancelMessage);
             reservationRepository.save(reservation);
         } else {
              // 이미 취소되었거나, 완료된 예약 등 취소 불가능한 상태
