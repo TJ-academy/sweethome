@@ -109,3 +109,38 @@ h2 {
   font-size: 14px;
   margin-top: 40px;
 }
+
+/* 10개 이후 항목을 숨길 때 사용할 클래스 */
+.home-item.hidden-item {
+    display: none;
+}
+
+/* 목록 제목 및 토글 버튼 스타일  */
+.list-header-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    margin-bottom: 20px; /* 목록과의 간격 */
+}
+
+.list-header-toggle h2 {
+    margin-bottom: 0; /* h2 기본 마진 제거 */
+    font-size: 1.5rem; /* 글자 크기 유지 */
+    font-weight: bold;
+    margin-right: 5px; /* 화살표와의 간격 */
+}
+
+.toggle-arrow {
+    display: inline-block;
+    margin-left: 8px; 
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent; 
+    border-right: 8px solid transparent;
+    border-top: 8px solid black; /* 아래쪽을 가리키는 화살표 */
+    transition: transform 0.3s ease;
+}
+
+.toggle-arrow.collapsed {
+    border-top-color: #666;
+}
