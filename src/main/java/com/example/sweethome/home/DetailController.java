@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,8 +61,32 @@ public class DetailController {
                             WishlistFolder::getIdx,
                             folder -> wishlistRepository.findByFolderWithHome(folder)
                     ));
-            model.addAttribute("folderWishlists", folderWishlists);
-            
+         // JSON 변환 시 Instant 필드를 제거한 간단한 DTO로 변환
+            Map<Long, List<Map<String, Object>>> safeFolderWishlists = folderWishlists.entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e.getValue().stream().map(wish -> {
+                        Map<String, Object> safe = new HashMap<>();
+//                        safe.put("home", Map.of(
+//                            "idx", wish.getHome().getIdx(),
+//                            "title", wish.getHome().getTitle(),
+//                            "thumbnail", wish.getHome().getThumbnail()
+//                        ));
+                        String thumbnail = wish.getHome().getThumbnail() != null
+                        	    ? wish.getHome().getThumbnail()
+                        	    : "/images/default_main_image.jpg";
+
+                        	safe.put("home", Map.of(
+                        	    "idx", wish.getHome().getIdx(),
+                        	    "title", wish.getHome().getTitle(),
+                        	    "thumbnail", thumbnail
+                        	));
+                        return safe;
+                    }).collect(Collectors.toList())
+                ));
+
+            model.addAttribute("folderWishlists", safeFolderWishlists);
+
 	         // 로그 찍기
 	            folderWishlists.forEach((folderId, wishlists) -> {
 	                System.out.println("폴더ID: " + folderId + ", 위시리스트 개수: " + wishlists.size());

@@ -11,11 +11,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
+import java.util.ArrayList;
+import jakarta.persistence.OneToMany;
 
 @Entity
 @Getter
@@ -23,9 +27,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Home {
 
     // idx (int, PK, auto increment)
+	@Transient
+	private long recommendCount;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idx;
@@ -82,6 +91,10 @@ public class Home {
 
     // checkout (int) - 체크아웃 시간 (시간 정수 값)
     private int checkOut;
+
+    @OneToMany(mappedBy = "home")
+    private List<HomeRecommend> homeRecommends = new ArrayList<>();
+
 }
 
 // HomeType의 ENUM 타입 정의 (숙소 타입 반영)
