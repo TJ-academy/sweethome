@@ -1,6 +1,7 @@
 package com.example.sweethome.chat;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,16 @@ public class ChatController {
 	public String getChatRooms(Model model, 
 			HttpSession session) {
 		User user = (User) session.getAttribute("userProfile");
-		
-		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByUser(user);
-		
+	    if (user == null) {
+	        return "redirect:/login";
+	    }
+	    
+		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByUser(user);		
 		model.addAttribute("roomsList", roomsList);
+		
+	    model.addAttribute("myEmail", user.getEmail());
+	    model.addAttribute("myNickname", user.getNickname());
+	    
 		return "chat/chatList";
 	}
 	
@@ -114,15 +121,18 @@ public class ChatController {
 	
 	//메시지 전송
 	@MessageMapping("/message/send")
-    public void handleChatMessage(ChatMessageDto dto) {
-        ChatMessage savedMessage = service.saveMessage(dto);
-        
-        dto.setMsgId(savedMessage.getIdx());
-        dto.setSendedAt(savedMessage.getSendedAt());
-        dto.setSenderNickname(savedMessage.getSender().getNickname());
-        
-        messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
-    }
+	public void handleChatMessage(ChatMessageDto dto) {
+	    if (dto.getSenderEmail() == null || dto.getSenderEmail().isEmpty()) {
+	        throw new IllegalArgumentException("senderEmail 누락됨");
+	    }
+
+	    ChatMessage savedMessage = service.saveMessage(dto);
+	    dto.setMsgId(savedMessage.getIdx());
+	    dto.setSendedAt(savedMessage.getSendedAt());
+	    dto.setSenderNickname(savedMessage.getSender().getNickname());
+
+	    messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+	}
 	
 	//이미지 전송
 	@PostMapping("/uploadImage")
@@ -154,4 +164,35 @@ public class ChatController {
 	    service.updateLastRead(roomId, user, messageIdx);
 	    return "ok";
 	}
+	
+	//선아 추가
+	// ✅ 채팅방의 메시지 목록을 JSON으로 반환 (Ajax용)
+	@GetMapping("/messages/{roomId}")
+	@ResponseBody
+	public Map<String, Object> getMessagesAjax(@PathVariable("roomId") Integer roomId,
+	                                           HttpSession session) {
+	    User user = (User) session.getAttribute("userProfile");
+	    if (user == null) {
+	        throw new RuntimeException("로그인이 필요합니다.");
+	    }
+
+	    // 메시지 목록 불러오기
+	    List<ChatMessageDto> messageList = service.getMessagesByChatRoom(roomId);
+	    // 상대방 정보
+	    ChatUser other = service.findChatOtherUser(roomId, user);
+	    ChatUser me = service.findChatUser(roomId, user);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("messages", messageList);
+	    response.put("roomId", roomId);
+	    response.put("myEmail", user.getEmail());
+	    response.put("myNickname", user.getNickname());
+	    response.put("otherEmail", other.getUser().getEmail());
+	    response.put("otherNickname", other.getUser().getNickname());
+	    response.put("lastRead", me.getLastRead());
+
+	    return response;
+	}
+
+
 }

@@ -11,5 +11,5 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 	//특정 채팅방의 마지막 메시지
 	Optional<ChatMessage> findFirstByChatRoom_IdOrderBySendedAtDesc(Integer chatRoomId);
 	//안읽은 메시지 수 구하기
-	int countByChatRoom_IdAndIdxGreaterThan(Integer roomId, Integer lastRead);
+	int countByChatRoom_IdAndIdxGreaterThanAndSender_EmailNot(Integer roomId, Integer idx, String email);
 }
