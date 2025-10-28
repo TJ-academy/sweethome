@@ -1,5 +1,10 @@
 package com.example.sweethome.review;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.sweethome.user.User; // User 엔티티 import
 
 import jakarta.persistence.Column;
@@ -9,13 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,6 +29,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "reply", 
+uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"review_id"}, name = "UQ_REVIEW_REPLY")
+})
 public class Reply {
 
     // replyIdx (int, PK)
@@ -30,8 +40,9 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int replyIdx;
 
-    @ManyToOne 
+    @OneToOne
     @JoinColumn(name = "reviewId", referencedColumnName = "reviewIdx", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Review review;
 
     // hostId (varchar(50), FK) -> User 엔티티와 ManyToOne 관계 (User.email 참조)

@@ -1,14 +1,9 @@
 package com.example.sweethome.mypage;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
+import com.example.sweethome.review.Reply;
+import com.example.sweethome.review.ReplyRepository;
 import com.example.sweethome.review.Review;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
@@ -37,6 +33,7 @@ public class MyReviewController {
 
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
+    private final ReplyRepository replyRepository;
 
     // ★ 목록 페이지
     @GetMapping("/review")
@@ -108,7 +105,7 @@ public class MyReviewController {
             throw new IllegalStateException("이용 완료된 예약만 리뷰 작성이 가능합니다.");
 
         if (reviewRepository.existsByReservationAndDirection(r, direction)) {
-            return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction;
+            return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction.name(); // .name() 추가
         }
 
         // 템플릿 바인딩
@@ -127,18 +124,13 @@ public class MyReviewController {
         return "mypage/myReviewWrite";
     }
 
-    // ★ 저장 (키워드 삭제 / 이미지만 선택)
+    // ★ 저장
     @PostMapping("/review/write")
     @Transactional
     public String submitReview(@RequestParam("reservationId") int reservationId,
                                @RequestParam("direction") ReviewDirection direction,
                                @RequestParam("star") int star,
                                @RequestParam("content") String content,
-                               // 이미지 4종(선택). 파일 저장 로직은 프로젝트 공통 유틸에 맞게 채우세요.
-                               @RequestParam(value = "reviewThumb", required = false) org.springframework.web.multipart.MultipartFile reviewThumb,
-                               @RequestParam(value = "imgOne", required = false) org.springframework.web.multipart.MultipartFile imgOne,
-                               @RequestParam(value = "imgTwo", required = false) org.springframework.web.multipart.MultipartFile imgTwo,
-                               @RequestParam(value = "imgThree", required = false) org.springframework.web.multipart.MultipartFile imgThree,
                                HttpSession session) {
 
         User user = (User) session.getAttribute("userProfile");
@@ -161,12 +153,6 @@ public class MyReviewController {
         if (reviewRepository.existsByReservationAndDirection(r, direction))
             throw new IllegalStateException("이미 리뷰를 작성하였습니다.");
 
-        // (선택) 파일 저장 – 예시: 파일명을 리턴하는 헬퍼 사용 가정
-        String thumb = saveIfPresent(reviewThumb);
-        String one   = saveIfPresent(imgOne);
-        String two   = saveIfPresent(imgTwo);
-        String three = saveIfPresent(imgThree);
-
         Review review = Review.builder()
                 .reservation(r)
                 .home(r.getReservedHome())
@@ -174,80 +160,21 @@ public class MyReviewController {
                 .direction(direction)
                 .star(star)
                 .content(content)
-                .reviewThumb(thumb)
-                .imgOne(one)
-                .imgTwo(two)
-                .imgThree(three)
+                // 이미지 필드는 null로 설정 (필요 시 Review 엔티티에서 해당 필드 제거 고려)
+                .reviewThumb(null)
+                .imgOne(null)
+                .imgTwo(null)
+                .imgThree(null)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         reviewRepository.save(review);
 
-        return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction;
-    }
-
-    private String saveIfPresent(MultipartFile f) {
-        if (f == null || f.isEmpty()) return null;
-
-        // 파일 이름 중복 방지용
-        String originalName = f.getOriginalFilename();
-        String ext = originalName.substring(originalName.lastIndexOf("."));
-        String newName = UUID.randomUUID() + ext;
-
-        // 실제 저장 경로
-        Path uploadPath = Paths.get("src/main/resources/static/img/review");
-        try {
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-            Path filePath = uploadPath.resolve(newName);
-            f.transferTo(filePath.toFile());
-            System.out.println("리뷰 이미지 저장 완료: " + filePath);
-            return newName; // DB에는 파일명만 저장
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // ★ 상세
-    @GetMapping("/review/detail")
-    public String reviewDetail(@RequestParam("reservationId") int reservationId,
-                               @RequestParam("direction") ReviewDirection direction,
-                               HttpSession session,
-                               Model model) {
-        User user = (User) session.getAttribute("userProfile");
-        if (user == null) return "redirect:/user/login";
-
-        Reservation r = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
-
-        Review review = reviewRepository.findByReservationAndDirection(r, direction)
-                .orElseThrow(() -> new IllegalArgumentException("작성된 리뷰가 없습니다."));
-
-        User viewer = user; // 세션 유저
-        User booker = review.getReservation().getBooker();
-        User host   = review.getReservation().getReservedHome().getHost();
-        boolean isWriter = review.getWriter().getEmail().equals(viewer.getEmail());
-
-        // 방향에 따른 대상자 체크 (게스트→호스트면 대상은 host, 호스트→게스트면 대상은 booker)
-        boolean isTarget =
-                (review.getDirection() == ReviewDirection.GUEST_TO_HOST  && host.getEmail().equals(viewer.getEmail())) ||
-                (review.getDirection() == ReviewDirection.HOST_TO_GUEST   && booker.getEmail().equals(viewer.getEmail()));
-
-        if (!(isWriter || isTarget)) {
-            throw new IllegalArgumentException("리뷰 열람 권한이 없습니다.");
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("reservation", r);
-        model.addAttribute("review", review);
-        model.addAttribute("direction", direction);
-        return "mypage/myReviewDetail";
+        return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction.name();
     }
     
-    /*
+    // ★ 상세
     @GetMapping("/review/detail")
     public String reviewDetail(@RequestParam("reservationId") int reservationId,
                                @RequestParam("direction") ReviewDirection direction,
@@ -273,23 +200,106 @@ public class MyReviewController {
         if (!(isWriter || isParticipant)) {
             throw new IllegalArgumentException("리뷰 열람 권한이 없습니다.");
         }
-
-        // 대상 사용자 (표시용)
+        
+     // 대상 사용자 (표시용)
         User targetUser = (direction == ReviewDirection.GUEST_TO_HOST) ? host : booker;
         String targetLabel = (direction == ReviewDirection.GUEST_TO_HOST) ? "호스트" : "게스트";
+        User writer = review.getWriter();
+        
+        // 템플릿 에러 방지를 위해 방향 라벨을 미리 계산하여 추가 (HTML에서 Enum 비교 오류 방지)
+        String directionLabel = (direction == ReviewDirection.GUEST_TO_HOST) ? "게스트 → 호스트" : "호스트 → 게스트";
+        
+     // 4. 답글 조회 (답글이 존재할 경우)
+        Reply reply = replyRepository.findByReview(review).orElse(null);
 
         // 모델 바인딩
         model.addAttribute("user", viewer);
         model.addAttribute("reservation", r);
         model.addAttribute("home", r.getReservedHome());
         model.addAttribute("review", review);
-        model.addAttribute("direction", direction);
-        model.addAttribute("writer", review.getWriter());
-        model.addAttribute("targetUser", targetUser);
-        model.addAttribute("targetLabel", targetLabel);
-        model.addAttribute("isWriter", isWriter); // 수정 버튼 노출용
-
+        model.addAttribute("directionLabel", directionLabel); // 이 변수를 HTML에서 사용
+        model.addAttribute("writer", writer); 
+        model.addAttribute("targetUser", targetUser); 
+        model.addAttribute("targetLabel", targetLabel); 
+        model.addAttribute("isWriter", isWriter); 
+        model.addAttribute("direction", direction); // URL 생성 시 .name()을 위해 유지
+        
+        model.addAttribute("isHost", viewer.getEmail().equals(host.getEmail())); // 호스트 여부 추가
+        model.addAttribute("reply", reply); // 답글 객체 추가
+        
         return "mypage/myReviewDetail";
     }
-    */
+    
+    // ★ 수정 폼
+    @GetMapping("/review/edit")
+    public String editReviewForm(@RequestParam("reservationId") int reservationId,
+                                 @RequestParam("direction") ReviewDirection direction,
+                                 HttpSession session,
+                                 Model model) {
+        User user = (User) session.getAttribute("userProfile");
+        if (user == null) return "redirect:/user/login";
+
+        Reservation r = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
+
+        Review review = reviewRepository.findByReservationAndDirection(r, direction)
+                .orElseThrow(() -> new IllegalArgumentException("작성된 리뷰가 없습니다."));
+
+        // 권한 체크: 리뷰 작성자만 수정 가능
+        if (!review.getWriter().getEmail().equals(user.getEmail()))
+            throw new IllegalArgumentException("리뷰 수정 권한이 없습니다.");
+
+        // 템플릿 바인딩 (작성 폼과 거의 동일)
+        model.addAttribute("user", user);
+        model.addAttribute("reservation", r);
+        model.addAttribute("direction", direction);
+        model.addAttribute("home", r.getReservedHome());
+        model.addAttribute("review", review);
+
+        // 대상 사용자(표시용)
+        User targetUser = (direction == ReviewDirection.GUEST_TO_HOST)
+                ? r.getReservedHome().getHost()
+                : r.getBooker();
+        model.addAttribute("targetUser", targetUser);
+        model.addAttribute("targetLabel", direction == ReviewDirection.GUEST_TO_HOST ? "호스트" : "게스트");
+
+        return "mypage/myReviewEdit";
+    }
+
+    // ★ 수정 저장 (이미지 기능 완전 삭제)
+    @PostMapping("/review/edit")
+    @Transactional
+    public String updateReview(@RequestParam("reviewId") int reviewId,
+                               @RequestParam("reservationId") int reservationId,
+                               @RequestParam("direction") ReviewDirection direction,
+                               @RequestParam("star") int star,
+                               @RequestParam("content") String content,
+                               HttpSession session) {
+
+        User user = (User) session.getAttribute("userProfile");
+        if (user == null) return "redirect:/user/login";
+
+        // 기존 리뷰 로드
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+
+        // 권한 체크
+        if (!review.getWriter().getEmail().equals(user.getEmail()))
+            throw new IllegalArgumentException("리뷰 수정 권한이 없습니다.");
+
+        // 1. 내용 및 별점 업데이트
+        review.setStar(star);
+        review.setContent(content);
+        review.setUpdatedAt(LocalDateTime.now());
+        
+        // 2. 이미지 필드는 그대로 유지 (또는 Review 엔티티에서 제거)
+        // 여기서는 코드가 단순화되어 이미지 관련 코드가 모두 제거되었습니다.
+        
+        reviewRepository.save(review); // Transactional로 인해 자동 더티체킹됨
+
+        // ⚠️ 문제 해결: 리다이렉트 시 direction.name() 사용
+        return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction.name();
+    }
+    
+    // 이미지 저장/삭제 관련 헬퍼 함수는 모두 제거되었습니다.
 }
