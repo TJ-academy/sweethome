@@ -281,9 +281,13 @@ function updateJoinButtonState() {
 
       <!-- 생년월일 -->
       <div class="input-row">
-        <input type="date" id="birthday" name="birthday"
-          th:field="*{birthday}" required>
-      </div>
+		  <input type="text" id="birthday" name="birthday"
+		    th:field="*{birthday}"
+		    placeholder="생년월일" 
+		    onfocus="(this.type='date')" 
+		    onblur="if(!this.value) this.type='text'"
+		    required>
+		</div>
 
       <!-- 가입 버튼 -->
       <button type="submit" id="joinBtn" class="btn-primary" disabled>가입하기</button>
