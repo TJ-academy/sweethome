@@ -1,137 +1,196 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title th:text="|숙소 상세: ${home.title}|">숙소 상세</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-  <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
-  <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
-  <style>
-    .kv {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-    .kv .k {
-      width: 120px;
-      color: #666;
-    }
-    .badge-status {
-      font-size: 0.95rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<title th:text="|숙소 상세: ${home.title}|">숙소 상세</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+<link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
+<link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+<style>
+.kv {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+
+.kv .k {
+	width: 120px;
+	color: #666;
+}
+
+.badge-status {
+	font-size: 0.95rem;
+}
+</style>
 </head>
 
 <body>
-  <div th:insert="~{fragments/header :: menuBar}"></div>
-  <div class="mypage-layout-wrap container-fluid">
-    <div class="row">
-      <div class="mypage-sidebar-col">
-        <div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
-      </div>
+	<div th:insert="~{fragments/header :: menuBar}"></div>
+	<div class="mypage-layout-wrap container-fluid">
+		<div class="row">
+			<div class="mypage-sidebar-col">
+				<div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
+			</div>
 
-      <div class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="m-0">예약 상세</h3>
-          <a th:href="@{/host/list}" class="btn btn-outline-secondary btn-sm">내 숙소 목록</a>
-        </div>
+			<div class="container my-4">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h3 class="m-0">예약 상세</h3>
+					<a th:href="@{/host/list}" class="btn btn-outline-secondary btn-sm">내
+						숙소 목록</a>
+				</div>
 
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="mb-3">
-              <span class="badge text-bg-secondary badge-status"
-                    th:text="${reservation.reservationStatus}">REQUESTED</span>
-            </div>
+				<div class="card shadow-sm">
+					<div class="card-body">
+						<div class="mb-3">
+							<span class="badge text-bg-secondary badge-status"
+								th:text="${reservation.reservationStatus}">REQUESTED</span>
+						</div>
 
-            <div class="kv"><div class="k">예약번호</div><div class="v" th:text="${reservation.reservationIdx}">1</div></div>
-            <div class="kv"><div class="k">숙소</div><div class="v" th:text="${reservation.reservedHome.title}">홈제목</div></div>
-            <div class="kv"><div class="k">게스트</div><div class="v"
-                 th:text="${reservation.booker.nickname} + ' (' + ${reservation.booker.email} + ')'">닉네임(email)</div></div>
-            <div class="kv"><div class="k">체크인</div><div class="v" th:text="${reservation.startDate}">2025-10-01</div></div>
-            <div class="kv"><div class="k">체크아웃</div><div class="v" th:text="${reservation.endDate}">2025-10-03</div></div>
-            <div class="kv"><div class="k">인원</div><div class="v"
-                 th:text="'성인 ' + ${reservation.adult} + ' / 아동 ' + ${reservation.child} + ' / 반려동물 ' + ${reservation.pet}">성인2/아동0/펫0</div></div>
-            <div class="kv"><div class="k">요금합계</div><div class="v"
-                 th:text="${#numbers.formatInteger(reservation.totalMoney, 3, 'COMMA')} + ' 원'">100,000 원</div></div>
-            <div class="kv"><div class="k">결제수단</div><div class="v" th:text="${reservation.payby}">KAKAOPAY</div></div>
-            <div class="kv" th:if="${reservation.bank}">
-              <div class="k">입금계좌</div><div class="v" th:text="${reservation.bank} + ' / ' + ${reservation.account}"></div>
-            </div>
-            <div class="kv" th:if="${reservation.message}">
-              <div class="k">게스트메시지</div><div class="v" th:text="${reservation.message}"></div>
-            </div>
+						<div class="kv">
+							<div class="k">예약번호</div>
+							<div class="v" th:text="${reservation.reservationIdx}">1</div>
+						</div>
+						<div class="kv">
+							<div class="k">숙소</div>
+							<div class="v" th:text="${reservation.reservedHome.title}">홈제목</div>
+						</div>
+						<div class="kv">
+							<div class="k">게스트</div>
+							<div class="v"
+								th:text="${reservation.booker.nickname} + ' (' + ${reservation.booker.email} + ')'">닉네임(email)</div>
+						</div>
+						<div class="kv">
+							<div class="k">체크인</div>
+							<div class="v" th:text="${reservation.startDate}">2025-10-01</div>
+						</div>
+						<div class="kv">
+							<div class="k">체크아웃</div>
+							<div class="v" th:text="${reservation.endDate}">2025-10-03</div>
+						</div>
+						<div class="kv">
+							<div class="k">인원</div>
+							<div class="v"
+								th:text="'성인 ' + ${reservation.adult} + ' / 아동 ' + ${reservation.child} + ' / 반려동물 ' + ${reservation.pet}">성인2/아동0/펫0</div>
+						</div>
+						<div class="kv">
+							<div class="k">요금합계</div>
+							<div class="v"
+								th:text="${#numbers.formatInteger(reservation.totalMoney, 3, 'COMMA')} + ' 원'">100,000
+								원</div>
+						</div>
+						<div class="kv">
+							<div class="k">결제수단</div>
+							<div class="v" th:text="${reservation.payby}">KAKAOPAY</div>
+						</div>
+						<div class="kv" th:if="${reservation.bank}">
+							<div class="k">입금계좌</div>
+							<div class="v"
+								th:text="${reservation.bank} + ' / ' + ${reservation.account}"></div>
+						</div>
+						<div class="kv" th:if="${reservation.message}">
+							<div class="k">게스트메시지</div>
+							<div class="v" th:text="${reservation.message}"></div>
+						</div>
 
-            <hr>
+						<div class="kv" th:if="${reservation.cancelMessage}">
+							<div class="k text-danger">취소 신청 사유</div>
+							<div class="v" th:text="${reservation.cancelMessage}"></div>
+						</div>
 
-            <!-- 상태별 액션 버튼 -->
-            <div class="d-flex flex-wrap gap-2">
-              <!-- REQUESTED: 예약거절 / 예약확인 -->
-              <form th:if="${reservation.reservationStatus.name() == 'REQUESTED'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="reject">
-                <button class="btn btn-outline-danger"
-                        onclick="return confirm('해당 예약을 거절하시겠습니까?')">예약 거절</button>
-              </form>
+						<hr>
 
-              <form th:if="${reservation.reservationStatus.name() == 'REQUESTED'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="confirm">
-                <button class="btn btn-primary"
-                        onclick="return confirm('해당 예약을 확정하시겠습니까?')">예약 확인</button>
-              </form>
+						<!-- 상태별 액션 버튼 -->
+						<div class="d-flex flex-wrap gap-2">
+							<!-- REQUESTED: 예약거절 / 예약확인 -->
+							<form
+								th:if="${reservation.reservationStatus.name() == 'REQUESTED'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="reject">
+								<button class="btn btn-outline-danger"
+									onclick="return confirm('해당 예약을 거절하시겠습니까?')">예약 거절</button>
+							</form>
 
-              <!-- CANCEL_REQUESTED: 취소수락 / 취소거절 -->
-              <form th:if="${reservation.reservationStatus.name() == 'CANCEL_REQUESTED'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="cancel_accept">
-                <button class="btn btn-outline-danger"
-                        onclick="return confirm('취소 요청을 수락하시겠습니까? (예약은 취소됩니다)')">취소 수락</button>
-              </form>
+							<form
+								th:if="${reservation.reservationStatus.name() == 'REQUESTED'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="confirm">
+								<button class="btn btn-primary"
+									onclick="return confirm('해당 예약을 확정하시겠습니까?')">예약 확인</button>
+							</form>
 
-              <form th:if="${reservation.reservationStatus.name() == 'CANCEL_REQUESTED'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="cancel_reject">
-                <button class="btn btn-success"
-                        onclick="return confirm('취소 요청을 거절하시겠습니까? (상태가 예약 확정됨으로 돌아갑니다)')">취소 거절</button>
-              </form>
+							<!-- CANCEL_REQUESTED: 취소수락 / 취소거절 -->
+							<form
+								th:if="${reservation.reservationStatus.name() == 'CANCEL_REQUESTED'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="cancel_accept">
+								<button class="btn btn-outline-danger"
+									onclick="return confirm('취소 요청을 수락하시겠습니까? (예약은 취소됩니다)')">취소
+									수락</button>
+							</form>
 
-              <!-- CONFIRMED: 이용중으로 변경 -->
-              <form th:if="${reservation.reservationStatus.name() == 'CONFIRMED'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="start_use">
-                <button class="btn btn-warning"
-                        onclick="return confirm('해당 예약을 이용 중 상태로 변경하시겠습니까?')">이용 중으로 변경</button>
-              </form>
+							<form
+								th:if="${reservation.reservationStatus.name() == 'CANCEL_REQUESTED'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="cancel_reject">
+								<button class="btn btn-success"
+									onclick="return confirm('취소 요청을 거절하시겠습니까? (상태가 예약 확정됨으로 돌아갑니다)')">취소
+									거절</button>
+							</form>
 
-              <!-- IN_USE: 이용완료 -->
-              <form th:if="${reservation.reservationStatus.name() == 'IN_USE'}"
-                    th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}" method="post">
-                <input type="hidden" name="action" value="complete">
-                <button class="btn btn-success"
-                        onclick="return confirm('해당 예약을 이용 완료 상태로 변경하시겠습니까?')">이용 완료</button>
-              </form>
+							<!-- CONFIRMED: 이용중으로 변경 -->
+							<form
+								th:if="${reservation.reservationStatus.name() == 'CONFIRMED'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="start_use">
+								<button class="btn btn-warning"
+									onclick="return confirm('해당 예약을 이용 중 상태로 변경하시겠습니까?')">이용
+									중으로 변경</button>
+							</form>
 
-              <!-- COMPLETED: 리뷰 작성/보기 -->
-              <div th:if="${reservation.reservationStatus.name() == 'COMPLETED'}" class="mt-2">
-                <a th:href="@{|/review/write?reservationId=${reservation.reservationIdx}|}"
-                   class="btn btn-outline-primary">리뷰 작성하기</a>
-                <a th:href="@{|/review/list?homeId=${reservation.reservedHome.idx}|}"
-                   class="btn btn-outline-secondary">리뷰 보기</a>
-              </div>
-            </div>
+							<!-- IN_USE: 이용완료 -->
+							<form th:if="${reservation.reservationStatus.name() == 'IN_USE'}"
+								th:action="@{|/host/reservation/detail/${reservation.reservationIdx}|}"
+								method="post">
+								<input type="hidden" name="action" value="complete">
+								<button class="btn btn-success"
+									onclick="return confirm('해당 예약을 이용 완료 상태로 변경하시겠습니까?')">이용
+									완료</button>
+							</form>
 
-            <hr>
+							<!-- COMPLETED: 리뷰 작성/보기 -->
+							<div
+								th:if="${reservation.reservationStatus.name() == 'COMPLETED'}"
+								class="mt-2">
+								<a
+									th:href="@{|/review/write?reservationId=${reservation.reservationIdx}|}"
+									class="btn btn-outline-primary">리뷰 작성하기</a> <a
+									th:href="@{|/review/list?homeId=${reservation.reservedHome.idx}|}"
+									class="btn btn-outline-secondary">리뷰 보기</a>
+							</div>
+						</div>
 
-            <div class="d-flex justify-content-between">
-              <a th:href="@{/host/calendar}" class="btn btn-light">캘린더로 돌아가기</a>
-              <a th:href="@{|/host/detail/${reservation.reservedHome.idx}|}" class="btn btn-outline-dark">숙소 상세</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+						<hr>
+
+						<div class="d-flex justify-content-between">
+							<a th:href="@{/host/calendar}" class="btn btn-light">캘린더로
+								돌아가기</a> <a
+								th:href="@{|/host/detail/${reservation.reservedHome.idx}|}"
+								class="btn btn-outline-dark">숙소 상세</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
