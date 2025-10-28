@@ -1,216 +1,230 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>숙소 비교</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .compare-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* 버튼과 제목을 양 끝으로 분리 */
-            margin-bottom: 20px;
-        }
-        .compare-table {
-            width: 100%;
-            margin-top: 20px;
-        }
-        .compare-table th, .compare-table td {
-            text-align: center;
-            vertical-align: middle;
-            padding: 10px;
-        }
-        .compare-table tbody td:first-child {
-            font-weight: bold;
-            text-align: left;
-            width: 20%;
-            background-color: #f8f9fa;
-        }
-        .home-info {
-            font-size: 0.9em;
-        }
-        .home-info ul {
-            padding-left: 15px;
-            text-align: left;
-        }
-        .nav-link.active {
-            font-weight: bold;
-            border-bottom: 2px solid #007bff;
-        }
-        /* 이미지 스타일 재정의 */
-        .compare-table thead th .thumbnail-img {
-            width: 100%; 
-            max-width: 100%; 
-            height: 120px; 
-            object-fit: cover; 
-            border-radius: 5px;
-            margin-bottom: 5px; /* 이미지와 제목 사이 간격 추가 */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>숙소 비교하기</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/home/compare.css}">
 </head>
 <body>
-	<div th:insert="fragments/header :: menuBar"></div>
+<div th:insert="fragments/header :: menuBar"></div>
 
-    <div class="container mt-5">
-        
-        <div class="compare-header">
-            <h1>숙소 비교하기</h1>
-            <button id="backButton" class="btn btn-secondary">
-                ← 이전 화면으로
-            </button>
+<div class="container mt-5">
+  <div class="compare-header">
+    <button id="backButton">&lt;</button>
+    <h1>비교하기</h1>
+  </div>
+
+  <!-- 탭 -->
+  <ul class="nav nav-tabs" id="compareTabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">전체</button></li>
+    <li class="nav-item"><button class="nav-link" id="price-tab" data-bs-toggle="tab" data-bs-target="#price" type="button">가격</button></li>
+    <li class="nav-item"><button class="nav-link" id="likes-tab" data-bs-toggle="tab" data-bs-target="#likes" type="button">추천 수</button></li>
+    <li class="nav-item"><button class="nav-link" id="options-tab" data-bs-toggle="tab" data-bs-target="#options" type="button">옵션</button></li>
+  </ul>
+
+  <div class="tab-content mt-4" id="compareTabsContent">
+
+    <!-- ✅ 전체 탭 -->
+    <div class="tab-pane fade show active" id="all" role="tabpanel">
+      <div class="compare-grid">
+        <div class="compare-card" th:each="detail, iter : ${compareHomeDetails}">
+          <h3 th:text="'TOP ' + ${iter.index + 1}">TOP 1</h3>
+          <img th:src="@{${detail.thumbnail}}" alt="썸네일">
+          <h5 th:text="${detail.title}">서울의 아파트</h5>
+          <p class="price" th:text="|기본 (1박) ₩${#numbers.formatInteger(detail.costBasic,3,'COMMA')}|">₩133,125</p>
+          <p class="price" th:text="|주말/성수기 ₩${#numbers.formatInteger(detail.costExpen,3,'COMMA')}|">₩150,000</p>
+          <p th:text="|★ ${detail.likeCount}|">★ 4.48</p>
+          <button class="reserve-btn">예약하기</button>
         </div>
-        <div th:if="${#lists.isEmpty(compareHomeDetails)}" class="alert alert-warning mt-3">
-            <p>비교할 숙소 데이터가 없거나, 잘못된 ID가 전달되었습니다.</p>
+      </div>
+
+      <!-- 옵션 그룹 -->
+      <div class="section-title"><h3><b>옵션</b></h3></div>
+      <div class="compare-grid">
+        <div class="compare-card" th:each="detail, iter : ${compareHomeDetails}">
+          <div class="option-group">
+            <h5>서비스</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('서비스') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('서비스')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>위치 특성</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('위치 특성') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('위치 특성')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>주차장 및 기타 시설</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('주차장 및 기타 시설') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('주차장 및 기타 시설')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>숙소 안전</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('숙소 안전') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('숙소 안전')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>엔터테인먼트</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('엔터테인먼트') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('엔터테인먼트')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>인터넷 및 업무 공간</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('인터넷 및 업무 공간') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('인터넷 및 업무 공간')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>냉난방</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('냉난방') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('냉난방')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>침실 및 세탁</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('침실 및 세탁') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('침실 및 세탁')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>욕실</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('욕실') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('욕실')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>주방 및 식사 공간</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('주방 및 식사 공간') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('주방 및 식사 공간')}" th:text="${opt}">옵션</li>
+            </ul>
+
+            <h5>기타</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('기타') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('기타')}" th:text="${opt}">옵션</li>
+            </ul>
+          </div>
         </div>
+      </div>
+    </div> <!-- ✅ 전체 탭 닫힘 -->
 
-        <ul class="nav nav-tabs mt-4" id="compareTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">전체</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="price-tab" data-bs-toggle="tab" data-bs-target="#price" type="button" role="tab">가격</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="likes-tab" data-bs-toggle="tab" data-bs-target="#likes" type="button" role="tab">추천수</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="options-tab" data-bs-toggle="tab" data-bs-target="#options" type="button" role="tab">옵션</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="compareTabsContent">
-            
-            <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
-                <table class="table table-bordered compare-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">항목</th>
-                            <th th:each="detail : ${compareHomeDetails}" style="width: 26%;">
-                                <img th:src="@{${detail.thumbnail}}" alt="썸네일" class="thumbnail-img">
-                                <p th:text="${detail.title}" style="font-weight: bold; margin-top: 5px;">숙소 이름</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody th:with="details=${compareHomeDetails}">
-                        
-                        <tr>
-                            <td>**가격 정보**</td>
-                            <td th:each="detail : ${details}">
-                                <span th:text="|기본 (1박): ${#numbers.formatInteger(detail.costBasic, 3, 'COMMA')}원|"></span><br>
-                                <span th:text="|주말/성수기: ${#numbers.formatInteger(detail.costExpen, 3, 'COMMA')}원|"></span>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>**추천 수**</td>
-                            <td th:each="detail : ${details}">
-                                <span th:text="|💖 ${detail.likeCount}개|">10개</span>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td>최대 인원</td>
-                            <td th:each="detail : ${details}" th:text="|${detail.maxPeople}명|">4명</td>
-                        </tr>
-                        <tr>
-                            <td>침실 / 침대 / 욕실</td>
-                            <td th:each="detail : ${details}" th:text="|${detail.room}개 / ${detail.bed}개 / ${detail.bath}개|">2개/3개/1개</td>
-                        </tr>
-                        
-                        <tr th:each="groupName : ${allOptionGroups}">
-                            <td th:text="${groupName}">옵션 그룹명</td>
-                            <td th:each="detail : ${details}" class="home-info">
-                                <ul th:if="${detail.groupedOptions.get(groupName) != null and !#lists.isEmpty(detail.groupedOptions.get(groupName))}">
-                                    <li th:each="optionName : ${detail.groupedOptions.get(groupName)}" th:text="${optionName}">옵션명</li>
-                                </ul>
-                                <span th:if="${detail.groupedOptions.get(groupName) == null or #lists.isEmpty(detail.groupedOptions.get(groupName))}">-</span>
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="tab-pane fade" id="price" role="tabpanel" aria-labelledby="price-tab">
-                <table class="table table-bordered compare-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">항목</th>
-                            <th th:each="detail : ${compareHomeDetails}" style="width: 26%;">
-                                <img th:src="@{${detail.thumbnail}}" alt="썸네일" class="thumbnail-img">
-                                <p th:text="${detail.title}" style="font-weight: bold; margin-top: 5px;">숙소 이름</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         <tr>
-                            <td>**기본 가격 (1박)**</td>
-                            <td th:each="detail : ${compareHomeDetails}" th:text="|${#numbers.formatInteger(detail.costBasic, 3, 'COMMA')}원|"></td>
-                        </tr>
-                        <tr>
-                            <td>**주말/성수기 가격**</td>
-                            <td th:each="detail : ${compareHomeDetails}" th:text="|${#numbers.formatInteger(detail.costExpen, 3, 'COMMA')}원|"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="tab-pane fade" id="likes" role="tabpanel" aria-labelledby="likes-tab">
-                <table class="table table-bordered compare-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">항목</th>
-                            <th th:each="detail : ${compareHomeDetails}" style="width: 26%;">
-                                <img th:src="@{${detail.thumbnail}}" alt="썸네일" class="thumbnail-img">
-                                <p th:text="${detail.title}" style="font-weight: bold; margin-top: 5px;">숙소 이름</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         <tr>
-                            <td>**총 추천 수 (좋아요)**</td>
-                            <td th:each="detail : ${compareHomeDetails}">
-                                <span th:text="|💖 ${detail.likeCount}개|">10개</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="tab-pane fade" id="options" role="tabpanel" aria-labelledby="options-tab">
-                 <table class="table table-bordered compare-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">옵션 그룹</th>
-                            <th th:each="detail : ${compareHomeDetails}" style="width: 26%;">
-                                <img th:src="@{${detail.thumbnail}}" alt="썸네일" class="thumbnail-img">
-                                <p th:text="${detail.title}" style="font-weight: bold; margin-top: 5px;">숙소 이름</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody th:with="details=${compareHomeDetails}">
-                        <tr th:each="groupName : ${allOptionGroups}">
-                            <td th:text="${groupName}">옵션 그룹명</td>
-                            <td th:each="detail : ${details}" class="home-info">
-                                <ul th:if="${detail.groupedOptions.get(groupName) != null and !#lists.isEmpty(detail.groupedOptions.get(groupName))}">
-                                    <li th:each="optionName : ${detail.groupedOptions.get(groupName)}" th:text="${optionName}">옵션명</li>
-                                </ul>
-                                <span th:if="${detail.groupedOptions.get(groupName) == null or #lists.isEmpty(detail.groupedOptions.get(groupName))}">-</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
+    <!-- 가격 탭 -->
+    <div class="tab-pane fade" id="price" role="tabpanel">
+      <div class="compare-grid">
+        <div class="compare-card" th:each="detail, iter : ${compareHomeDetails}">
+          <h3 th:text="'TOP ' + ${iter.index + 1}">TOP 1</h3>
+          <img th:src="@{${detail.thumbnail}}" alt="썸네일">
+          <h5 th:text="${detail.title}">서울의 아파트</h5>
+          <p class="price" th:text="|기본 (1박) ₩${#numbers.formatInteger(detail.costBasic,3,'COMMA')}|">₩133,125</p>
+          <p class="price" th:text="|주말/성수기 ₩${#numbers.formatInteger(detail.costExpen,3,'COMMA')}|">₩150,000</p>
+          <button class="reserve-btn">예약하기</button>
         </div>
+      </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        document.getElementById('backButton').addEventListener('click', function() {
-            window.history.back();
-        });
-    </script>
+    <!-- 추천수 탭 -->
+    <div class="tab-pane fade" id="likes" role="tabpanel">
+      <div class="compare-grid">
+        <div class="compare-card" th:each="detail, iter : ${compareHomeDetails}">
+          <h3 th:text="'TOP ' + ${iter.index + 1}">TOP 1</h3>
+          <img th:src="@{${detail.thumbnail}}" alt="썸네일">
+          <h5 th:text="${detail.title}">서울의 아파트</h5>
+          <p class="price" th:text="|★ ${detail.likeCount}|">★ 4.48</p>
+          <button class="reserve-btn">예약하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 옵션 탭 -->
+    <div class="tab-pane fade" id="options" role="tabpanel">
+      <div class="compare-grid">
+        <div class="compare-card" th:each="detail, iter : ${compareHomeDetails}">
+          <h3 th:text="'TOP ' + ${iter.index + 1}">TOP 1</h3>
+          <img th:src="@{${detail.thumbnail}}" alt="썸네일">
+          <h5 th:text="${detail.title}">서울의 아파트</h5>
+          <button class="reserve-btn">예약하기</button>
+          <div class="option-group">
+            <!-- 옵션 그룹 동일하게 반복 -->
+            <h5>서비스</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('서비스') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('서비스')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>위치 특성</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('위치 특성') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('위치 특성')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>주차장 및 기타 시설</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('주차장 및 기타 시설') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('주차장 및 기타 시설')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>숙소 안전</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('숙소 안전') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('숙소 안전')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>엔터테인먼트</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('엔터테인먼트') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('엔터테인먼트')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>인터넷 및 업무 공간</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('인터넷 및 업무 공간') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('인터넷 및 업무 공간')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>냉난방</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('냉난방') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('냉난방')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>침실 및 세탁</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('침실 및 세탁') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('침실 및 세탁')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>욕실</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('욕실') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('욕실')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>주방 및 식사 공간</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('주방 및 식사 공간') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('주방 및 식사 공간')}" th:text="${opt}">옵션</li>
+            </ul>
+            <h5>기타</h5>
+            <ul class="option-list" th:if="${detail.groupedOptions.get('기타') != null}">
+              <li th:each="opt : ${detail.groupedOptions.get('기타')}" th:text="${opt}">옵션</li>
+            </ul>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('backButton').addEventListener('click', () => history.back());
+</script>
+<script>
+window.addEventListener("load", () => {
+  // 각 옵션 그룹 이름
+  const groupNames = [
+    "서비스", "위치 특성", "주차장 및 기타 시설", "숙소 안전",
+    "엔터테인먼트", "인터넷 및 업무 공간", "냉난방",
+    "침실 및 세탁", "욕실", "주방 및 식사 공간", "기타"
+  ];
+
+  // 각 옵션 그룹별로 높이를 통일
+  groupNames.forEach(name => {
+    // 모든 카드에서 해당 옵션 그룹 찾기
+    const headers = Array.from(document.querySelectorAll(".option-group h5"))
+      .filter(h => h.innerText.trim() === name);
+
+    if (headers.length === 0) return; // 없는 그룹은 패스
+
+    // 각 그룹 아래에 있는 리스트들(ul)
+    const lists = headers.map(h => h.nextElementSibling).filter(Boolean);
+    const maxHeight = Math.max(...lists.map(ul => ul.scrollHeight));
+
+    // 모든 카드의 해당 그룹 리스트 높이를 동일하게 설정
+    lists.forEach(ul => {
+      ul.style.minHeight = `${maxHeight}px`;
+    });
+  });
+});
+</script>
+
 </body>
 </html>
