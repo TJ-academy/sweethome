@@ -2,40 +2,352 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+
 </head>
 <body>
+<div th:fragment="menuBar">
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
-	<div th:fragment="menuBar">
-		<nav class="navbar navbar-light bg-light">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="/"> <!--  
-	            <img src="@{/img/logo.png}" alt="로고" style="height: 30px;">
-	        -->
-				</a>
-				<a href="/">메인</a>
-				<ul class="navbar-nav d-flex flex-row ms-auto">
+<style>
+.badge-dot {
+  position: absolute;
+  top: 0; right: 0;
+  width: 8px; height: 8px;
+  background: red;
+  border-radius: 50%;
+}
+
+#notiPopup {
+    display: none;
+    position: absolute;
+    top: 50px; /* 버튼 아래 위치 */
+    right: 0;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1050;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px;
+}
+
+.noti-item {
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background-color: #F5F5F5; /* 배경색을 연한 회색으로 설정 */
+    border-radius: 8px; /* 둥근 사각형 */
+    /* border: 1px solid #e9ecef; 연한 테두리 */
+    transition: opacity 0.3s; /* 불투명도 변경 시 부드러운 전환 효과 */
+    cursor: pointer;
+}
+
+/* 새 알림 (불투명도 100% 유지, 선택적 배경색 강조) */
+.noti-item.new {
+    /*background-color: #fff;  새 알림은 흰색 배경 
+    border-color: #dee2e6;*/
+    opacity: 1.0 !important; /* 항상 100% 불투명도 */
+}
+
+/* 읽은 알림 (불투명도 60% 적용) */
+.noti-item:not(.new) {
+    opacity: 0.6;
+}
+
+.noti-date {
+	margin: 5px 0;
+    padding: 0 5px;
+}
+.noti-content {
+	padding: 5px;
+}
+</style>
+	<nav class="navbar navbar-light bg-light">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/"> <!--  
+		    	<img src="@{/img/logo.png}" alt="로고" style="height: 30px;">-->
+			</a>
+			<a href="/">메인</a>
+			<ul class="navbar-nav d-flex flex-row ms-auto">
+				<li class="nav-item me-3"><a class="nav-link"
+					aria-current="page" href="/home/write">숙소등록</a></li>
+				
+				<li class="nav-item me-3"><a class="nav-link"
+					aria-current="page" href="/host/list">호스트</a></li>
+				
+				<th:block th:if="${userProfile == null and user == null}">
 					<li class="nav-item me-3"><a class="nav-link"
-						aria-current="page" href="/home/write">숙소등록</a></li>
-					<li class="nav-item me-3"><a class="nav-link"
-						aria-current="page" href="/chat/rooms">채팅방</a></li>
-					<li class="nav-item me-3"><a class="nav-link"
-						aria-current="page" href="/host/list">호스트</a></li>
+						href="/user/join">가입하기</a></li>
+					<li class="nav-item"><a class="nav-link" href="/user/login">로그인하기</a>
+					</li>
+				</th:block>
+		
+				<th:block th:if="${userProfile != null or user != null}">
+					<li class="nav-item me-3">
+						<a class="nav-link"
+						aria-current="page" 
+						href="/chat/rooms">채팅방</a>
+					</li>
 					
-					<th:block th:if="${userProfile == null and user == null}">
-						<li class="nav-item me-3"><a class="nav-link"
-							href="/user/join">가입하기</a></li>
-						<li class="nav-item"><a class="nav-link" href="/user/login">로그인하기</a>
-						</li>
-					</th:block>
-					<th:block th:if="${userProfile != null or user != null}">
-						<li class="nav-item me-3"><a class="nav-link"
-							href="/user/logout">로그아웃</a></li>
-						<li class="nav-item"><a class="nav-link" href="/mypage">마이페이지</a></li>
-					</th:block>
-				</ul>
-			</div>
-		</nav>
-	</div>
+					<li id="notiContainer" class="nav-item me-3 position-relative">
+						<button type="button"
+						class="btn position-relative p-0 border-0 bg-transparent"
+						id="notiButton"
+						aria-expanded="false">
+							<img src="/img/icon/bell.png" alt="알림" 
+							style="width:46px;">
+							<span id="notiBadge"
+							class="badge-dot"
+							style="display:none;">
+							</span>
+						</button>
+	
+						<div id="notiPopup" style="display:none;">
+							<div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+								<h6 class="mb-0">알림</h6>
+								<hr>
+							</div>
+							<div id="notiList" class="noti-list">
+								<div id="todayNotifications" class="noti-content" style="display:none;">
+									<h6 class="noti-date">오늘 받은 알림</h6>
+								</div>
+							
+								<div id="oldNotifications" class="noti-content" style="display:none;">
+							    	<hr>
+							    	<h6 class="noti-date">이전 알림</h6>
+							    </div>
+							</div>
+						</div>
+					</li>
+					
+					<li class="nav-item me-3">
+						<a class="nav-link" href="/mypage">마이페이지</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link"
+						href="/user/logout">로그아웃</a>
+					</li>
+				</th:block>
+			</ul>
+		</div>
+	</nav>
+
+<!-- 알림 관련 JS -->
+<script th:inline="javascript">
+let stompClient = null;
+let notiDBList = [];
+
+//로그인 유저 이메일 (서버에서 Thymeleaf로 주입 가능)
+let email = /*[[${session.userProfile != null ? session.userProfile.email : ''}]]*/ '';
+
+const notiButton = document.getElementById('notiButton');
+const notiPopup = document.getElementById('notiPopup');
+const notiList = document.getElementById('notiList');
+const notiBadge = document.getElementById('notiBadge');
+const notiContainer = document.getElementById('notiContainer');
+
+//알림 버튼 누르면 알림창 팝업
+notiButton.addEventListener('click', function(e) {
+    const isVisible = notiPopup.style.display === 'block';
+    
+    notiPopup.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) {
+    	getNotiFromDB();
+    	notiButton.setAttribute('aria-expanded', 'true');
+    } else {
+    	notiButton.setAttribute('aria-expanded', 'false');
+    }
+    e.stopPropagation();
+});
+
+//밖에 누르면 팝업 닫기
+document.addEventListener('click', () => {
+	const isClickedOutside = !notiContainer.contains(event.target);
+    const isDropdownVisible = notiPopup.style.display === 'block';
+
+    if (isClickedOutside && isDropdownVisible) {
+    	/* markAllAsRead(); */
+        notiPopup.style.display = 'none';
+        notiButton.setAttribute('aria-expanded', 'false');
+    }
+    /* notiDBList.forEach(noti => {
+    	markAsRead(noti.id, item);
+    }); */
+});
+
+//웹소켓 연결
+function connect() {
+	if (!email) {
+        console.warn("WebSocket connect skipped: User email is not defined.");
+        return;
+    }
+	
+	const socket = new SockJS('/ws');
+	stompClient = Stomp.over(socket);
+	
+	stompClient.connect({}, function(frame) {
+		console.log('Connected: ' + frame);
+		
+		stompClient.subscribe('/topic/notifications/' + email, function(message){
+			const newNoti = JSON.parse(message.body);
+			console.log('Received real-time notification:', newNoti);
+			
+			// 새 알림을 배열 맨 앞에 추가하고 렌더링 (UI 즉시 업데이트)
+            notiDBList.unshift(newNoti);
+			showNotification();
+			
+			// 팝업이 닫혀있더라도 새 알림이 오면 배지 표시
+            if (notiPopup.style.display !== 'block') {
+                notiBadge.style.display = 'inline-block';
+            }
+		});
+	}, (error) => {
+        console.error('STOMP Error:', error);
+    });
+}
+
+//알림 표시
+function showNotification() {
+	const todayContainer = document.getElementById('todayNotifications');
+    const oldContainer = document.getElementById('oldNotifications');
+    
+    todayContainer.querySelectorAll('.noti-item').forEach(e => e.remove());
+    oldContainer.querySelectorAll('.noti-item').forEach(e => e.remove());
+    
+    todayContainer.style.display = 'none';
+    oldContainer.style.display = 'none'; 
+    
+    if (notiDBList.length === 0) {
+        notiList.innerHTML = '<div class="text-center p-3 text-muted">알림이 없습니다.</div>';
+        notiBadge.style.display = 'none';
+        return;
+    }
+    
+    let newCount = 0;
+    notiDBList.forEach(noti => {
+    	const isNew = noti.status === 'NEW';
+    	if (isNew) newCount++;
+    	
+    	const container = isToday(noti.sendAt) ? todayContainer : oldContainer;
+    	
+    	// 모달 리스트에 알림 추가
+    	const item = document.createElement('div');
+    	item.className = 'noti-item' + (isNew ? ' new' : '');
+    	item.dataset.id = noti.id;
+    	item.innerHTML = `
+    		<strong>${noti.title}</strong>
+    		<br>${noti.message}<br>
+    		<small style="font-size: 0.75rem; color:#6b7280;">${noti.sendAt.substring(11, 16)}</small>`;
+    	
+    	item.addEventListener('click', (e) => {
+            e.stopPropagation(); // 알림 항목 클릭이 외부 클릭으로 간주되어 닫히지 않도록 방지
+            markAsRead(noti.id, item);
+            // TODO: 알림 클릭 시 해당 내용과 관련된 페이지로 이동하는 로직 추가
+        });
+    	
+    	container.insertBefore(item, container.children[1]);
+    	container.style.display = 'block';
+    });
+	
+	// 팝업이 열려 있지 않을 때만 배지 표시
+    if (notiPopup.style.display !== 'block' &&
+    		newCount > 0) {
+        notiBadge.style.display = 'inline-block';
+    } else {
+        notiBadge.style.display = 'none';
+    }
+}
+
+//오늘인지 확인
+function isToday(dateString) {
+    const date = new Date(dateString);
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+}
+
+//DB에서 알림 불러오기
+function getNotiFromDB() {
+	notiBadge.style.display = 'none';
+	
+	fetch('/notifications')
+	.then(res => {
+		if (!res.ok) {
+            throw new Error('알림 목록을 불러오지 못했습니다.');
+        }
+        return res.json();
+	})
+	.then(data => {
+		notiDBList = data;
+		showNotification();
+	})
+	.catch(error => {
+	    console.error('Error fetching notifications:', error);
+	    notiList.innerHTML = '<div class="text-center p-3 text-danger">알림 로드 실패</div>';
+	});
+}
+
+//알림창 열면 자동 읽음 처리
+function markAsRead(id, element) {
+	// 알림 항목을 notiDBList에서 찾습니다.
+    const notiIndex = notiDBList.findIndex(n => n.id === id);
+    const noti = notiDBList[notiIndex];
+
+    if (notiIndex === -1) {
+        console.warn("알림 ID를 notiDBList에서 찾을 수 없습니다:", id);
+        return;
+    }
+    
+	// 이미 읽은 상태라면 바로 닫기
+    if (!noti || noti.status === 'READ') {
+        notiPopup.style.display = 'none';
+        notiButton.setAttribute('aria-expanded', 'false');
+        return;
+    }
+
+    fetch(`/notifications/${id}/read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('읽음 처리 실패');
+        }
+        
+        // 데이터 상태 업데이트 및 UI 즉시 갱신
+        notiDBList[notiIndex].status = 'READ';
+        element.classList.remove('new');
+        showNotification(); // 배지 업데이트 및 목록 정렬 유지
+
+        // 알림 하나 읽음 처리 후 팝업 닫기
+        /* notiPopup.style.display = 'none';
+        notiButton.setAttribute('aria-expanded', 'false'); */
+    })
+    .catch(error => {
+        console.error('Error marking as read:', error);
+    });
+}
+
+//초기 연결 시도 및 데이터 로드 (로그인 상태일 때만 실행)
+if (email) {
+    connect();
+    getNotiFromDB(); // 초기 로드 (팝업 닫혀있어도 배지 표시를 위해)
+} else {
+    console.log("User is not logged in. Notification features are inactive.");
+}
+
+</script>
+</div>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+
+
 
 </body>
 </html>
