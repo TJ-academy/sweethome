@@ -65,6 +65,9 @@ public class Notification {
     // sendAt (date, timestamp)
     @Column(columnDefinition = "timestamp")
     private LocalDateTime sendAt;
+    
+    @Column(length = 30)
+    private String notiType; 
 }
 
 // 알림 레벨 Enum 정의 (INFO, WARN, CRITICAL)
