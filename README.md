@@ -14,19 +14,27 @@
 - **회원 관리** : 회원가입 / 로그인 / 권한(호스트·게스트) 구분  
 - **숙소 관리** : 숙소 등록, 수정, 삭제  
 - **예약 관리** : 예약 일정 확인, 체크인·체크아웃 표시  
+- **결제 기능** : **KakaoPay API**를 이용한 안전한 결제 처리  
+- **지도 기능** : **Kakao Map / Daum Map API**를 통한 위치 표시 및 검색  
 - **채팅 기능** : WebSocket(STOMP) 기반 실시간 1:1 채팅  
 - **달력 관리** : FullCalendar 기반 예약 일정·메모 표시  
+- **이메일 발송** : SMTP 기반 이메일 알림 (예: CodeWithMe API 연동)  
+- **모바일 지원** : **Flutter**를 활용한 앱 개발 및 Spring Boot 연동  
 - **마이페이지** : 사용자 정보, 예약 내역, 일정 관리 통합  
 - **알림 기능** : 새로운 채팅 메시지, 예약 변경 시 실시간 알림  
+
+---
 
 ## 🛠 기술 스택
 
 | 구분 | 사용 기술 |
 |------|------------|
-| **Frontend** | HTML, CSS, JavaScript, Thymeleaf, Bootstrap 5, FullCalendar.js |
+| **Frontend (Web)** | HTML, CSS, JavaScript, Thymeleaf, Bootstrap 5, FullCalendar.js |
+| **Frontend (App)** | Flutter |
 | **Backend** | Spring Boot, Spring Security, WebSocket(STOMP), JPA / MyBatis |
 | **DB** | MySQL |
-| **Tools** | GitHub, Figma, Eclipse |
+| **API 연동** | Kakao Map API, Daum Map API, KakaoPay API, SMTP(이메일 전송) |
+| **Tools** | GitHub, Figma, Eclipse, IntelliJ |
 | **Design** | [Figma 디자인 바로가기](https://www.figma.com/design/YSjc45WehXFYvqh77Dk7ej/HomeSweetHome) |
 
 ---
