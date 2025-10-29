@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소 등록 9단계 - 숙소 사진 등록</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+    /* ------------------------------------- */
+    /* 1. 레이아웃 및 공통 스타일 (기존 재활용) */
+    /* ------------------------------------- */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute; 
+        top: 0;
+        z-index: 100;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .exit-button:hover {
+        color: #3aa6e9; 
+    }
+
+    .main-content-selection {
+        width: 100%;
+        max-width: 1000px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 120px 20px 100px 20px; 
+        flex-grow: 1;
+        box-sizing: border-box;
+    }
+
+    .question-title {
+        font-size: 2.5em; 
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    
+    .question-subtitle {
+        font-size: 1.1em; 
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 40px;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171; 
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600; 
+    }
+
+    .next-button {
+        background-color: #3aa6e9; 
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px; 
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+    
+    /* ------------------------------------- */
+    /* 2. 9단계 고유 스타일: 다중 이미지 업로드 */
+    /* ------------------------------------- */
+    .image-upload-container {
+        width: 100%;
+        max-width: 800px; 
+        margin-top: 20px;
+    }
+    
+    .photo-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-start;
+        align-items: flex-start;
+        min-height: 450px; 
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background-color: white;
+        padding: 20px;
+        text-align: center;
+        transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    
+    .photo-area:hover {
+        border-color: #3aa6e9;
+    }
+
+    .default-upload-box {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        height: 400px;
+    }
+
+    .camera-image {
+        width: 500px; 
+        margin-bottom: 20px;
+    }
+    
+    .add-photo-button {
+        background-color: white;
+        color: #333;
+        border: 1px solid #333;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+    
+    .add-photo-button:hover {
+        background-color: #f0f0f0;
+        border-color: #000;
+        color: #000;
+    }
+    
+    /* 실제 파일 입력 필드는 숨김 */
+    .file-input {
+        display: none;
+    }
+    
+    /* 미리보기 그리드 아이템 */
+    .preview-item {
+        width: calc(33.333% - 10px); /* 3열 그리드 */
+        aspect-ratio: 1 / 1; 
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .delete-btn:hover {
+        opacity: 1;
+    }
+
+
+    /* 새로운 사진 추가 버튼 박스 */
+    .add-new-box {
+        width: calc(33.333% - 10px);
+        aspect-ratio: 1 / 1;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        color: #717171;
+        font-weight: 500;
+    }
+    
+    .add-new-box:hover {
+        border-color: #3aa6e9;
+        color: #3aa6e9;
+    }
+    
+    .add-icon {
+        font-size: 30px;
+        margin-bottom: 5px;
+    }
+
+    @media (max-width: 600px) {
+        .footer-bar, .header {
+            padding: 0 20px;
+        }
+    }
+</style>
+
+<script>
+let filesToUpload = []; // 업로드할 파일 객체들을 저장하는 배열
+
+$(document).ready(function() {
+    
+    // ✅ 사진 추가 버튼 클릭 시 숨겨진 파일 입력 필드 클릭 유도
+    $('.photo-area').on('click', '#addNewBox', function() {
+        $('#homeImagesInput').click();
+    });
+
+    // ✅ 파일 선택 시 파일 목록 처리
+    $('#homeImagesInput').on('change', function() {
+        const files = this.files;
+        
+        // filesToUpload 배열에 새 파일을 추가하고, 최대 10개로 제한
+        for (let i = 0; i < files.length; i++) {
+            if (filesToUpload.length < 10) {
+                filesToUpload.push(files[i]);
+            } else {
+                // 10개 초과 시 알림 (alert 대신 커스텀 메시지 사용 권장)
+                $('#errorMessage').text('사진은 최대 10장까지만 첨부 가능합니다.').css('color', 'red');
+                break;
+            }
+        }
+        
+        renderPreviews(); // 미리보기 업데이트
+        // 파일 입력 필드 초기화 (같은 파일 다시 선택 가능하게)
+        this.value = '';
+    });
+    
+    // ✅ 미리보기 영역에서 삭제 버튼 클릭 이벤트
+    $('.photo-area').on('click', '.delete-btn', function(e) {
+        e.stopPropagation(); // 부모 요소 클릭 이벤트 방지
+        const indexToDelete = $(this).data('index');
+        
+        // filesToUpload 배열에서 해당 인덱스 파일 제거
+        filesToUpload.splice(indexToDelete, 1);
+        
+        renderPreviews(); // 미리보기 업데이트
+    });
+    
+    // ✅ 미리보기 렌더링 함수
+    function renderPreviews() {
+        const photoArea = $('.photo-area');
+        photoArea.empty(); // 기존 내용 삭제
+
+        if (filesToUpload.length === 0) {
+            // 파일이 없을 때 기본 카메라 화면 표시
+            photoArea.append(
+                `<div class="default-upload-box">
+                    <img src="/img/icon/camera.png" alt="카메라 아이콘" class="camera-image">
+                    <button type="button" class="add-photo-button" id="addNewBox">사진 추가하기</button>
+                </div>`
+            );
+            $('#errorMessage').text(''); // 에러 메시지 초기화
+        } else {
+            // 파일이 있을 때 미리보기 이미지들 표시
+            filesToUpload.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const item = $(`
+                        <div class="preview-item">
+                            <img src="${e.target.result}" class="preview-img">
+                            <button type="button" class="delete-btn" data-index="${index}">×</button>
+                        </div>
+                    `);
+                    photoArea.prepend(item); // 새 이미지를 앞에 추가
+                    
+                    // filesToUpload.length가 10 미만일 경우에만 '사진 추가' 박스를 유지
+                    if (filesToUpload.length < 10) {
+                        // '사진 추가' 박스가 이미 있다면 제거
+                        photoArea.find('#addNewBox').remove();
+                        // 마지막에 '사진 추가' 박스 추가
+                        photoArea.append(
+                            `<div class="add-new-box" id="addNewBox">
+                                <span class="add-icon">+</span>
+                                <span>사진 추가</span>
+                            </div>`
+                        );
+                    } else {
+                        // 10장이면 '사진 추가' 박스 제거
+                        photoArea.find('#addNewBox').remove();
+                    }
+                }
+                reader.readAsDataURL(file);
+            });
+            
+            // 10장 미만일 때 '사진 추가' 박스만 추가 (초기 로딩 시)
+            if (filesToUpload.length < 10 && filesToUpload.length > 0) {
+                 photoArea.append(
+                    `<div class="add-new-box" id="addNewBox">
+                        <span class="add-icon">+</span>
+                        <span>사진 추가</span>
+                    </div>`
+                );
+            }
+        }
+    }
+    
+    // ✅ 다음 버튼 클릭 시 유효성 검사 및 폼 제출 준비
+    $('#nextButton').on('click', function(e) {
+        e.preventDefault(); 
+        
+        if (filesToUpload.length === 0) {
+            $('#errorMessage').text('숙소의 사진을 최소 1장 이상 등록해야 합니다.').css('color', 'red');
+            return;
+        }
+
+        // 1. filesToUpload 배열의 파일을 담을 임시 <input type="file" /> 요소 생성
+        const dataTransfer = new DataTransfer();
+        filesToUpload.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+
+        // 2. 기존의 숨겨진 homeImagesInput에 DataTransfer 객체의 files를 할당
+        const input = document.getElementById('homeImagesInput');
+        input.files = dataTransfer.files;
+
+        // 3. 유효성 검사 통과 및 데이터 준비 완료 후 폼 제출
+        $('#writeNineForm').submit();
+    });
+    
+    // 초기 렌더링
+    renderPreviews();
+
+});
+</script>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="logo">
+            <!-- 로고 이미지를 넣어주세요 -->
+            <img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <div class="main-content-selection">
+        <p class="question-title">숙소 사진 등록하기</p>
+        <p class="question-subtitle">
+            이제 방의 모습을 잘 보여줄 사진들을 선택해주세요.<br>
+            사진은 최대 10장까지 첨부 가능해요!
+        </p>
+        
+        <div class="image-upload-container">
+            <form id="writeNineForm" th:action="@{/home/writeTen}" method="post" th:object="${homeWriteDTO}" enctype="multipart/form-data">
+                
+                <!-- DTO 상태 유지를 위한 Hidden 필드 (이전 단계 데이터) -->
+                <input type="hidden" th:field="*{hostId}" />
+                <input type="hidden" th:field="*{homeType}" />
+                <input type="hidden" th:field="*{address}" />
+                <input type="hidden" th:field="*{detailAddress}" />
+                <input type="hidden" th:field="*{maxPeople}" />
+                <input type="hidden" th:field="*{room}" />
+                <input type="hidden" th:field="*{bed}" />
+                <input type="hidden" th:field="*{bath}" />
+                <!-- 7단계 옵션 데이터 -->
+                <div th:if="${homeWriteDTO.optionIds}">
+                    <input type="hidden" th:each="optionId : ${homeWriteDTO.optionIds}" th:name="optionIds" th:value="${optionId}" />
+                </div>
+                <!-- 8단계 썸네일 파일은 컨트롤러에서 세션에 저장했다고 가정하고, 여기서는 다시 전송하지 않습니다. 
+                     만약 썸네일도 9단계에서 다시 전송해야 한다면 DTO에 맞춰 Hidden 필드를 추가해야 합니다.
+                -->
+                
+                <!-- 숙소 사진 입력 필드 (실제는 숨김) -->
+                <input 
+                    type="file" 
+                    id="homeImagesInput" 
+                    name="homeImages" 
+                    class="file-input" 
+                    accept="image/*" 
+                    multiple>
+                
+                <!-- 사진 미리보기 및 추가 영역 -->
+                <div class="photo-area">
+                    <!-- JS로 내용이 채워집니다. -->
+                </div>
+            </form>
+            
+            <p id="errorMessage" style="text-align: center; margin-top: 15px; font-weight: 600;"></p>
+        </div>
+    </div>
+    
+    <div class="footer-bar">
+        <!-- 8단계로 돌아가기 -->
+        <button class="back-button" onclick="location.href='@{/home/writeEight}'">뒤로</button>
+        <!-- 다음 버튼: JS로 유효성 검사 후 폼 제출 -->
+        <button class="next-button" type="button" id="nextButton">다음</button>
+    </div>
+
+</body>
+</html>

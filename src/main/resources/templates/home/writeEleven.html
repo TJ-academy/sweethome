@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소 등록 11단계 - 상세 설명</title>
+
+<!-- Tailwind CSS는 폼 필드 스타일링에만 사용하고, 레이아웃/헤더/푸터는 커스텀 CSS를 따릅니다. -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- jQuery (Summernote 필요) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Summernote Dependencies (Bootstrap CSS와 JS) -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- Summernote CORE CSS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
+<!-- Summernote CORE JS: 누락된 부분 포함 완료 -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script> 
+<!-- Summernote Language Pack -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-ko-KR.min.js"></script> 
+
+<style>
+    /* ------------------------------------- */
+    /* 1. 레이아웃 및 공통 스타일 (기존 재활용) */
+    /* ------------------------------------- */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute; 
+        top: 0;
+        z-index: 100;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .exit-button:hover {
+        color: #3aa6e9; 
+    }
+
+    .main-content-selection {
+        width: 100%;
+        /* writeNine의 max-width 1000px를 따릅니다. */
+        max-width: 1000px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* writeNine의 padding을 따릅니다. */
+        padding: 120px 20px 100px 20px; 
+        flex-grow: 1;
+        box-sizing: border-box;
+    }
+
+    /* writeNine와 동일한 스타일 적용 */
+    .question-title {
+        font-size: 2.5em; 
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px; 
+        text-align: center;
+    }
+    
+    .question-subtitle {
+        font-size: 1.1em; 
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 40px; 
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171; 
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600; 
+    }
+
+    .next-button {
+        background-color: #3aa6e9; 
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px; 
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+    /* disabled 스타일은 더 이상 필요 없지만, 혹시 모를 상황을 위해 남겨둡니다. */
+    .next-button:disabled {
+        background-color: #ccc; 
+        cursor: not-allowed;
+    }
+    
+    /* ------------------------------------- */
+    /* 2. Summernote 및 폼 영역 스타일 */
+    /* ------------------------------------- */
+    .editor-container {
+        width: 100%;
+        max-width: 800px; /* 에디터의 최대 너비 제한 */
+        margin-top: 20px;
+    }
+    
+    /* Summernote 에디터의 높이와 경계선 설정 */
+    .note-editor.note-frame {
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* 에디터 내부 본문 영역 높이 */
+    .note-editable {
+        min-height: 350px !important; /* 충분한 높이 확보 */
+        font-size: 1em;
+        line-height: 1.6;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    // Summernote 활성화
+    $('#description').summernote({
+        height: 350,
+        width: '100%', // 컨테이너에 맞게 100% 사용
+        lang: 'ko-KR', // 한국어 설정
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link']], // 이미지 업로드 기능은 서버 처리가 필요하므로 기본적으로 비활성화
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+    });
+
+    const nextButton = $('#nextButton');
+    
+    // 초기 상태를 항상 활성화로 설정 
+    nextButton.prop('disabled', false);
+
+    // ✅ 다음 버튼 클릭 이벤트 핸들러: 유효성 검사 없이 바로 폼 제출
+    nextButton.on('click', function(e) {
+        e.preventDefault(); // 기본 폼 제출 동작 방지
+        
+        // 유효성 검사 없이 바로 폼을 명시적으로 제출
+        $('#writeElevenForm').submit();
+    });
+});
+</script>
+</head>
+<body>
+    
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="logo">
+            <img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-content-selection">
+        
+        <!-- 제목 영역 (writeNine 스타일 적용) -->
+        <p class="question-title">
+            숙소에 대한 상세 설명을 작성해주세요
+        </p>
+        <p class="question-subtitle">
+            투숙객들이 숙소의 매력을 충분히 이해할 수 있도록 자세한 내용을 포함해주세요.
+        </p>
+
+        <div class="editor-container">
+            <form id="writeElevenForm" th:action="@{/home/writeEleven}" method="post" th:object="${homeWriteDTO}">
+                
+                <!-- DTO 상태 유지를 위한 Hidden 필드 (생략) -->
+                <!-- DTO 상태 유지를 위한 Hidden 필드 -->
+                <input type="hidden" th:field="*{hostId}" />
+                <input type="hidden" th:field="*{homeType}" />
+                <input type="hidden" th:field="*{address}" />
+                <input type="hidden" th:field="*{detailAddress}" />
+                <input type="hidden" th:field="*{maxPeople}" />
+                <input type="hidden" th:field="*{room}" />
+                <input type="hidden" th:field="*{bed}" />
+                <input type="hidden" th:field="*{bath}" />
+                <input type="hidden" th:field="*{title}" />
+                <input type="hidden" th:field="*{costBasic}" />
+                <input type="hidden" th:field="*{costExpen}" />
+                <input type="hidden" th:field="*{checkIn}" />
+                <input type="hidden" th:field="*{checkOut}" />
+
+                <!-- 썸네일 경로 (String 타입이므로 안전하게 전달) -->
+                <input type="hidden" th:field="*{currentThumbnailPath}" />
+                
+                <!-- 숙소 이미지 경로 리스트 (List<String> 타입) -->
+                <div th:if="${homeWriteDTO.currentHomeImagePaths}">
+                    <input type="hidden" th:each="imagePath : ${homeWriteDTO.currentHomeImagePaths}" 
+                           th:name="currentHomeImagePaths" 
+                           th:value="${imagePath}" />
+                </div>
+                
+                <!-- 옵션 ID 리스트 (List<Long> 타입) -->
+                <div th:if="${homeWriteDTO.optionIds}">
+                    <!-- th:each를 사용하여 리스트 항목들을 개별 Hidden Input으로 전달합니다. -->
+                    <input type="hidden" th:each="optionId : ${homeWriteDTO.optionIds}" 
+                           th:name="optionIds" 
+                           th:value="${optionId}" />
+                </div>
+                
+                <!-- 해시태그 boolean 필드들도 전달 -->
+                <input type="hidden" th:field="*{wifi}" />
+                <input type="hidden" th:field="*{tv}" />
+                <input type="hidden" th:field="*{kitchen}" />
+                <input type="hidden" th:field="*{freePark}" />
+                <input type="hidden" th:field="*{selfCheckin}" />
+                <input type="hidden" th:field="*{coldWarm}" />
+                <input type="hidden" th:field="*{petFriendly}" />
+                <input type="hidden" th:field="*{barrierFree}" />
+                <input type="hidden" th:field="*{elevator}" />
+
+                
+                <!-- 상세 설명 (Summernote 적용 대상) -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <!-- 'description' 필드와 'name' 속성이 겹치므로 th:field를 사용하면 name이 자동으로 설정됩니다. -->
+                    <textarea id="description" th:field="*{description}" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 푸터 바 -->
+    <div class="footer-bar">
+        <!-- 10단계로 돌아가기 (writeTen으로 수정) -->
+        <a th:href="@{/home/writeTen}" class="back-button">뒤로</a>
+        
+        <!-- 다음 버튼: JS로 폼 제출 -->
+        <!-- disabled 속성을 제거했으므로 항상 활성화됩니다. -->
+        <button class="next-button" id="nextButton" type="button">다음</button>
+    </div>
+
+</body>
+</html>

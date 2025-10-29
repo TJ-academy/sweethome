@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>숙소 위치는 어디인가요?</title>
+
+<!-- Daum 주소 검색 API -->
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<!-- Kakao Map SDK -->
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
+
+<style>
+    /* ===============================
+       공통 레이아웃
+    =============================== */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        top: 0;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .exit-button:hover {
+        color: #3aa6e9;
+    }
+
+    .main-content-selection {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 100px 20px 100px 20px;
+        flex-grow: 1;
+        box-sizing: border-box;
+    }
+
+    .question-title {
+        font-size: 2em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .question-subtitle {
+        font-size: 1em;
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    /* ===============================
+       주소 검색 UI
+    =============================== */
+    .address-search-container {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-input-wrapper {
+        width: 100%;
+        height: 55px;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .address-search-button {
+        width: 100%;
+        height: 100%;
+        padding: 0 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: white;
+        text-align: left;
+        font-size: 1em;
+        color: #333;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    .address-search-button:hover {
+        border-color: #3aa6e9;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #717171;
+        font-size: 1.2em;
+        z-index: 2;
+    }
+
+    #addressDisplay {
+        padding-left: 30px;
+        color: #717171;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .detail-address-container {
+        width: 100%;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    #detailAddress {
+        width: 100%;
+        height: 55px;
+        padding: 0 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
+
+    #map {
+        width: 100%;
+        height: 400px;
+        background-color: #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    /* ===============================
+       Footer
+    =============================== */
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171;
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .next-button {
+        background-color: #3aa6e9;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .next-button.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+</style>
+
+<script>
+    let selectedAddress = '';
+    let selectedDetailAddress = '';
+    let map, geocoder, marker;
+
+    function updateMap(address) {
+        if (!geocoder) return;
+
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                map.setCenter(coords);
+                map.setLevel(3);
+
+                if (marker) {
+                    marker.setPosition(coords);
+                } else {
+                    marker = new kakao.maps.Marker({
+                        map: map,
+                        position: coords
+                    });
+                }
+            } else {
+                console.error('주소-좌표 변환 실패: ' + status);
+            }
+        });
+    }
+
+    function updateNextButtonState() {
+        const nextButton = document.getElementById('nextButton');
+        const detailInput = document.getElementById('detailAddress');
+
+        selectedDetailAddress = detailInput.value.trim();
+
+        if (selectedAddress && selectedDetailAddress) {
+            nextButton.classList.add('active');
+        } else {
+            nextButton.classList.remove('active');
+        }
+    }
+
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                let finalAddr = data.userSelectedType === 'J' ? data.jibunAddress : data.roadAddress;
+                selectedAddress = finalAddr;
+
+                document.getElementById('addressDisplay').textContent = finalAddr;
+                updateMap(finalAddr);
+
+                const detailContainer = document.getElementById('detailAddressContainer');
+                const detailInput = document.getElementById('detailAddress');
+                detailContainer.style.display = 'block';
+                detailInput.focus();
+
+                updateNextButtonState();
+            }
+        }).open();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 지도 초기화
+        const mapContainer = document.getElementById('map');
+        const mapOption = {
+            center: new kakao.maps.LatLng(37.566826, 126.9786567),
+            level: 9
+        };
+        map = new kakao.maps.Map(mapContainer, mapOption);
+        geocoder = new kakao.maps.services.Geocoder();
+
+        const nextButton = document.getElementById('nextButton');
+        const detailInput = document.getElementById('detailAddress');
+
+        detailInput.addEventListener('input', updateNextButtonState);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const homeType = urlParams.get('homeType') || '';
+
+        nextButton.addEventListener('click', function() {
+            selectedDetailAddress = detailInput.value.trim();
+            if (!homeType) {
+                alert('숙소 유형 정보가 없습니다.');
+                return;
+            }
+            if (!selectedAddress || !selectedDetailAddress) {
+                alert('주소 검색과 상세 주소 입력을 모두 완료해주세요.');
+                return;
+            }
+
+            const encodedAddress = encodeURIComponent(selectedAddress);
+            const encodedDetailAddress = encodeURIComponent(selectedDetailAddress);
+
+            window.location.href = `/home/writeFive?homeType=${homeType}&address=${encodedAddress}&detailAddress=${encodedDetailAddress}`;
+        });
+    });
+</script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">나가기</button>
+    </div>
+
+    <div class="main-content-selection">
+        <p class="question-title">숙소 위치는 어디인가요?</p>
+        <p class="question-subtitle">정확한 주소는 게스트의 예약이 확정된 이후에 공개됩니다.</p>
+
+        <div class="address-search-container">
+            <div class="search-input-wrapper" onclick="execDaumPostcode()">
+                <span class="search-icon">🔍</span>
+                <button type="button" class="address-search-button">
+                    <span id="addressDisplay">주소를 입력하세요</span>
+                </button>
+            </div>
+
+            <div id="detailAddressContainer" class="detail-address-container">
+                <input type="text" id="detailAddress" placeholder="상세 주소 (예: 동, 호수, 건물명)">
+            </div>
+
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <button class="back-button" onclick="history.back()">뒤로</button>
+        <button class="next-button" id="nextButton">다음</button>
+    </div>
+</body>
+</html>

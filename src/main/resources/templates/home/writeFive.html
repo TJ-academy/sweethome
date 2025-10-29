@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소의 기본 정보를 알려 주세요</title>
+
+<style>
+    /* ------------------------------------- */
+    /* 1. 공통 및 레이아웃 스타일 (writeFour에서 복사) */
+    /* ------------------------------------- */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        z-index: 100;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .exit-button:hover {
+        color: #3aa6e9;
+    }
+
+    /* --- 메인 콘텐츠 영역 --- */
+    .main-content-selection {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 100px 0 100px 0; 
+        flex-grow: 1;
+    }
+
+    .question-title {
+        font-size: 2em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .question-subtitle {
+        font-size: 1em;
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+    
+    /* ------------------------------------- */
+    /* 2. 카운터 및 폼 영역 스타일 (writeFive 전용) */
+    /* ------------------------------------- */
+    .write-five-form-container {
+        width: 100%;
+        max-width: 500px; /* 카운터는 좁게 배치 */
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .counter-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .counter-group:last-child {
+        border-bottom: none;
+    }
+    
+    .counter-label {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .counter-buttons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .counter-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #ccc;
+        background-color: white;
+        cursor: pointer;
+        font-size: 1.25rem;
+        font-weight: 600;
+        transition: all 0.15s;
+    }
+    
+    .counter-button:hover:not(:disabled) {
+        border-color: #3aa6e9;
+        background-color: #f0f8ff;
+    }
+    
+    .counter-button:disabled {
+        color: #ccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    .counter-display {
+        width: 30px;
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: 600;
+        background: none;
+        border: none;
+        padding: 0;
+        pointer-events: none; 
+    }
+    
+    /* ------------------------------------- */
+    /* 3. 하단 바 (Footer) 스타일 (writeFour에서 복사) */
+    /* ------------------------------------- */
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171;
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .next-button {
+        background-color: #3aa6e9;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        opacity: 1; 
+        pointer-events: auto;
+    }
+    
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+</style>
+</head>
+<body>
+    
+    <!-- 헤더 (writeFour 구조 유지) -->
+    <div class="header">
+        <div class="logo">
+        	<img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 (writeFive 내용) -->
+    <div class="main-content-selection">
+        <p class="question-title">
+            숙소의 기본 정보를 알려 주세요
+        </p>
+        <p class="question-subtitle">
+            침대 유형과 같은 세부 사항은 나중에 추가하실 수 있습니다.
+        </p>
+        
+        <div class="write-five-form-container">
+            <!-- 폼 액션을 Controller의 @PostMapping("/writeFive")로 지정 -->
+            <form id="writeFiveForm" th:action="@{/home/writeFive}" method="post" th:object="${homeWriteDTO}">
+                
+                <!-- 🌟 폼 제출 시 DTO의 모든 필드를 전송하기 위한 Hidden 필드 🌟 -->
+                <!-- writeFive에서 직접적으로 변경하는 필드를 제외한 모든 필드를 Hidden으로 전송 -->
+                <input type="hidden" th:field="*{hostId}" />
+                <input type="hidden" th:field="*{homeType}" />
+                <input type="hidden" th:field="*{address}" />
+                <input type="hidden" th:field="*{detailAddress}" />
+                <!-- 여기에 DTO의 나머지 필드들 (예: title, description, costBasic 등)을 모두 추가해야 합니다.
+                     현재 DTO 구조를 알 수 없어 핵심 필드만 남겼습니다. -->
+                
+                <!-- 게스트 최대 인원 (maxPeople) - 실제 값은 hidden 필드가 아닌 input 태그의 name으로 전송됨 -->
+                <input type="hidden" th:field="*{maxPeople}" data-field-name="maxPeople-hidden" />
+                <input type="hidden" th:field="*{room}" data-field-name="room-hidden" />
+                <input type="hidden" th:field="*{bed}" data-field-name="bed-hidden" />
+                <input type="hidden" th:field="*{bath}" data-field-name="bath-hidden" />
+                
+                
+                <!-- 게스트 최대 인원 (maxPeople) -->
+                <div class="counter-group">
+                    <span class="counter-label">게스트 최대 인원</span>
+                    <div class="counter-buttons">
+                        <button type="button" class="counter-button" data-field="maxPeople" data-action="decrement" disabled>-</button>
+                        <!-- type="number"로 바인딩된 필드에 th:field 적용하지 않고, hidden 필드를 통해 값을 넘깁니다. -->
+                        <input type="number" name="maxPeople-display" th:value="*{maxPeople}" class="counter-display" min="1" readonly data-field="maxPeople" />
+                        <button type="button" class="counter-button" data-field="maxPeople" data-action="increment">+</button>
+                    </div>
+                </div>
+
+                <!-- 침실 (room) -->
+                <div class="counter-group">
+                    <span class="counter-label">침실</span>
+                    <div class="counter-buttons">
+                        <button type="button" class="counter-button" data-field="room" data-action="decrement" disabled>-</button>
+                        <input type="number" name="room-display" th:value="*{room}" class="counter-display" min="0" readonly data-field="room" />
+                        <button type="button" class="counter-button" data-field="room" data-action="increment">+</button>
+                    </div>
+                </div>
+
+                <!-- 침대 (bed) -->
+                <div class="counter-group">
+                    <span class="counter-label">침대</span>
+                    <div class="counter-buttons">
+                        <button type="button" class="counter-button" data-field="bed" data-action="decrement" disabled>-</button>
+                        <input type="number" name="bed-display" th:value="*{bed}" class="counter-display" min="0" readonly data-field="bed" />
+                        <button type="button" class="counter-button" data-field="bed" data-action="increment">+</button>
+                    </div>
+                </div>
+
+                <!-- 욕실 (bath) -->
+                <div class="counter-group">
+                    <span class="counter-label">욕실</span>
+                    <div class="counter-buttons">
+                        <button type="button" class="counter-button" data-field="bath" data-action="decrement" disabled>-</button>
+                        <input type="number" name="bath-display" th:value="*{bath}" class="counter-display" min="1" readonly data-field="bath" />
+                        <button type="button" class="counter-button" data-field="bath" data-action="increment">+</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+	</div>
+    
+    <!-- 푸터 바 (writeFour 구조 유지) -->
+    <div class="footer-bar">
+        <!-- 뒤로 가기 버튼: writeFour로 이동 -->
+        <a th:href="@{/home/writeFour}" class="back-button">뒤로</a>
+        
+        <!-- 다음 버튼: 폼 제출 (POST /home/writeFive 호출) -->
+        <button class="next-button active" id="nextButton" type="submit" form="writeFiveForm">다음</button>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 초기 최소값 설정
+            const minValues = {
+                maxPeople: 1, // 최소 1명
+                room: 0,
+                bed: 0,
+                bath: 1       // 최소 1개
+            };
+            
+            // DTO 필드명과 디스플레이 필드명 매핑
+            const fieldMap = {
+                maxPeople: 'maxPeople',
+                room: 'room',
+                bed: 'bed',
+                bath: 'bath'
+            };
+
+
+            function updateCounter(input, action) {
+                let value = parseInt(input.value);
+                const field = input.getAttribute('data-field');
+                const minValue = minValues[field];
+                
+                // 증가/감소 로직
+                if (action === 'increment') {
+                    value++;
+                } else if (action === 'decrement' && value > minValue) {
+                    value--;
+                }
+                
+                // 최대값 제한 (예: 게스트 최대 16명)
+                const maxValue = (field === 'maxPeople') ? 16 : 99; 
+                if (value > maxValue) {
+                    value = maxValue;
+                }
+
+                input.value = value;
+                
+                // 🌟 중요: Hidden 필드 값 업데이트 (Controller로 전송될 실제 DTO 값) 🌟
+                const hiddenInput = document.querySelector(`input[name="${fieldMap[field]}"]`);
+                if(hiddenInput) {
+                    hiddenInput.value = value;
+                }
+                
+                updateButtonStates(input);
+            }
+
+            function updateButtonStates(input) {
+                const field = input.getAttribute('data-field');
+                const value = parseInt(input.value);
+                const minValue = minValues[field];
+                
+                // input 필드의 이전 형제는 '빼기' 버튼
+                const decrementBtn = input.previousElementSibling;
+                
+                // 최소값에 도달하면 '빼기' 버튼 비활성화
+                if (value <= minValue) {
+                    decrementBtn.setAttribute('disabled', 'true');
+                } else {
+                    decrementBtn.removeAttribute('disabled');
+                }
+            }
+
+            const counters = document.querySelectorAll('.counter-buttons');
+
+            counters.forEach(group => {
+                const input = group.querySelector('.counter-display');
+                const field = input.getAttribute('data-field');
+                const hiddenInput = document.querySelector(`input[name="${fieldMap[field]}"]`);
+                
+                // 1. 초기값 설정 및 Hidden 필드 동기화
+                const minValue = minValues[field];
+                if (parseInt(input.value) < minValue) {
+                    input.value = minValue;
+                }
+                if (hiddenInput) {
+                    hiddenInput.value = input.value;
+                }
+                
+                // 2. 초기 상태 설정
+                updateButtonStates(input); 
+
+                // 3. 이벤트 리스너 추가
+                group.addEventListener('click', function(e) {
+                    const button = e.target.closest('.counter-button');
+                    if (button) {
+                        const action = button.getAttribute('data-action');
+                        if (action) {
+                            updateCounter(input, action);
+                        }
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>숙소의 해시태그를 선택해주세요</title>
+
+  <!-- ✅ Tailwind 및 jQuery -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f7f7f7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 1400px; 
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      z-index: 100;
+    }
+
+    .exit-button {
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 1em;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .exit-button:hover { color: #3aa6e9; }
+
+    .main-content-selection {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 100px 20px;
+      flex-grow: 1;
+    }
+
+    .footer-bar {
+      height: 80px;
+      background-color: #f0f0f0;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: #717171;
+      font-size: 1em;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .next-button {
+      background-color: #3aa6e9;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1em;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+    .next-button:hover { background-color: #1499FF; }
+
+    /* 🌟 해시태그 칩 스타일 */
+    .hashtag-container {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .hashtag-item label {
+      display: flex;
+      align-items: center;
+      padding: 8px 18px;
+      border: 1px solid #ddd;
+      border-radius: 25px;
+      background-color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+      color: #333;
+      font-size: 1em;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .hashtag-item input[type="checkbox"] {
+      display: none;
+    }
+
+    .hashtag-item label.selected {
+      border: 2px solid #3aa6e9;
+      background-color: #e6f7ff;
+      color: #1a1a1a;
+      font-weight: 700;
+      box-shadow: 0 2px 5px rgba(58,166,233,0.2);
+    }
+
+    .hashtag-item label::before {
+      content: '#';
+      font-weight: 800;
+      font-size: 1.2em;
+      margin-right: 4px;
+      color: #717171;
+      transition: color 0.2s;
+    }
+
+    .hashtag-item label.selected::before {
+      color: #1499FF;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="logo">
+      <img src="/img/icon/logo.png" width="100" alt="로고">
+    </div>
+    <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-content-selection">
+    <div class="w-full max-w-3xl text-center">
+      <h1 class="text-3xl font-semibold mb-2">숙소의 해시태그를 선택해주세요</h1>
+      <p class="text-lg text-gray-500 mb-12">
+        게스트가 숙소를 검색할 때 핵심 특징을 빠르게 파악하는 데 도움이 됩니다.
+      </p>
+
+	<form th:action="@{/home/writeThirteen}" method="post" th:object="${homeWriteDTO}" id="writeFinalForm">
+        <div class="hashtag-container">
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{wifi}">
+              <span>와이파이</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{tv}">
+              <span>TV</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{kitchen}">
+              <span>주방</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{freePark}">
+              <span>무료주차</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{selfCheckin}">
+              <span>셀프 체크인</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{coldWarm}">
+              <span>냉난방</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{petFriendly}">
+              <span>애견동반 가능</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{barrierFree}">
+              <span>장애물 없는 시설</span>
+            </label>
+          </div>
+
+          <div class="hashtag-item">
+            <label>
+              <input type="checkbox" th:field="*{elevator}">
+              <span>엘리베이터</span>
+            </label>
+          </div>
+        </div>
+
+        <div th:if="${error}" class="text-red-500 mt-4 text-sm font-medium" th:text="${error}"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer-bar">
+    <a th:href="@{/home/writeTwelve}" class="back-button">뒤로</a>
+    <button class="next-button" type="submit" form="writeFinalForm">등록 완료</button>
+  </div>
+
+  <!-- ✅ JS: 클릭 시 selected 클래스 토글 -->
+  <script>
+    $(function() {
+      $(".hashtag-item label").on("click", function(e) {
+        e.preventDefault(); // 기본 클릭 방지 (더블체크 방지)
+        const checkbox = $(this).find('input[type="checkbox"]');
+        const isChecked = checkbox.prop("checked");
+        checkbox.prop("checked", !isChecked);
+        $(this).toggleClass("selected", !isChecked);
+      });
+    });
+  </script>
+</body>
+</html>

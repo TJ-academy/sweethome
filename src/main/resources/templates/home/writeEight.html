@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소 등록 8단계 - 썸네일 등록</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+    /* ------------------------------------- */
+    /* 1. 레이아웃 및 공통 스타일 (기존 재활용) */
+    /* ------------------------------------- */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute; 
+        top: 0;
+        z-index: 100;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .exit-button:hover {
+        color: #3aa6e9; 
+    }
+
+    .main-content-selection {
+        width: 100%;
+        max-width: 1000px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 120px 20px 100px 20px; 
+        flex-grow: 1;
+        box-sizing: border-box;
+    }
+
+    .question-title {
+        font-size: 2.5em; 
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    
+    .question-subtitle {
+        font-size: 1.1em; 
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 40px;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171; 
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600; 
+    }
+
+    .next-button {
+        background-color: #3aa6e9; 
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px; 
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+    
+    /* ------------------------------------- */
+    /* 2. 8단계 고유 스타일: 썸네일 업로드 영역 */
+    /* ------------------------------------- */
+    .image-upload-container {
+        width: 100%;
+        max-width: 600px; /* 적당한 최대 너비 설정 */
+        margin-top: 20px;
+    }
+    
+    .thumbnail-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 450px; /* 충분한 높이 */
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background-color: white;
+        text-align: center;
+        cursor: pointer;
+        transition: box-shadow 0.2s, border-color 0.2s;
+        padding: 20px;
+    }
+
+    .thumbnail-box:hover {
+        border-color: #3aa6e9;
+        box-shadow: 0 0 0 1px #3aa6e9;
+    }
+    
+    .camera-image {
+        width: 500px; /* 이미지 크기 조정 */
+        margin-bottom: 20px;
+    }
+    
+    .add-photo-button {
+        background-color: white;
+        color: #333;
+        border: 1px solid #333;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+    
+    .add-photo-button:hover {
+        background-color: #f0f0f0;
+        border-color: #000;
+        color: #000;
+    }
+    
+    /* 실제 파일 입력 필드는 숨김 */
+    .file-input {
+        display: none;
+    }
+    
+    /* 미리보기 이미지 스타일 */
+    .preview-image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+        .footer-bar, .header {
+            padding: 0 20px;
+        }
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    
+    // ✅ "사진 추가하기" 버튼 클릭 시 숨겨진 파일 입력 필드 클릭 유도
+    $('.thumbnail-box').on('click', function() {
+        $('#thumbnailInput').click();
+    });
+
+    // ✅ 파일 선택 시 미리보기 및 버튼 텍스트 변경
+    $('#thumbnailInput').on('change', function() {
+        const file = this.files[0];
+        const previewContainer = $('#previewContainer');
+        const defaultContent = $('#defaultContent');
+        
+        previewContainer.empty();
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // 기본 컨텐츠 숨기기
+                defaultContent.hide();
+                // 이미지 미리보기 표시
+                const img = $('<img>').attr('src', e.target.result).addClass('preview-image');
+                previewContainer.append(img);
+                // "사진 추가하기" 버튼 텍스트 변경
+                $('#addPhotoButton').text('다른 사진으로 변경');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // 파일이 취소되거나 없을 경우 기본 상태로 복구
+            defaultContent.show();
+            $('#addPhotoButton').text('사진 추가하기');
+        }
+        
+        // 오류 메시지 초기화
+        $('#errorMessage').text('');
+    });
+    
+    // ✅ 다음 버튼 클릭 시 유효성 검사
+    $('#nextButton').on('click', function(e) {
+        if ($('#thumbnailInput')[0].files.length === 0) {
+            e.preventDefault(); // 폼 제출 방지
+            $('#errorMessage').text('숙소의 대표 사진(썸네일)을 반드시 등록해야 합니다.').css('color', 'red');
+        } else {
+            // 유효성 검사 통과 시 폼 제출
+            $('#writeEightForm').submit();
+        }
+    });
+
+});
+</script>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="logo">
+            <img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <div class="main-content-selection">
+        <p class="question-title">썸네일 등록하기</p>
+        <p class="question-subtitle">
+            숙소의 매력을 가장 잘 보여줄 수 있는 대표 사진을 등록해주세요.
+        </p>
+        
+        <div class="image-upload-container">
+            <form id="writeEightForm" th:action="@{/home/writeNine}" method="post" th:object="${homeWriteDTO}" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{hostId}" />
+                <input type="hidden" th:field="*{homeType}" />
+                <input type="hidden" th:field="*{address}" />
+                <input type="hidden" th:field="*{detailAddress}" />
+                <input type="hidden" th:field="*{maxPeople}" />
+                <input type="hidden" th:field="*{room}" />
+                <input type="hidden" th:field="*{bed}" />
+                <input type="hidden" th:field="*{bath}" />
+                <div th:if="${homeWriteDTO.optionIds}">
+                    <input type="hidden" th:each="optionId : ${homeWriteDTO.optionIds}" th:name="optionIds" th:value="${optionId}" />
+                </div>
+                
+                <input 
+                    type="file" 
+                    id="thumbnailInput" 
+                    name="thumbnail" 
+                    class="file-input" 
+                    accept="image/*" 
+                    required>
+                
+                <div class="thumbnail-box" tabindex="0">
+                    <div id="defaultContent">
+                        <img src="/img/icon/camera.png" alt="카메라 아이콘" class="camera-image">
+                        <button type="button" class="add-photo-button" id="addPhotoButton">사진 추가하기</button>
+                    </div>
+                    <div id="previewContainer"></div>
+                </div>
+            </form>
+            
+            <p id="errorMessage" style="text-align: center; margin-top: 15px; font-weight: 600;"></p>
+        </div>
+    </div>
+    
+    <div class="footer-bar">
+        <button class="back-button" onclick="location.href='@{/home/writeSeven}'">뒤로</button>
+        <button class="next-button" type="button" id="nextButton">다음</button>
+    </div>
+
+</body>
+</html>
