@@ -3,13 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <title>채팅</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-<link rel="stylesheet" th:href="@{/css/chat/chat.css}">
+
+<style>
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+  background-color: #e9eef6;
+}
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===============================
+   왼쪽: 채팅방 리스트
+   =============================== */
+.chat-list {
+  width: 320px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+.chat-list h2 {
+  padding: 15px 20px;
+  margin: 0;
+  /* border-bottom: 1px solid #eee; */
+  font-size: 1.2rem;
+}
+.chat-room {
+  border-bottom: 1px solid #eee;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.chat-room:hover { background-color: #f5f5f5; }
+.room-name { font-weight: bold; font-size: 1rem; }
+.last-message { color: #555; font-size: 0.9rem; margin-top: 3px; }
+.last-message-time { color: #999; font-size: 0.8rem; }
+.unread-count {
+  color: white; background-color: #ff3b30; border-radius: 50%;
+  width: 20px; height: 20px; font-size: 0.8em;
+  text-align: center; line-height: 20px; float: right;
+  margin-top: -40px; margin-right: 10px; font-weight: bold;
+}
+.empty-message { padding: 20px; color: #888; text-align: center; }
+
+/* ===============================
+   오른쪽: 채팅창
+   =============================== */
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #e9eef6;
+}
+.chat-header {
+  padding: 15px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.date-separator {
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* ===============================
+   메시지 공통
+   =============================== */
+/* 공통 메시지 컨테이너 */
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  margin-bottom: 14px;
+}
+
+/* 보낸 메시지 */
+.message-out {
+  align-self: flex-end;
+  text-align: right;
+}
+
+/* 받은 메시지 */
+.message-in {
+  align-self: flex-start;
+  text-align: left;
+}
+
+/* 닉네임 + 시간 */
+.meta {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 4px;
+}
+.meta-left { justify-content: flex-start; }
+.meta-right { justify-content: flex-end; }
+.nickname {
+  font-weight: 500;
+}
+.time {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+/* 말풍선 자체 */
+.bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* 오른쪽(내가 보낸 말풍선) */
+.message-out .bubble {
+  background-color: #4DB2FF;
+  color: #fff;
+  border-radius: 16px 16px 2px 16px;
+}
+
+/* 왼쪽(상대방 말풍선) */
+.message-in .bubble {
+  background-color: #f1f1f1;
+  color: #000;
+  border-radius: 16px 16px 16px 2px;
+}
+
+/* ===============================
+   입력 영역 (modern wide style)
+   =============================== */
+#chatForm {
+  background-color: #e9eef6;
+  padding: 14px 20px;
+  border-top: 1px solid #d0d7de;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 2px solid transparent;
+  border-radius: 24px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-input-wrapper:focus-within {
+  border-color: #4DB2FF;
+  box-shadow: 0 0 0 3px rgba(77, 178, 255, 0.2);
+}
+
+/* 카메라 아이콘 */
+.image-upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: transform 0.2s ease;
+}
+.image-upload-icon:hover svg {
+  transform: scale(1.1);
+}
+
+/* 입력창 */
+#messageInput {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  padding: 10px 0;
+  background-color: transparent;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #222;
+  min-height: 44px; /* ✅ 높이 늘림 */
+  line-height: 1.5;
+}
+#messageInput::placeholder {
+  color: #aaa;
+}
+
+/* 전송 버튼 (둥근 아이콘) */
+#chatForm button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background-color: #4DB2FF;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+#chatForm button:hover {
+  background-color: #3ca0e6;
+  transform: scale(1.05);
+}
+#chatForm button:disabled {
+  background-color: #ccc;
+  cursor: default;
+}
+
+/* 이미지 미리보기 */
+#previewContainer {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 6px;
+}
+#previewImage {
+  max-width: 140px;
+  max-height: 140px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  object-fit: cover;
+}
+#removePreview {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+#removePreview:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+/* ===============================
+   뒤로가기 버튼 (내 채팅방 헤더)
+   =============================== */
+.chat-list-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 12px 18px;
+  background-color: #fff;
+}
+
+.chat-list-header h2 {
+  margin: 0;
+  margin-left: 6px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+.back-btn:hover {
+  transform: translateX(-2px);
+}
+
+</style>
 
 </head>
 
 <body>
+<div th:insert="fragments/header :: menuBar"></div>
 <div class="container">
 
   <!-- ==================== 왼쪽: 채팅방 목록 ==================== -->
@@ -70,7 +355,7 @@
 	  <!-- ✅ 미리보기 영역 -->
 	  <div id="previewContainer" style="display:none;">
 	    <img id="previewImage" alt="이미지 미리보기">
-	    <span id="removePreview">×</span>
+	    <span id="removePreview" onclick="removeImagePreview()">×</span>
 	  </div>
 	
 	  <input type="file" id="imageInput" name="img" accept="image/*" hidden disabled>
@@ -82,13 +367,40 @@
 <script th:inline="javascript">
 const myNickname = '[[${myNickname}]]';
 const myEmail = '[[${myEmail}]]';
-let stompClient = null;
+const roomId = /*[[${roomId}]]*/ null;
+/* let stompClient = null; */
+
+const messageInput = document.getElementById('messageInput');
+const chatForm = document.getElementById('chatForm');
+const imageInput = document.getElementById("imageInput");
+const previewContainer = document.getElementById("previewContainer");
+const previewImage = document.getElementById("previewImage");
+const removePreview = document.getElementById("removePreview");
 
 // 선택된 채팅방 정보 (전역 저장)
 window.currentRoomId = null;
 window.otherEmail = null;
 
-/** ✅ 선택된 채팅방 메시지 불러오기 */
+//페이지 로딩 시 선택된 채팅방있으면 그걸로 바로 출력
+window.addEventListener('DOMContentLoaded', () => {
+  if(roomId) {
+	  const firstRoom = document.querySelector(`.chat-room[data-room-id='${roomId}']`);
+	  
+	  if (firstRoom) {
+	    openChatRoom(firstRoom);
+	  }
+  }
+  
+});
+
+messageInput.addEventListener('keydown', function(event) {
+	if (event.key === 'Enter' && !event.shiftKey) {
+		event.preventDefault();  //줄바꿈 방지
+		chatForm.dispatchEvent(new Event('submit'));  //메시지 전송
+	}
+});
+
+/* 선택된 채팅방 메시지 불러오기 */
 async function openChatRoom(element) {
   const roomId = element.getAttribute("data-room-id");
   const roomName = element.getAttribute("data-room-name");
@@ -99,7 +411,7 @@ async function openChatRoom(element) {
   chatBox.innerHTML = "<p style='color:#aaa;text-align:center;'>불러오는 중...</p>";
 
   try {
-    const res = await fetch(`/chat/messages/${roomId}`);
+    const res = await fetch(`/chat/rooms/${roomId}`);
     if (!res.ok) throw new Error("메시지 로드 실패");
     const data = await res.json();
 
@@ -133,8 +445,8 @@ async function openChatRoom(element) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     // ✅ 입력창 활성화
-    document.getElementById("messageInput").disabled = false;
-    document.getElementById("imageInput").disabled = false;
+    messageInput.disabled = false;
+    imageInput.disabled = false;
     document.querySelector("#chatForm button").disabled = false;
 
     // ✅ 현재 방 정보 저장
@@ -213,20 +525,61 @@ function showRealtimeMessage(message, myEmail) {
 
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
+  
+  updateChatListPreview(message);
 }
 
+/* 채팅방 목록의 마지막 메시지 갱신 */
+function updateChatListPreview(message) {
+  const roomItem = document.querySelector(`.chat-room[data-room-id="${message.roomId}"]`);
+  if (!roomItem) return;
+
+  // 메시지 내용 미리보기 (긴 경우 자르기)
+  let previewText = "";
+  if (message.img && message.img !== '-') {
+    previewText = "이미지";
+  } else {
+    previewText = message.content || "";
+    if (previewText.length > 25) previewText = previewText.substring(0, 25) + "…";
+  }
+
+  const lastMsgEl = roomItem.querySelector(".last-message");
+  const lastTimeEl = roomItem.querySelector(".last-message-time");
+
+  lastMsgEl.textContent = previewText;
+  lastTimeEl.textContent = new Date(message.sendedAt).toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  // 다른 사람이 메시지 보내만 “읽지 않은 수” +1
+  if (message.senderEmail !== myEmail) {
+    let unreadEl = roomItem.querySelector(".unread-count");
+    if (!unreadEl) {
+      unreadEl = document.createElement("div");
+      unreadEl.className = "unread-count";
+      unreadEl.textContent = "1";
+      roomItem.appendChild(unreadEl);
+    } else {
+      unreadEl.textContent = parseInt(unreadEl.textContent) + 1;
+      unreadEl.style.display = "block";
+    }
+  }
+}
 
 /** ✅ 메시지 전송 */
-document.getElementById("chatForm").addEventListener("submit", async (e) => {
+chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const input = document.getElementById("messageInput");
-  const imageInput = document.getElementById("imageInput");
+  /* const input = document.getElementById("messageInput");
+  const imageInput = document.getElementById("imageInput"); */
   let imageUrl = "-";
 
   if (imageInput.files.length > 0) {
     const formData = new FormData();
     formData.append("image", imageInput.files[0]);
     formData.append("roomId", window.currentRoomId);
+    
     const res = await fetch("/chat/uploadImage", { method: "POST", body: formData });
     if (res.ok) {
       const result = await res.json();
@@ -237,15 +590,15 @@ document.getElementById("chatForm").addEventListener("submit", async (e) => {
     }
   }
 
-  const msg = input.value.trim();
+  const msg = messageInput.value.trim();
   if (!msg && imageUrl === "-") return;
 
   sendMessage(msg, imageUrl);
-  input.value = "";
-  imageInput.value = "";
+  messageInput.value = "";
+  removeImagePreview();
 });
 
-/** ✅ WebSocket 메시지 전송 */
+/* 메시지 전송 */
 function sendMessage(content, img="-") {
   if (stompClient && stompClient.connected) {
     stompClient.send("/app/message/send", {}, JSON.stringify({
@@ -259,11 +612,6 @@ function sendMessage(content, img="-") {
 }
 
 /** ✅ 이미지 미리보기 기능 */
-const imageInput = document.getElementById("imageInput");
-const previewContainer = document.getElementById("previewContainer");
-const previewImage = document.getElementById("previewImage");
-const removePreview = document.getElementById("removePreview");
-
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   if (file) {
@@ -276,12 +624,12 @@ imageInput.addEventListener("change", () => {
   }
 });
 
-/** ✅ 미리보기 제거 버튼 */
-removePreview.addEventListener("click", () => {
+/* 이미지 미리보기 제거 */
+function removeImagePreview() {
   imageInput.value = "";
   previewContainer.style.display = "none";
   previewImage.src = "";
-});
+}
 
 function goBack() {
   // 방법 ①: 브라우저 이전 페이지로 이동

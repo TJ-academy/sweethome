@@ -5,37 +5,21 @@
   <title>일정 관리 달력 | 마이페이지</title>
 
   <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
 
-  <!-- Optional (thymeleaf app styles) -->
   <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
   <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
   <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+  <link rel="stylesheet" th:href="@{/css/host/calendar.css}">
 
-  <style>
-    .main-container { padding: 0; }
-    .calendar-card { border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    .schedule-detail { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .schedule-item { border-left: 5px solid; padding-left: 15px; margin-bottom: 15px; }
 
-    .calendar-grid { padding: 20px; }
-    .month-name { font-size: 24px; font-weight: 300; }
-    
-    /*마우스로 클릭 가능*/
-    .schedule-item { cursor: pointer; }
-
-    /* 날짜칸 점(체크인/체크아웃 마커) */
-    .fc-dotwrap { display:flex; gap:6px; align-items:center; margin-left:6px; }
-    .fc-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-    .fc-dot.checkin  { background:#007bff; }  /* 파랑: 체크인 */
-    .fc-dot.checkout { background:#dc3545; }  /* 빨강: 체크아웃 */
-  </style>
 </head>
+
 <body>
   <div th:insert="~{fragments/header :: menuBar}"></div>
 
@@ -48,16 +32,27 @@
       <div class="mypage-content-col">
         <div class="mypage-content-area">
           <div class="container-fluid main-container">
-            <div class="row">
-              <!-- 캘린더 -->
+            <div class="row align-items-start">
               <div class="col-lg-8">
-                <div class="p-4 bg-white calendar-card">
+                <div class="calendar-card">
+                  <div class="month-display">
+                    <span class="month-arrow left" id="prevMonth">&#10094;</span>
+                    <div>
+                      <h1 id="monthNum">10</h1>
+                      <p id="monthName">OCTOBER</p>
+                    </div>
+                    <span class="month-arrow right" id="nextMonth">&#10095;</span>
+                    <button id="todayBtn" class="btn btn-outline-secondary btn-sm position-absolute" 
+					          style="top: 50%; right: 60px; transform: translateY(-50%);">
+					    TODAY
+					  </button>
+                  
+                  </div>
                   <div id="calendar" class="calendar-grid"></div>
                 </div>
               </div>
 
-              <!-- 우측 일정/메모 패널 -->
-              <div class="col-lg-4 mt-4 mt-lg-0">
+              <div class="col-lg-4">
                 <div class="schedule-detail">
                   <p class="text-muted">일정을 불러오고 있습니다.</p>
                 </div>
@@ -89,253 +84,254 @@
     </div>
   </div>
 
-  <!-- Bootstrap Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    // ---------- 우측 패널: 일정 로드 ----------
-    function loadSchedules(dateStr) {
-      const box = document.querySelector('.schedule-detail');
-      const d = new Date(dateStr + 'T00:00:00');
-      const day = d.getDate();
-      box.innerHTML = `<h5><span class="text-primary">${day}</span>일 일정</h5><hr><p class="text-muted">일정 로딩 중...</p>`;
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let selectedCell = null;
+  let currentReservationId = null;
+  let currentMemoType = null;
+  let dayMarks = {};
+  const calendarEl = document.getElementById('calendar');
+  const today = new Date();
 
-      fetch('/api/schedules/day?date=' + dateStr)
-        .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
-        .then(list => {
-          let html = `<h5><span class="text-primary">${day}</span>일 일정</h5><hr>`;
-          if (!list || list.length === 0) {
-            html += `<p class="text-muted">일정이 없습니다.</p>`;
-          } else {
-            list.forEach(item => {
-              // 체크인 카드
-              if (item.checkInTime) {
-                const memo = (item.memoForCheckIn || '').replace(/"/g, '&quot;');
-                html += `
-                  <div class="schedule-item"
-                       style="border-left-color:#007bff;"
-                       data-reservation-id="${item.reservationId}"
-                       data-home-title="${item.homeTitle}"
-                       data-guest="${item.guestNickname}"
-                       data-memo-type="CHECKIN"
-                       data-memo="${memo}">
-                    <p class="mb-1 d-flex align-items-center justify-content-between">
-                      <span>
-                        <span class="badge text-bg-primary me-2">${new Date(item.checkInTime).toTimeString().substring(0,5)}</span>
-                        게스트 ${item.guestNickname} 님 ${item.homeTitle} 체크인
-                      </span>
-                      <button class="btn btn-sm btn-outline-secondary btn-memo-edit">메모</button>
-                    </p>
-                    ${memo ? `<small class="text-muted d-block ms-4">${memo}</small>` : `<small class="text-muted d-block ms-4">메모 없음</small>`}
-                  </div>`;
-              }
-              // 체크아웃 카드
-              if (item.checkOutTime) {
-                const memo = (item.memoForCheckOut || '').replace(/"/g, '&quot;');
-                html += `
-                  <div class="schedule-item"
-                       style="border-left-color:#dc3545;"
-                       data-reservation-id="${item.reservationId}"
-                       data-home-title="${item.homeTitle}"
-                       data-guest="${item.guestNickname}"
-                       data-memo-type="CHECKOUT"
-                       data-memo="${memo}">
-                    <p class="mb-1 d-flex align-items-center justify-content-between">
-                      <span>
-                        <span class="badge text-bg-secondary me-2">${new Date(item.checkOutTime).toTimeString().substring(0,5)}</span>
-                        게스트 ${item.guestNickname} 님 ${item.homeTitle} 체크아웃
-                      </span>
-                      <button class="btn btn-sm btn-outline-secondary btn-memo-edit">메모</button>
-                    </p>
-                    ${memo ? `<small class="text-muted d-block ms-4">${memo}</small>` : `<small class="text-muted d-block ms-4">메모 없음</small>`}
-                  </div>`;
-              }
-            });
-          }
-          box.innerHTML = html;
-        })
-        .catch(() => {
-          box.innerHTML = `<h5><span class="text-primary">${day}</span>일 일정</h5><hr><p class="text-danger">일정 로딩에 실패했습니다.</p>`;
+  // 일정 로드
+  async function loadSchedules(dateStr) {
+    const box = document.querySelector('.schedule-detail');
+    const d = new Date(dateStr);
+    const day = d.getDate();
+    box.innerHTML = `<h5><span class="text-primary">${day}</span>일 일정</h5><hr><p class="text-muted">일정 로딩 중...</p>`;
+    try {
+      const res = await fetch('/api/schedules/day?date=' + dateStr);
+      if (!res.ok) throw new Error(res.status);
+      const list = await res.json();
+      let html = `<h5><span class="text-primary">${day}</span>일 일정</h5><hr>`;
+      if (!list || list.length === 0) html += `<p class="text-muted">일정이 없습니다.</p>`;
+      else {
+        list.forEach(item => {
+          const memoIn = item.memoForCheckIn || '';
+          const memoOut = item.memoForCheckOut || '';
+          const makeCard = (type, time, guest, home, memo) => {
+            const isPast = new Date(time) < today;
+            return `
+              <div class="schedule-item"
+                   data-reservation-id="${item.reservationId}"
+                   data-home-title="${home}"
+                   data-guest="${guest}"
+                   data-memo-type="${type}"
+                   data-memo="${memo}">
+                <div class="d-flex justify-content-between align-items-start">
+                  <p class="mb-1 flex-grow-1">
+                    <span class="badge ${isPast ? 'text-bg-secondary' : (type === 'CHECKIN' ? 'text-bg-danger' : 'text-bg-primary')} me-2">
+                      ${new Date(time).toTimeString().substring(0,5)}
+					  </span>
+					  <b>${type === 'CHECKIN' ? '체크인 ｜' : '체크아웃 ｜'}</b> 게스트 <b>${guest}님</b> ${home}
+					</p>
+                  <button class="btn btn-memo-edit" title="메모 수정"><i class="bi bi-pencil-square"></i></button>
+                </div>
+                ${memo 
+                  ? `<div class="memo-preview ${isPast ? 'past' : ''}">${memo}</div>` 
+                  : `<small class="text-muted d-block ms-4">메모 없음</small>`}
+              </div>`;
+          };
+          if (item.checkInTime) html += makeCard('CHECKIN', item.checkInTime, item.guestNickname, item.homeTitle, memoIn);
+          if (item.checkOutTime) html += makeCard('CHECKOUT', item.checkOutTime, item.guestNickname, item.homeTitle, memoOut);
         });
+      }
+      box.innerHTML = html;
+    } catch { box.innerHTML = `<p class="text-danger">일정 로딩 실패</p>`; }
+  }
+
+  // 메모 수정 모달
+  function openMemoModal(el) {
+    const item = el.closest('.schedule-item');
+    currentReservationId = item.dataset.reservationId;
+    currentMemoType = item.dataset.memoType;
+    document.getElementById('memoTextarea').value = item.dataset.memo || '';
+    document.getElementById('memoModalInfo').textContent = `${item.dataset.homeTitle} · ${item.dataset.guest}`;
+    new bootstrap.Modal(document.getElementById('memoModal')).show();
+  }
+
+  async function saveMemo() {
+    const memo = document.getElementById('memoTextarea').value;
+    const res = await fetch(`/api/reservations/${currentReservationId}/memo?type=${currentMemoType}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memo })
+    });
+    if (!res.ok) return alert('저장 실패');
+    bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide();
+  const selectedDate =
+    selectedCell?.dataset.date || new Date().toISOString().split('T')[0];
+  loadSchedules(selectedDate);
+}
+
+  async function deleteMemo() {
+    if (!confirm('삭제할까요?')) return;
+    const res = await fetch(`/api/reservations/${currentReservationId}/memo?type=${currentMemoType}`, { method: 'DELETE' });
+    if (!res.ok) return alert('삭제 실패');
+    bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide();
+    loadSchedules(new Date().toISOString().split('T')[0]);
+  }
+
+  document.getElementById('btnMemoSave').addEventListener('click', saveMemo);
+  document.getElementById('btnMemoDelete').addEventListener('click', deleteMemo);
+
+  // ✅ 메모 클릭 시 상세 페이지로 이동
+  document.querySelector('.schedule-detail').addEventListener('click', e => {
+    const memoBtn = e.target.closest('.btn-memo-edit');
+    if (memoBtn) {
+      e.stopPropagation();
+      openMemoModal(memoBtn);
+      return;
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      // --------- 상태값 ----------
-      let currentDateStr = null;
-      let currentReservationId = null;
-      let currentMemoType = null;
+    const item = e.target.closest('.schedule-item');
+    if (item) {
+      const rid = item.dataset.reservationId;
+      if (rid) window.location.href = `/host/reservation/detail/${rid}`;
+    }
+  });
 
-      // --------- 메모 모달 ----------
-      function openMemoModal(el) {
-        const item = el.closest('.schedule-item');
-        currentReservationId = item.dataset.reservationId;
-        currentMemoType = item.dataset.memoType;
-        document.getElementById('memoTextarea').value = item.dataset.memo || '';
-        document.getElementById('memoModalInfo').textContent =
-          `${item.dataset.homeTitle} · ${item.dataset.guest}`;
-        new bootstrap.Modal(document.getElementById('memoModal')).show();
-      }
-
-      async function saveMemo() {
-        const memo = document.getElementById('memoTextarea').value;
-        const res = await fetch(`/api/reservations/${currentReservationId}/memo?type=${currentMemoType}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ memo })
-        });
-        if (!res.ok) return alert('저장 실패');
-        bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide();
-        if (currentDateStr) loadSchedules(currentDateStr);
-      }
-
-      async function deleteMemo() {
-        if (!confirm('삭제할까요?')) return;
-        const res = await fetch(`/api/reservations/${currentReservationId}/memo?type=${currentMemoType}`, { method: 'DELETE' });
-        if (!res.ok) return alert('삭제 실패');
-        bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide();
-        if (currentDateStr) loadSchedules(currentDateStr);
-      }
-
-      // 우측 패널 클릭 이벤트
-      document.querySelector('.schedule-detail').addEventListener('click', (e) => {
-    	  // 1) 메모 버튼이면 모달만 열고 카드 클릭 막기
-    	  const memoBtn = e.target.closest('.btn-memo-edit');
-    	  if (memoBtn) {
-    	    e.stopPropagation();
-    	    openMemoModal(memoBtn);
-    	    return;
-    	  }
-
-    	  // 2) 일정 카드 클릭 시 상세 페이지 이동
-    	  const item = e.target.closest('.schedule-item');
-    	  if (item) {
-    	    const rid = item.dataset.reservationId;
-    	    if (rid) {
-    	      window.location.href = `/host/reservation/detail/${rid}`;
-    	    }
-    	  }
-    	});
-      
-      
-      document.getElementById('btnMemoSave').addEventListener('click', saveMemo);
-      document.getElementById('btnMemoDelete').addEventListener('click', deleteMemo);
-
-      // loadSchedules 호출 시 마지막 날짜 기억
-      const originalLoadSchedules = window.loadSchedules;
-      window.loadSchedules = function (dateStr) {
-        currentDateStr = dateStr;
-        return originalLoadSchedules(dateStr);
-      };
-
-      // ---------- 날짜 마커(점) ----------
-      let dayMarks = {}; // {'YYYY-MM-DD': {in:true,out:false}}
-
-      async function fetchDayMarks(startStr, endStr) {
-        const s = startStr.slice(0, 10);
-        const e = endStr.slice(0, 10);
-        const res = await fetch(`/api/schedules/marks?start=${s}&end=${e}`);
-        if (!res.ok) return;
-        const arr = await res.json();
-        dayMarks = {};
-        arr.forEach(m => {
-          dayMarks[m.date] = { in: !!m.checkIn, out: !!m.checkOut };
-        });
-      }
-
-      function decorateCell(info) {
-        const yyyy = info.date.getFullYear();
-        const mm = String(info.date.getMonth() + 1).padStart(2, '0');
-        const dd = String(info.date.getDate()).padStart(2, '0');
-        const key = `${yyyy}-${mm}-${dd}`;
-        const mark = dayMarks[key];
-        const top = info.el.querySelector('.fc-daygrid-day-top');
-        if (!top) return;
-
-        const old = top.querySelector('.fc-dotwrap');
-        if (old) old.remove();
-
-        if (!mark) return;
-
-        const wrap = document.createElement('div');
-        wrap.className = 'fc-dotwrap';
-        if (mark.in) {
-          const dotIn = document.createElement('span');
-          dotIn.className = 'fc-dot checkin';
-          wrap.appendChild(dotIn);
-        }
-        if (mark.out) {
-          const dotOut = document.createElement('span');
-          dotOut.className = 'fc-dot checkout';
-          wrap.appendChild(dotOut);
-        }
-        top.appendChild(wrap);
-      }
-
-      function decorateAllCells() {
-        document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
-          const dateStr = cell.getAttribute('data-date'); // 'YYYY-MM-DD'
-          const mark = dayMarks[dateStr];
-          const top = cell.querySelector('.fc-daygrid-day-top');
-          if (!top) return;
-
-          const old = top.querySelector('.fc-dotwrap');
-          if (old) old.remove();
-
-          if (!mark) return;
-
-          const wrap = document.createElement('div');
-          wrap.className = 'fc-dotwrap';
-          if (mark.in) {
-            const dotIn = document.createElement('span');
-            dotIn.className = 'fc-dot checkin';
-            wrap.appendChild(dotIn);
-          }
-          if (mark.out) {
-            const dotOut = document.createElement('span');
-            dotOut.className = 'fc-dot checkout';
-            wrap.appendChild(dotOut);
-          }
-          top.appendChild(wrap);
-        });
-      }
-
-      // ---------- FullCalendar ----------
-      const calendarEl = document.getElementById('calendar');
-      const today = new Date();
-      const tY = today.getFullYear();
-      const tM = String(today.getMonth() + 1).padStart(2, '0');
-      const tD = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${tY}-${tM}-${tD}`;
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'ko',
-        headerToolbar: { left: 'prev', center: 'title', right: 'today,next' },
-        events: '/api/schedules',
-        dateClick: (info) => loadSchedules(info.dateStr),
-        
-        eventClick: function(info) {
-            const rid = info.event.extendedProps && info.event.extendedProps.reservationId;
-            if (rid) {
-              window.location.href = `/host/reservation/detail/${rid}`;
-            }
-          },
-
-        // 뷰 범위가 바뀔 때 마커 불러오고 모든 셀 다시 장식
-        datesSet: async (info) => {
-          await fetchDayMarks(info.startStr, info.endStr);
-          decorateAllCells();
-        },
-
-        // 최초 셀 렌더 시 장식 (첫 화면 표시용)
-        dayCellDidMount: decorateCell
-      });
-
-      calendar.render();
-      loadSchedules(todayStr);
+  // 도트 데이터
+  async function fetchDayMarks(startStr, endStr) {
+    const res = await fetch(`/api/schedules/marks?start=${startStr.slice(0,10)}&end=${endStr.slice(0,10)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    dayMarks = {};
+    data.forEach(m => {
+      dayMarks[m.date] = { checkIn: m.checkIn || 0, checkOut: m.checkOut || 0 };
     });
-  </script>
+  }
+
+  function decorateCell(info) {
+    const yyyy = info.date.getFullYear();
+    const mm = String(info.date.getMonth() + 1).padStart(2, '0');
+    const dd = String(info.date.getDate()).padStart(2, '0');
+    const key = `${yyyy}-${mm}-${dd}`;
+    const marks = dayMarks[key];
+    const frame = info.el.querySelector('.fc-daygrid-day-frame');
+    if (!frame) return;
+
+    const oldWrap = frame.querySelector('.fc-dotwrap');
+    if (oldWrap) oldWrap.remove();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'fc-dotwrap';
+    const isPast = info.date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    if (marks) {
+      for (let i = 0; i < marks.checkIn; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'fc-dot checkin' + (isPast ? ' past-dot' : '');
+        wrap.appendChild(dot);
+      }
+      for (let i = 0; i < marks.checkOut; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'fc-dot checkout' + (isPast ? ' past-dot' : '');
+        wrap.appendChild(dot);
+      }
+    }
+
+    frame.insertAdjacentElement('afterbegin', wrap);
+  }
+
+  // FullCalendar
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'en',
+    headerToolbar: false,
+    height: 'auto',
+    showNonCurrentDates: false,
+    dayHeaderFormat: { weekday: 'short' },
+    events: '/api/schedules',
+
+    dayCellContent: (arg) => {
+      return { html: `<div>${arg.date.getDate()}</div>` };
+    },
+
+    dateClick: info => {
+      loadSchedules(info.dateStr);
+      if (selectedCell) selectedCell.classList.remove('selected-date');
+      selectedCell = info.dayEl;
+      selectedCell.classList.add('selected-date');
+    },
+
+    datesSet: async info => {
+      await fetchDayMarks(info.startStr, info.endStr);
+      document.querySelectorAll('.fc-daygrid-day').forEach(cell => 
+        decorateCell({ date: new Date(cell.dataset.date), el: cell })
+      );
+      updateMonthLabel(info.view.currentStart);
+    },
+
+    dayCellDidMount: decorateCell
+  });
+
+  function updateMonthLabel(date) {
+    document.getElementById('monthNum').textContent = date.getMonth() + 1;
+    document.getElementById('monthName').textContent =
+      date.toLocaleString('en-US', { month: 'long' }).toUpperCase();
+  }
+
+  // ✅ “오늘” 버튼
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    calendar.today();
+    updateMonthLabel(calendar.getDate());
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayCell = document.querySelector(`.fc-daygrid-day[data-date="${todayStr}"]`);
+
+    if (selectedCell) selectedCell.classList.remove('selected-date');
+    if (todayCell) {
+      todayCell.classList.add('selected-date');
+      selectedCell = todayCell;
+    }
+    loadSchedules(todayStr);
+  });
+
+  // ✅ 날짜가 바뀌어도 선택 상태 유지
+  calendar.on('datesSet', () => {
+    if (!selectedCell) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayCell = document.querySelector(`.fc-daygrid-day[data-date="${todayStr}"]`);
+      if (todayCell) {
+        todayCell.classList.add('selected-date');
+        selectedCell = todayCell;
+      }
+    }
+  });
+
+// ✅ 이전달 버튼
+document.getElementById('prevMonth').addEventListener('click', () => {
+  calendar.prev();
+  updateMonthLabel(calendar.getDate());
+
+  // 이동 후 현재 달의 첫 날짜 기준으로 도트 다시 표시
+  const view = calendar.view;
+  fetchDayMarks(view.currentStart.toISOString(), view.currentEnd.toISOString()).then(() => {
+    document.querySelectorAll('.fc-daygrid-day').forEach(cell => 
+      decorateCell({ date: new Date(cell.dataset.date), el: cell })
+    );
+  });
+});
+
+// ✅ 다음달 버튼
+document.getElementById('nextMonth').addEventListener('click', () => {
+  calendar.next();
+  updateMonthLabel(calendar.getDate());
+
+  const view = calendar.view;
+  fetchDayMarks(view.currentStart.toISOString(), view.currentEnd.toISOString()).then(() => {
+    document.querySelectorAll('.fc-daygrid-day').forEach(cell => 
+      decorateCell({ date: new Date(cell.dataset.date), el: cell })
+    );
+  });
+});
+
+  calendar.render();
+  loadSchedules(new Date().toISOString().split('T')[0]);
+});
+</script>
+
 </body>
 </html>
