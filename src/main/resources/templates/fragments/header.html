@@ -15,8 +15,8 @@
 <style>
 .badge-dot {
   position: absolute;
-  top: 0; right: 0;
-  width: 8px; height: 8px;
+  bottom: 0; right: 0;
+  width: 13px; height: 13px;
   background: red;
   border-radius: 50%;
 }
@@ -109,14 +109,17 @@
 	
 						<div id="notiPopup" style="display:none;">
 							<div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-								<h6 class="mb-0">알림</h6>
+								<h6 class="mb-0 text-center w-100">알림</h6>
+								<button id="markAllReadBtn" 
+								class="btn btn-sm btn-primary ms-2"
+								onclick="markAllAsRead()">모두 읽음</button>
 								<hr>
 							</div>
 							<div id="notiList" class="noti-list">
 								<div id="todayNotifications" class="noti-content" style="display:none;">
 									<h6 class="noti-date">오늘 받은 알림</h6>
 								</div>
-							
+								
 								<div id="oldNotifications" class="noti-content" style="display:none;">
 							    	<hr>
 							    	<h6 class="noti-date">이전 알림</h6>
@@ -150,6 +153,7 @@ const notiPopup = document.getElementById('notiPopup');
 const notiList = document.getElementById('notiList');
 const notiBadge = document.getElementById('notiBadge');
 const notiContainer = document.getElementById('notiContainer');
+const markAllReadBtn = document.getElementById('markAllReadBtn');
 
 //알림 버튼 누르면 알림창 팝업
 notiButton.addEventListener('click', function(e) {
@@ -171,13 +175,9 @@ document.addEventListener('click', () => {
     const isDropdownVisible = notiPopup.style.display === 'block';
 
     if (isClickedOutside && isDropdownVisible) {
-    	/* markAllAsRead(); */
         notiPopup.style.display = 'none';
         notiButton.setAttribute('aria-expanded', 'false');
     }
-    /* notiDBList.forEach(noti => {
-    	markAsRead(noti.id, item);
-    }); */
 });
 
 //웹소켓 연결
@@ -243,23 +243,29 @@ function showNotification() {
     		<strong>${noti.title}</strong>
     		<br>${noti.message}<br>
     		<small style="font-size: 0.75rem; color:#6b7280;">${noti.sendAt.substring(11, 16)}</small>`;
+   		
+    	container.appendChild(item);
+       	container.style.display = 'block';
     	
+       	//알림 클릭했을 때
     	item.addEventListener('click', (e) => {
             e.stopPropagation(); // 알림 항목 클릭이 외부 클릭으로 간주되어 닫히지 않도록 방지
             markAsRead(noti.id, item);
-            // TODO: 알림 클릭 시 해당 내용과 관련된 페이지로 이동하는 로직 추가
+            if(noti.notiType === "MESSAGE") {
+            	window.location.href='/chat/rooms';
+            } else if(noti.notiType === "RESERVATION") {
+            	window.location.href='/mypage/reservations';
+            } else if(noti.notiType === "REVIEW") {
+            	window.location.href='/mypage/reviews';
+            }
         });
-    	
-    	container.insertBefore(item, container.children[1]);
-    	container.style.display = 'block';
     });
+	console.log("newCount : " + newCount);
 	
-	// 팝업이 열려 있지 않을 때만 배지 표시
-    if (notiPopup.style.display !== 'block' &&
-    		newCount > 0) {
+    if (newCount > 0) {
         notiBadge.style.display = 'inline-block';
     } else {
-        notiBadge.style.display = 'none';
+    	notiBadge.style.display = 'none';
     }
 }
 
@@ -272,7 +278,7 @@ function isToday(dateString) {
 
 //DB에서 알림 불러오기
 function getNotiFromDB() {
-	notiBadge.style.display = 'none';
+	/* notiBadge.style.display = 'none'; */
 	
 	fetch('/notifications')
 	.then(res => {
@@ -291,7 +297,6 @@ function getNotiFromDB() {
 	});
 }
 
-//알림창 열면 자동 읽음 처리
 function markAsRead(id, element) {
 	// 알림 항목을 notiDBList에서 찾습니다.
     const notiIndex = notiDBList.findIndex(n => n.id === id);
@@ -303,11 +308,11 @@ function markAsRead(id, element) {
     }
     
 	// 이미 읽은 상태라면 바로 닫기
-    if (!noti || noti.status === 'READ') {
+    /* if (!noti || noti.status === 'READ') {
         notiPopup.style.display = 'none';
         notiButton.setAttribute('aria-expanded', 'false');
         return;
-    }
+    } */
 
     fetch(`/notifications/${id}/read`, {
         method: 'POST',
@@ -334,13 +339,32 @@ function markAsRead(id, element) {
     });
 }
 
+function markAllAsRead() {
+	const notRead = notiDBList.filter(n => n.status === 'NEW');
+	if (notRead.length === 0) return;
+	
+	notRead.forEach(noti => {
+		fetch(`/notifications/${noti.id}/read`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(res => {
+            if (res.ok) {
+                noti.status = 'READ';
+                showNotification();
+            }
+        })
+        .catch(err => console.error(`읽음 처리 실패 (ID: ${noti.id})`, err));
+	});
+}
+
 //초기 연결 시도 및 데이터 로드 (로그인 상태일 때만 실행)
 if (email) {
     connect();
     getNotiFromDB(); // 초기 로드 (팝업 닫혀있어도 배지 표시를 위해)
-} else {
+}/*  else {
     console.log("User is not logged in. Notification features are inactive.");
-}
+} */
 
 </script>
 </div>

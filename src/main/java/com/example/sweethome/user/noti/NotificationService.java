@@ -19,7 +19,8 @@ public class NotificationService {
     // DB 저장 + 실시간 전송
     public void sendNotification(User receiver, 
     		String title, 
-    		String message) {
+    		String message,
+    		String type) {
         Notification n = Notification.builder()
                 .receiver(receiver)
                 .title(title)
@@ -27,6 +28,7 @@ public class NotificationService {
                 .status(NotificationStatus.NEW)
                 .alertLevel(AlertLevel.INFO)
                 .sendAt(LocalDateTime.now())
+                .notiType(type)
                 .build();
 
         repo.save(n);

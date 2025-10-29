@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>채팅</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
@@ -29,7 +30,7 @@ body {
 .chat-list h2 {
   padding: 15px 20px;
   margin: 0;
-  border-bottom: 1px solid #eee;
+  /* border-bottom: 1px solid #eee; */
   font-size: 1.2rem;
 }
 .chat-room {
@@ -293,6 +294,7 @@ body {
 </head>
 
 <body>
+<div th:insert="fragments/header :: menuBar"></div>
 <div class="container">
 
   <!-- ==================== 왼쪽: 채팅방 목록 ==================== -->
@@ -353,7 +355,7 @@ body {
 	  <!-- ✅ 미리보기 영역 -->
 	  <div id="previewContainer" style="display:none;">
 	    <img id="previewImage" alt="이미지 미리보기">
-	    <span id="removePreview">×</span>
+	    <span id="removePreview" onclick="removeImagePreview()">×</span>
 	  </div>
 	
 	  <input type="file" id="imageInput" name="img" accept="image/*" hidden disabled>
@@ -365,13 +367,40 @@ body {
 <script th:inline="javascript">
 const myNickname = '[[${myNickname}]]';
 const myEmail = '[[${myEmail}]]';
-let stompClient = null;
+const roomId = /*[[${roomId}]]*/ null;
+/* let stompClient = null; */
+
+const messageInput = document.getElementById('messageInput');
+const chatForm = document.getElementById('chatForm');
+const imageInput = document.getElementById("imageInput");
+const previewContainer = document.getElementById("previewContainer");
+const previewImage = document.getElementById("previewImage");
+const removePreview = document.getElementById("removePreview");
 
 // 선택된 채팅방 정보 (전역 저장)
 window.currentRoomId = null;
 window.otherEmail = null;
 
-/** ✅ 선택된 채팅방 메시지 불러오기 */
+//페이지 로딩 시 선택된 채팅방있으면 그걸로 바로 출력
+window.addEventListener('DOMContentLoaded', () => {
+  if(roomId) {
+	  const firstRoom = document.querySelector(`.chat-room[data-room-id='${roomId}']`);
+	  
+	  if (firstRoom) {
+	    openChatRoom(firstRoom);
+	  }
+  }
+  
+});
+
+messageInput.addEventListener('keydown', function(event) {
+	if (event.key === 'Enter' && !event.shiftKey) {
+		event.preventDefault();  //줄바꿈 방지
+		chatForm.dispatchEvent(new Event('submit'));  //메시지 전송
+	}
+});
+
+/* 선택된 채팅방 메시지 불러오기 */
 async function openChatRoom(element) {
   const roomId = element.getAttribute("data-room-id");
   const roomName = element.getAttribute("data-room-name");
@@ -382,7 +411,7 @@ async function openChatRoom(element) {
   chatBox.innerHTML = "<p style='color:#aaa;text-align:center;'>불러오는 중...</p>";
 
   try {
-    const res = await fetch(`/chat/messages/${roomId}`);
+    const res = await fetch(`/chat/rooms/${roomId}`);
     if (!res.ok) throw new Error("메시지 로드 실패");
     const data = await res.json();
 
@@ -416,8 +445,8 @@ async function openChatRoom(element) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     // ✅ 입력창 활성화
-    document.getElementById("messageInput").disabled = false;
-    document.getElementById("imageInput").disabled = false;
+    messageInput.disabled = false;
+    imageInput.disabled = false;
     document.querySelector("#chatForm button").disabled = false;
 
     // ✅ 현재 방 정보 저장
@@ -496,20 +525,61 @@ function showRealtimeMessage(message, myEmail) {
 
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
+  
+  updateChatListPreview(message);
 }
 
+/* 채팅방 목록의 마지막 메시지 갱신 */
+function updateChatListPreview(message) {
+  const roomItem = document.querySelector(`.chat-room[data-room-id="${message.roomId}"]`);
+  if (!roomItem) return;
+
+  // 메시지 내용 미리보기 (긴 경우 자르기)
+  let previewText = "";
+  if (message.img && message.img !== '-') {
+    previewText = "이미지";
+  } else {
+    previewText = message.content || "";
+    if (previewText.length > 25) previewText = previewText.substring(0, 25) + "…";
+  }
+
+  const lastMsgEl = roomItem.querySelector(".last-message");
+  const lastTimeEl = roomItem.querySelector(".last-message-time");
+
+  lastMsgEl.textContent = previewText;
+  lastTimeEl.textContent = new Date(message.sendedAt).toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  // 다른 사람이 메시지 보내만 “읽지 않은 수” +1
+  if (message.senderEmail !== myEmail) {
+    let unreadEl = roomItem.querySelector(".unread-count");
+    if (!unreadEl) {
+      unreadEl = document.createElement("div");
+      unreadEl.className = "unread-count";
+      unreadEl.textContent = "1";
+      roomItem.appendChild(unreadEl);
+    } else {
+      unreadEl.textContent = parseInt(unreadEl.textContent) + 1;
+      unreadEl.style.display = "block";
+    }
+  }
+}
 
 /** ✅ 메시지 전송 */
-document.getElementById("chatForm").addEventListener("submit", async (e) => {
+chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const input = document.getElementById("messageInput");
-  const imageInput = document.getElementById("imageInput");
+  /* const input = document.getElementById("messageInput");
+  const imageInput = document.getElementById("imageInput"); */
   let imageUrl = "-";
 
   if (imageInput.files.length > 0) {
     const formData = new FormData();
     formData.append("image", imageInput.files[0]);
     formData.append("roomId", window.currentRoomId);
+    
     const res = await fetch("/chat/uploadImage", { method: "POST", body: formData });
     if (res.ok) {
       const result = await res.json();
@@ -520,15 +590,15 @@ document.getElementById("chatForm").addEventListener("submit", async (e) => {
     }
   }
 
-  const msg = input.value.trim();
+  const msg = messageInput.value.trim();
   if (!msg && imageUrl === "-") return;
 
   sendMessage(msg, imageUrl);
-  input.value = "";
-  imageInput.value = "";
+  messageInput.value = "";
+  removeImagePreview();
 });
 
-/** ✅ WebSocket 메시지 전송 */
+/* 메시지 전송 */
 function sendMessage(content, img="-") {
   if (stompClient && stompClient.connected) {
     stompClient.send("/app/message/send", {}, JSON.stringify({
@@ -542,11 +612,6 @@ function sendMessage(content, img="-") {
 }
 
 /** ✅ 이미지 미리보기 기능 */
-const imageInput = document.getElementById("imageInput");
-const previewContainer = document.getElementById("previewContainer");
-const previewImage = document.getElementById("previewImage");
-const removePreview = document.getElementById("removePreview");
-
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   if (file) {
@@ -559,12 +624,12 @@ imageInput.addEventListener("change", () => {
   }
 });
 
-/** ✅ 미리보기 제거 버튼 */
-removePreview.addEventListener("click", () => {
+/* 이미지 미리보기 제거 */
+function removeImagePreview() {
   imageInput.value = "";
   previewContainer.style.display = "none";
   previewImage.src = "";
-});
+}
 
 function goBack() {
   // 방법 ①: 브라우저 이전 페이지로 이동
