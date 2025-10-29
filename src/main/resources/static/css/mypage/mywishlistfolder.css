@@ -1,0 +1,91 @@
+
+.mypage-content-area {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 60px 70px;
+  min-height: 700px;
+}
+
+.mypage-content-area h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #f3f3f3;
+  padding-bottom: 10px;
+}
+
+
+.wishlist-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 25px;
+}
+
+
+.wishlist-card {
+  width: 260px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.wishlist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+
+
+
+.wishlist-info {
+  padding: 14px 18px 20px;
+}
+
+.wishlist-info h2 {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+.wishlist-info p {
+  font-size: 13px;
+  color: #777;
+  margin: 2px 0;
+}
+
+
+.wishlist-info a {
+  text-decoration: none;
+  color: #111;
+}
+
+.wishlist-info a:hover {
+  color: #4db2ff;
+}
+
+.mypage-content-area > p {
+  font-size: 16px;
+  color: #777;
+  text-align: center;
+  margin-top: 50px;
+}
+
+
+@media (max-width: 992px) {
+  .wishlist-container {
+    justify-content: center;
+  }
+  .wishlist-card {
+    width: 220px;
+  }
+  .wishlist-info h2 {
+    font-size: 14.5px;
+  }
+}
