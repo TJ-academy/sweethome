@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소의 매력을 돋보이게 하세요</title>
+<style>
+    /* 폰트 설정 및 배경 */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7; /* 배경색 */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    /* 최상단 헤더 영역 (로고와 저장 후 나가기 버튼 포함) */
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* 저장 후 나가기 버튼 스타일 */
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .exit-button:hover {
+    	color: #3aa6e9;
+    }
+
+    /* 메인 콘텐츠 영역 */
+    .main-content {
+        width: 100%;
+        max-width: 1000px; /* 메인 콘텐츠의 최대 너비 */
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 180px 0 100px 0; /* 상단 패딩 조정 */
+    }
+
+    /* 왼쪽 텍스트 섹션 */
+    .left-section {
+        width: 45%;
+        margin-top: 15vh;
+        padding-left: 0; 
+        text-align: left;
+    }
+    
+    /* 2단계 텍스트 스타일 */
+    .step-label {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #717171;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* 주요 제목 스타일 */
+    .main-title {
+        font-size: 2.2em;
+        font-weight: 800;
+        line-height: 1.3;
+        color: #333;
+        margin: 0 0 20px 0;
+    }
+
+    /* 상세 설명 스타일 */
+    .description-text {
+        font-size: 1.1em;
+        font-weight: 400;
+        color: #484848;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* 오른쪽 이미지 섹션 */
+    .right-section {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 50px; 
+    }
+    
+    .right-section img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* 하단 바 (Footer) 스타일 */
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 100; /* 헤더보다 높게 설정 */
+        
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05); /* 경계선 효과 추가 */
+    }
+
+    /* 뒤로 버튼 스타일 (하단 왼쪽) */
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171; 
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600; 
+    }
+
+    /* 다음 버튼 스타일 (하단 오른쪽) */
+    .next-button {
+        background-color: #3aa6e9; /* 밝은 파란색 버튼 */
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px; 
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+    
+    .next-button:hover {
+     	background-color: #1499FF;
+    }
+    
+</style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+        	<!-- 로고 이미지 경로를 /img/icon/logo.png로 유지 -->
+        	<img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <div class="main-content">
+        <div class="left-section">
+            <!-- 🌟 컨텐츠 업데이트: 2단계 🌟 -->
+            <span class="step-label">2단계</span>
+            <p class="main-title">숙소의 매력을 돋보이게 하세요</p>
+            <p class="description-text">
+	            이 단계에서는 숙소에 갖춰진 편의시설과 사진 5장 이상을 추가한 후 숙소 이름과 설명을 작성하실 수 있습니다.
+            </p>
+        </div>
+        <div class="right-section">
+            <img src="/img/icon/home.png" alt="숙소 평면도 이미지">    
+        </div>
+    </div>
+    
+    <div class="footer-bar">
+        <!-- 뒤로 버튼: writeFive로 이동 -->
+        <a th:href="@{/home/writeFive}" class="back-button">뒤로</a>
+        
+        <!-- 다음 버튼: 다음 단계인 writeSeven으로 이동 (가정) -->
+        <a th:href="@{/home/writeSeven}" class="next-button">다음</a>
+    </div>
+
+</body>
+</html>

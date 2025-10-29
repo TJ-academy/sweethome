@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>숙소 편의시설 선택</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+    /* ------------------------------------- */
+    /* 1. 레이아웃 및 공통 스타일 */
+    /* ------------------------------------- */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f7f7f7; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .header {
+        width: 100%;
+        max-width: 1400px; 
+        padding: 20px 40px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute; 
+        top: 0;
+        z-index: 100;
+    }
+
+    .exit-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 1em;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .exit-button:hover {
+        color: #3aa6e9; 
+    }
+
+    .main-content-selection {
+        width: 100%;
+        max-width: 1000px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 120px 20px 100px 20px; 
+        flex-grow: 1;
+        box-sizing: border-box;
+    }
+
+    .question-title {
+        font-size: 2.5em; 
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    
+    .question-subtitle {
+        font-size: 1.1em; 
+        font-weight: 400;
+        color: #717171;
+        margin-bottom: 40px;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .option-form-container {
+        width: 100%;
+        max-width: 900px; 
+        text-align: left;
+    }
+
+    .callout-box {
+        border-left: 5px solid #3aa6e9;
+        padding: 15px;
+        margin-bottom: 30px;
+        font-weight: 600;
+        font-size: 1em;
+        color: #333;
+        background-color: #f0f8ff; 
+        border-radius: 4px;
+    }
+
+    .option-group-title {
+        font-size: 1.8em; 
+        font-weight: 700;
+        color: #333;
+        margin-top: 50px; 
+        margin-bottom: 25px;
+    }
+
+    .option-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 30px;
+    }
+
+    .option-item {
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    .option-label {
+        display: flex; 
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        min-height: 100px; 
+        width: 100%; 
+        border: 1px solid #ddd; 
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95em;
+        font-weight: 500;
+        text-align: center;
+        color: #333;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
+    }
+
+    .option-label:hover {
+        border-color: #222; 
+    }
+
+    .option-checkbox {
+        display: none;
+    }
+
+    /* 🌟 JS로 토글 시 적용될 선택 스타일 */
+    .option-label.selected {
+        border: 2px solid #3aa6e9;
+        font-weight: 600;
+    }
+
+    .footer-bar {
+        height: 80px;
+        background-color: #f0f0f0; 
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 10; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px; 
+        box-sizing: border-box;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: #717171; 
+        font-size: 1em;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 600; 
+    }
+
+    .next-button {
+        background-color: #3aa6e9; 
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1em;
+        border-radius: 25px; 
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+    .next-button:hover {
+        background-color: #1499FF;
+    }
+
+    @media (max-width: 900px) {
+        .option-grid {
+            grid-template-columns: repeat(3, 1fr) !important; 
+        }
+    }
+
+    @media (max-width: 600px) {
+        .option-grid {
+            grid-template-columns: repeat(2, 1fr) !important; 
+            gap: 20px;
+        }
+        .footer-bar, .header {
+            padding: 0 20px;
+        }
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    // ✅ 카드 클릭 시 체크박스 토글 + 테두리 변경
+    $('.option-label').on('click', function() {
+        const checkbox = $(this).find('.option-checkbox');
+        const isChecked = !checkbox.prop('checked');
+        checkbox.prop('checked', isChecked);
+        $(this).toggleClass('selected', isChecked);
+
+        // 선택된 옵션 콘솔 출력 (디버깅용)
+        let selected = [];
+        $('.option-checkbox:checked').each(function() {
+            selected.push($(this).val());
+        });
+        console.clear();
+        console.log("선택된 옵션:", selected);
+    });
+});
+</script>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="logo">
+            <img src="/img/icon/logo.png" width="100" alt="로고">
+        </div>
+        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+    </div>
+
+    <div class="main-content-selection">
+        <p class="question-title">숙소 편의시설 정보를 추가하세요</p>
+        <p class="question-subtitle">
+            여기에 추가하려는 편의시설이 보이지 않더라도 걱정하지 마세요!<br>
+            숙소를 등록한 후에 편의시설을 추가할 수 있습니다.
+        </p>
+        
+        <div class="option-form-container">
+            <div class="callout-box">특별히 내세울 만한 편의시설이 있나요?</div>
+
+            <form id="writeSevenForm" th:action="@{/home/writeEight}" method="post" th:object="${homeWriteDTO}">
+                <input type="hidden" th:field="*{hostId}" />
+                <input type="hidden" th:field="*{homeType}" />
+                <input type="hidden" th:field="*{address}" />
+                <input type="hidden" th:field="*{detailAddress}" />
+                <input type="hidden" th:field="*{maxPeople}" />
+                <input type="hidden" th:field="*{room}" />
+                <input type="hidden" th:field="*{bed}" />
+                <input type="hidden" th:field="*{bath}" />
+                
+                <div th:each="groupEntry : ${groupedOptions}">
+                    <div class="option-group-title" th:text="${groupEntry.key}">그룹 제목</div>
+                    <div class="option-grid">
+                        <div th:each="opt : ${groupEntry.value}" class="option-item">
+                            <label class="option-label">
+                                <input 
+                                    type="checkbox" 
+                                    th:id="${'option-' + opt.optionId}" 
+                                    class="option-checkbox" 
+                                    th:field="*{optionIds}" 
+                                    th:value="${opt.optionId}">
+                                <span th:text="${opt.optionName}">옵션 이름</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="footer-bar">
+        <a th:href="@{/home/writeSix}" class="back-button">뒤로</a>
+        <button class="next-button" type="submit" form="writeSevenForm">다음</button>
+    </div>
+
+</body>
+</html>
