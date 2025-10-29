@@ -18,6 +18,7 @@ import com.example.sweethome.review.ReplyRepository;
 import com.example.sweethome.review.Review;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class HostReplyController {
 
     private final ReviewRepository reviewRepository;
     private final ReplyRepository replyRepository;
+    private final NotificationService notiservice;
 
     /**
      * 답글 작성을 위한 폼 객체 (ReplyForm)
@@ -108,7 +110,18 @@ public class HostReplyController {
                 .updatedAt(LocalDateTime.now()) 
                 .build();
         
-        replyRepository.save(newReply);
+        Reply savedReply = replyRepository.save(newReply);
+        
+        User guest = savedReply.getReview().getWriter();
+        
+        String message = savedReply.getContent().length() > 10 
+        		? savedReply.getContent().substring(0, 10) + "..." 
+				: savedReply.getContent();
+        
+        notiservice.sendNotification(guest, 
+        		"호스트가 내 리뷰에 답글을 달았습니다.", 
+        		message,
+        		"GUESTREVIEW");
         
         rttr.addFlashAttribute("successMsg", "답글이 성공적으로 작성되었습니다.");
         

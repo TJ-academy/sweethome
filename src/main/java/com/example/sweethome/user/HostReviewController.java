@@ -18,6 +18,7 @@ import com.example.sweethome.review.ReplyRepository;
 import com.example.sweethome.review.Review;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class HostReviewController {
     private final ReviewRepository reviewRepository;
     private final ReplyRepository replyRepository;
     private final ReservationRepository reservationRepository;
+    private final NotificationService notiservice;
 
     /**
      * 호스트에게 작성된 리뷰 목록 (GUEST_TO_HOST) 조회
@@ -168,7 +170,18 @@ public class HostReviewController {
                 .createdAt(java.time.LocalDateTime.now()) // createdAt 필드 추가 (nullable이 아니라면)
                 .build();
         
-        reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
+        
+        User guest = reservation.getBooker();
+        
+        String message = savedReview.getContent().length() > 10 
+        		? savedReview.getContent().substring(0, 10) + "..." 
+				: savedReview.getContent();
+        
+    	notiservice.sendNotification(guest, 
+        		"호스트가 내게 리뷰를 달았습니다.", 
+        		message,
+        		"GUESTREVIEW");
         
         redirectAttributes.addFlashAttribute("message", "게스트에 대한 리뷰 작성이 완료되었습니다.");
         

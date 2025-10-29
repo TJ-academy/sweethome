@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.sweethome.home.Home;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class MyReservationController {
 
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
+    private final NotificationService notiservice;
     
     @GetMapping("/reservation")
     public String myReservation(HttpSession session, Model model) {
@@ -142,6 +145,16 @@ public class MyReservationController {
             // 💡 추가: 취소 메시지 저장
             reservation.setCancelMessage(cancelMessage);
             reservationRepository.save(reservation);
+            
+            Home reservedHome = reservation.getReservedHome();
+            String homeName = reservedHome.getTitle().length() > 10 
+            		? reservedHome.getTitle().substring(0, 10) + "..." 
+                    : reservedHome.getTitle();
+            
+            notiservice.sendNotification(user, 
+            		"\"" + homeName + "\" 예약 취소 신청이 완료됐습니다.", 
+            		"호스트가 승인해야 예약 취소가 완료됩니다.",
+            		"RESERVATION");
         } else {
              // 이미 취소되었거나, 완료된 예약 등 취소 불가능한 상태
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 상태에서는 취소 신청할 수 없습니다.");

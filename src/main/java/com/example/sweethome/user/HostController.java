@@ -1,5 +1,6 @@
 package com.example.sweethome.user;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class HostController {
 	private final OptionRepository optionRepository;
 	private final HomeService homeService;
 	private final ReviewRepository reviewRepository;
+	private final NotificationService notiservice;
 
 
     @GetMapping("/list")
@@ -161,6 +164,18 @@ public class HostController {
 	        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
 	    }
 
+	    Home reservedHome = r.getReservedHome();
+        String homeName = reservedHome.getTitle().length() > 10 
+        		? reservedHome.getTitle().substring(0, 10) + "..." 
+                : reservedHome.getTitle();
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd");
+
+        String formattedStartDate = r.getStartDate().format(formatter);
+        String formattedEndDate = r.getEndDate().format(formatter);
+
+        String resDate = formattedStartDate + " ~ " + formattedEndDate;
+        
 	    // ---- POST 액션 처리 ----
 	    if (action != null) {
 	        ReservationStatus curr = r.getReservationStatus();
@@ -169,36 +184,66 @@ public class HostController {
 	            case "confirm": // 예약 확인
 	                if (curr == ReservationStatus.REQUESTED) {
 	                    r.setReservationStatus(ReservationStatus.CONFIRMED);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"\"" + homeName + "\" 예약이 확정됐습니다.", 
+	                    		homeName + ", " + resDate,
+	                    		"RESERVATION");
 	                }
 	                break;
 
 	            case "reject": // 예약 거절
 	                if (curr == ReservationStatus.REQUESTED) {
 	                    r.setReservationStatus(ReservationStatus.REJECTED);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"호스트가 \"" + homeName + "\" 예약을 거절했습니다.", 
+	                    		homeName + ", " + resDate,
+	                    		"RESERVATION");
 	                }
 	                break;
 
 	            case "cancel_accept": // 취소 수락
 	                if (curr == ReservationStatus.CANCEL_REQUESTED) {
 	                    r.setReservationStatus(ReservationStatus.CANCELLED);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"\"" + homeName + "\" 예약 취소가 완료됐습니다.", 
+	                    		"3일 이내로 예약금이 환불됩니다.",
+	                    		"RESERVATION");
 	                }
 	                break;
 
 	            case "cancel_reject": // 취소 거절 → 다시 예약 확정됨으로
 	                if (curr == ReservationStatus.CANCEL_REQUESTED) {
 	                    r.setReservationStatus(ReservationStatus.CONFIRMED);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"\"" + homeName + "\" 예약 취소가 거절됐습니다.", 
+	                    		"예약 확정으로 변경됐습니다.",
+	                    		"RESERVATION");
 	                }
 	                break;
 
 	            case "start_use": // 이용중으로 전환
 	                if (curr == ReservationStatus.CONFIRMED) {
 	                    r.setReservationStatus(ReservationStatus.IN_USE);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"\"" + homeName + "\"를 이용 중이에요.", 
+	                    		homeName + ", " + resDate,
+	                    		"RESERVATION");
 	                }
 	                break;
 
 	            case "complete": // 이용완료로 전환
 	                if (curr == ReservationStatus.IN_USE) {
 	                    r.setReservationStatus(ReservationStatus.COMPLETED);
+	                    
+	                    notiservice.sendNotification(r.getBooker(), 
+	                    		"\"" + homeName + "\" 이용이 완료됐습니다. 리뷰를 쓰시겠습니까?", 
+	                    		homeName + ", " + resDate,
+	                    		"REVIEW");
 	                }
 	                break;
 	        }

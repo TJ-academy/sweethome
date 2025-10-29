@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
 import com.example.sweethome.user.noti.NotificationService;
@@ -42,7 +41,7 @@ public class ChatController {
 			HttpSession session) {
 		User user = (User) session.getAttribute("userProfile");
 	    if (user == null) {
-	        return "redirect:/login";
+	    	return "redirect:/user/login";
 	    }
 	    
 		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByUser(user);		
@@ -62,7 +61,7 @@ public class ChatController {
     		@RequestParam("host") String hostEmail) {
 		User guest = (User) session.getAttribute("userProfile");
 		if (guest == null) {
-	        return "redirect:/login";
+	        return "redirect:/user/login";
 	    }
 		User host = userrepo.findByEmail(hostEmail)
 				.orElseThrow(() -> new RuntimeException("호스트를 찾을 수 없습니다."));
@@ -70,15 +69,14 @@ public class ChatController {
 		//두사람의 채팅방
 		ChatRoom room = service.getChatRoom(guest, host, null);
 		int roomId = room.getId();
-		System.out.println("a");
 		
 		ChatUser guestCU = service.findChatUser(roomId, guest);
-		System.out.println("b");
+		
 		//채팅방 메시지 조회
 		List<ChatMessageDto> messageList = service.getMessagesByChatRoom(roomId);
-		System.out.println("c");
+		
 		List<ChatRoomPreviewDTO> roomsList = service.getChatRoomsByUser(guest);
-		System.out.println("d");
+		
 		Map<String, Object> map = new HashMap<>();
 		
 		map.put("roomsList", roomsList);
@@ -95,31 +93,31 @@ public class ChatController {
     }
 	
 	//예약 후 채팅방 생성 또는 조회 + 자동 메시지 전송
-    public String createReservationChat(Reservation reservation) {
-    	User guest = reservation.getBooker();
-    	User host = reservation.getReservedHome().getHost();
-
-        //두사람의 채팅방
-        ChatRoom room = service.getChatRoom(guest, host, reservation);
-
-        //자동 메시지 전송
-        ChatMessageDto dto = new ChatMessageDto();
-        dto.setRoomId(room.getId());
-        dto.setSenderEmail(host.getEmail());
-        dto.setSenderNickname(host.getEmail());
-        dto.setReceiverEmail(guest.getEmail());
-        dto.setContent("예약이 완료되었습니다. 감사합니다!");
-        
-        ChatMessage saved = service.saveMessage(dto);
-        
-        dto.setMsgId(saved.getIdx());
-        dto.setSendedAt(saved.getSendedAt());
-        
-        //실시간 메시지 전송
-        messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), dto);
-
-        return "ok";
-    }
+//    public String createReservationChat(Reservation reservation) {
+//    	User guest = reservation.getBooker();
+//    	User host = reservation.getReservedHome().getHost();
+//
+//        //두사람의 채팅방
+//        ChatRoom room = service.getChatRoom(guest, host, reservation);
+//
+//        //자동 메시지 전송
+//        ChatMessageDto dto = new ChatMessageDto();
+//        dto.setRoomId(room.getId());
+//        dto.setSenderEmail(host.getEmail());
+//        dto.setSenderNickname(host.getEmail());
+//        dto.setReceiverEmail(guest.getEmail());
+//        dto.setContent("예약이 완료되었습니다. 감사합니다!");
+//        
+//        ChatMessage saved = service.saveMessage(dto);
+//        
+//        dto.setMsgId(saved.getIdx());
+//        dto.setSendedAt(saved.getSendedAt());
+//        
+//        //실시간 메시지 전송
+//        messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), dto);
+//
+//        return "ok";
+//    }
 	
 	//한 채팅방에 들어가기
 	@GetMapping("/rooms/{roomId}")
