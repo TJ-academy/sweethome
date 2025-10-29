@@ -18,7 +18,7 @@
 - **지도 기능** : **Kakao Map / Daum Map API**를 통한 위치 표시 및 검색  
 - **채팅 기능** : WebSocket(STOMP) 기반 실시간 1:1 채팅  
 - **달력 관리** : FullCalendar 기반 예약 일정·메모 표시  
-- **이메일 발송** : SMTP 기반 이메일 알림 (예: CodeWithMe API 연동)  
+- **이메일 발송** : SMTP 기반 이메일 알림 (Jakarta Mail API 연동)  
 - **모바일 지원** : **Flutter**를 활용한 앱 개발 및 Spring Boot 연동  
 - **마이페이지** : 사용자 정보, 예약 내역, 일정 관리 통합  
 - **알림 기능** : 새로운 채팅 메시지, 예약 변경 시 실시간 알림  
