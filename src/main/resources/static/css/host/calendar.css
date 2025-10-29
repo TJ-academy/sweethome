@@ -1,0 +1,226 @@
+@charset "UTF-8";
+
+/* ===========================
+   기본 설정
+=========================== */
+body {
+  background-color: #f7f7f7;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #222;
+}
+
+/* ===========================
+   달력 카드
+=========================== */
+.calendar-card {
+  background: #fff;
+  border-radius: 40px;
+  padding: 60px 70px 50px;
+  border: none;
+  box-shadow: none;
+  position: relative;
+}
+
+/* FullCalendar header 및 테두리 제거 */
+.fc, .fc-scrollgrid, .fc-theme-standard td, .fc-theme-standard th {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.fc-header-toolbar { display: none !important; }
+
+/* ===========================
+   월 표시
+=========================== */
+.month-display {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+.month-display h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #000;
+}
+.month-display p {
+  font-size: 0.8rem;
+  color: #999;
+  letter-spacing: 2px;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* 화살표 */
+.month-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.month-arrow:hover { color: #999; }
+.month-arrow.left { left: 0; }
+.month-arrow.right { right: 0; }
+
+/* ===========================
+   FullCalendar 스타일
+=========================== */
+
+/* 요일 헤더 */
+.fc-col-header-cell {
+  border: none !important;
+  color: #999 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+.fc-col-header-cell a {
+  color: #999 !important;
+  text-decoration: none !important;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+/* 날짜 셀 - 표 구조 유지 */
+.fc-daygrid-day {
+  border: none !important;
+  vertical-align: middle !important;
+  text-align: center;
+  cursor: pointer;
+  height: 90px !important;
+  transition: background-color 0.2s;
+}
+.fc-daygrid-day:hover { background-color: #fafafa; }
+
+/* 날짜 숫자 중앙 정렬 */
+.fc-daygrid-day-number {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+  text-decoration: none !important;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0 auto;
+}
+.fc-day-sun .fc-daygrid-day-number { color: #ff6b6b; }
+.fc-day-sat .fc-daygrid-day-number { color: #4478ff; }
+
+/* 날짜 밑 도트 */
+.fc-dotwrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px; /* 날짜 바로 밑 */
+}
+.fc-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.fc-dot.checkin { background: #ff6b6b; }
+.fc-dot.checkout { background: #4478ff; }
+.fc-dot.past-dot { background-color: #c9c9c9 !important; }
+
+/* 클릭한 날짜 회색 배경 */
+.fc-daygrid-day.selected-date {
+  background-color: #e9e9e9 !important;
+  border-radius: 15px !important;
+}
+
+.fc-dotwrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  min-height: 10px; /* ✅ 도트 없을 때도 높이 확보 */
+}
+
+/* 오늘 날짜 표시 */
+.fc-day-today {
+  background-color: #eef2ff !important;
+  border-radius: 15px !important;
+}
+
+/* ===========================
+   일정 패널
+=========================== */
+.schedule-detail {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #ebebeb;
+  padding: 25px 30px;
+}
+.schedule-detail h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 15px;
+}
+
+.schedule-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: background-color 0.2s;
+}
+.schedule-item[data-memo-type="CHECKIN"] { border-left: 3px solid #ff6b6b; }
+.schedule-item[data-memo-type="CHECKOUT"] { border-left: 3px solid #4478ff; }
+.schedule-item:hover { background: #fafafa; }
+
+.memo-preview {
+  background-color: #fff8d8;
+  border: 1px solid #f2e3a8;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  margin-left: 28px;
+  margin-top: 4px;
+  white-space: pre-wrap;
+}
+.memo-preview.past {
+  background-color: #f2f2f2;
+  color: #999;
+  border: 1px solid #ddd;
+}
+
+.btn-memo-edit {
+  background: none !important;
+  border: none !important;
+  color: #555 !important;
+  font-size: 1.2rem !important;
+}
+.btn-memo-edit:hover { color: #000 !important; }
+
+.modal-content { border-radius: 18px; border: none; }
+.modal-header { border-bottom: none; }
+.modal-title { font-size: 1rem; font-weight: 600; color: #222; }
+#memoTextarea {
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background-color: #fafafa;
+  resize: none;
+  font-size: 0.9rem;
+}
+#btnMemoDelete, #btnMemoSave {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  padding: 6px 16px;
+}
+#btnMemoDelete {
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+}
+#btnMemoDelete:hover { background-color: #ffeaea; }
+#btnMemoSave {
+  background-color: #4478ff;
+  border: none;
+}
+#btnMemoSave:hover { background-color: #2f63ff; }
