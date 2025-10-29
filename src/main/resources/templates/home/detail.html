@@ -247,15 +247,76 @@
 		<!-- 지도를 표시할 div -->
 		<div id="map"></div>
 
-		<div class="review-section">
-			<h2>★ 4.9 · 후기 12개</h2>
+		<div class="review-section mt-5">
+			<h2 th:if="${reviewCount > 0}" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
+			<h2 th:if="${reviewCount == 0}">아직 작성된 후기가 없습니다.</h2>
 
-			<div class="review-card">
-				<p>박*근</p>
-				<p>호스트 활동 기간 3년</p>
-				<p>모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
-				<button>더보기</button>
+			<div class="row g-4" th:if="${!#lists.isEmpty(recentReviews)}">
+				<div class="col-md-6" th:each="review : ${recentReviews}" th:if="${review.writer != null}">
+					<div class="review-card p-3 border rounded-3 h-100">
+						<div class="d-flex align-items-center mb-2">
+							<img th:src="${review.writer.profileImg != null ? review.writer.profileImg : '/images/host_default.jpg'}"
+								src="/images/host_default.jpg" alt="게스트 이미지" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+							<div>
+								<p class="fw-bold mb-0" th:text="${review.writer.username}"></p>
+								<small class="text-muted" th:text="${#temporals.format(review.createdAt, 'yyyy년 M월')}"></small>
+							</div>
+						</div>
+						
+						<p class="small mb-2">
+						  <span style="color: gold;">
+						    <span th:each="i : ${#numbers.sequence(1,5)}"
+						          th:text="${i <= (review?.star ?: 0)} ? '★' : '☆'">☆</span>
+						  </span>
+						  <span th:text="${review?.star ?: 0}">4</span>
+						</p>
+						
+						<p class="review-text mb-0" style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: pre-line;" 
+							th:text="${review.content}">
+							모든 것이 완벽했고 오션뷰가 정말 좋았습니다. 숙소도 깨끗하고 호스트님도 친절하셔서 다음에도 꼭 재방문할 거예요.
+						</p>
+						
+						<div th:if="${review.reply != null and review.reply.content != null}" class="reply-preview mt-3 small text-muted">
+						    <p class="mb-0 fw-semibold">호스트 답변:</p>
+						    <p class="mb-0 text-truncate" th:text="${review.reply.content}"></p>
+						</div>
+
+					</div>
+				</div>
 			</div>
+			
+			<div class="mt-4" th:if="${reviewCount > 4}" style="text-align: right;">
+				<button type="button" class="btn btn-outline-dark rounded-pill px-4"
+					data-bs-toggle="modal" data-bs-target="#allReviewsModal"
+					style="border-color: black;">
+					후기 <span th:text="${reviewCount}">12</span>개 모두 보기
+				</button>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="allReviewsModal" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+		    <div class="modal-content">
+		      <div class="modal-header border-0">
+		        <h5 class="modal-title fw-bold" id="allReviewsModalLabel">전체 후기</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+		      </div>
+		      <div class="modal-body pt-0">
+		      	
+		      	<div class="d-flex align-items-center mb-4">
+		      		<h4 class="fw-bold me-2 mb-0" th:text="|★ ${rating}|">★ 4.9</h4>
+		      		<span class="text-muted" th:text="|(${reviewCount}개 후기)|">(12개 후기)</span>
+		      	</div>
+		      	
+		      	<div id="allReviewsContainer" class="row g-4">
+		          <div class="col-12 text-center text-muted">로딩 중...</div>
+		        </div>
+		      </div>
+		      <div class="modal-footer border-0">
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+		      </div>
+		    </div>
+		  </div>
 		</div>
 
 		<div class="amenities-section">
@@ -488,6 +549,98 @@
 								const formattedTotalCost = totalCost
 										.toLocaleString('ko-KR');
 								totalPriceDisplay.innerHTML = `총 ${nights}박<br><span>${formattedTotalCost}원</span>`;
+							}
+							
+							// ==========================================================
+							// 4. 리뷰 모달 로직 추가 (수정/유지)
+							// ==========================================================
+							
+							const allReviewsModal = document.getElementById('allReviewsModal');
+							if (allReviewsModal) {
+							  // 모달이 열릴 때 리뷰를 로드
+							  allReviewsModal.addEventListener('show.bs.modal', function () {
+							    loadAllReviews(currentHomeId);
+							  });
+							}
+
+							/**
+							 * 로드된 리뷰 데이터를 HTML로 렌더링하는 함수.
+							 * @param {Array<Object>} reviews - 리뷰 객체 배열 (ReviewDto 형태)
+							 */
+							function renderReviews(reviews) {
+							  const container = document.getElementById('allReviewsContainer');
+							  container.innerHTML = ''; // 기존 내용 초기화
+
+							  if (!reviews || reviews.length === 0) {
+							    container.innerHTML = '<div class="col-12 text-center text-muted">작성된 후기가 없습니다.</div>';
+							    return;
+							  }
+
+							  reviews.forEach(review => {
+							    // ... (별점 및 날짜 포맷 로직 생략) ...
+							    const fullStars = '★'.repeat(review.star);
+							    const emptyStars = '☆'.repeat(5 - review.star);
+							    const ratingStars = `<span style="color: gold;">${fullStars}${emptyStars}</span> <span class="fw-semibold">${review.star}</span>`;
+							    
+							    const reviewDate = new Date(review.createdAt);
+							    const formattedDate = reviewDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' });
+							    
+							    // ✅ 작성자 프로필 이미지 (DTO에서 직접 접근)
+							    const profileImg = review.writerProfileImg ? review.writerProfileImg : '/images/host_default.jpg';
+							    
+							    // ✅ 호스트 답변 (reply) 처리: DTO 구조에 맞게 접근
+							    let replyHtml = '';
+							    if (review.reply && review.reply.content) {
+							      // ✅ review.reply.host.username 대신 review.reply.hostUsername 사용
+							      replyHtml = `
+							        <div class="reply-box mt-3 p-3 bg-light rounded-3 border-start border-3 border-secondary">
+							          <p class="fw-bold mb-1 small text-secondary">호스트의 답변 (${review.reply.hostUsername}):</p>
+							          <p class="mb-0 small" style="white-space: pre-line;">${review.reply.content}</p>
+							        </div>
+							      `;
+							    }
+
+							    const reviewHtml = `
+							      <div class="col-md-6">
+							        <div class="p-3 border rounded-3 h-100 shadow-sm">
+							          <div class="d-flex align-items-center mb-2">
+							              <img src="${profileImg}" alt="게스트 이미지" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+							              <div>
+							                  <p class="fw-bold mb-0">${review.writerUsername}</p>
+							                  <small class="text-muted">${formattedDate}</small>
+							              </div>
+							          </div>
+							          <p class="small mb-2">${ratingStars}</p>
+							          <p class="mb-3" style="white-space: pre-line;">${review.content}</p>
+							          ${replyHtml}
+							        </div>
+							      </div>
+							    `;
+							    container.insertAdjacentHTML('beforeend', reviewHtml);
+							  });
+							}
+							/**
+							 * 전체 리뷰 데이터를 비동기적으로 가져오는 함수.
+							 * @param {number} homeId - 현재 숙소 ID
+							 */
+							function loadAllReviews(homeId) {
+							  const container = document.getElementById('allReviewsContainer');
+							  container.innerHTML = '<div class="col-12 text-center text-muted"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">리뷰 로딩 중...</p></div>';
+							  
+							  fetch(`/home/detail/${homeId}/reviews/all`)
+							    .then(response => {
+							      if (!response.ok) {
+							        throw new Error('리뷰 로드 실패');
+							      }
+							      return response.json();
+							    })
+							    .then(reviews => {
+							      renderReviews(reviews);
+							    })
+							    .catch(error => {
+							      console.error('Error loading reviews:', error);
+							      container.innerHTML = '<div class="col-12 text-center text-danger">리뷰를 로드하는 데 실패했습니다. 서버 로그를 확인하세요.</div>';
+							    });
 							}
 
 						}); // DOMContentLoaded 끝

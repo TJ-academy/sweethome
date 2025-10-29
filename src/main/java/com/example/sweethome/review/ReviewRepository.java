@@ -3,9 +3,13 @@ package com.example.sweethome.review;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import com.example.sweethome.home.Home;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.user.User;
 
@@ -42,4 +46,37 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
      * Reservation.reservationIdx (필드명: reservationIdx)
      */
     Optional<Review> findByReservationReservationIdxAndDirection(int reservationIdx, ReviewDirection direction);
+    
+    // DetailController 에 쓰기 위한 추가 메서드
+    
+    /**
+     * ✅ 홈에 대한 게스트의 리뷰 총 개수를 조회합니다. (GUEST_TO_HOST)
+     * Review.home -> Home
+     */
+    int countByHomeAndDirection(Home home, ReviewDirection direction);
+
+    /**
+     * ✅ 홈에 대한 게스트 리뷰의 평균 별점을 조회합니다. (GUEST_TO_HOST)
+     * Review.star 필드를 이용합니다.
+     */
+    @Query("SELECT AVG(r.star) FROM Review r WHERE r.home = :home AND r.direction = :direction")
+    Double findAverageRatingByHomeAndDirection(@Param("home") Home home, @Param("direction") ReviewDirection direction);
+
+    /**
+     * ✅ 홈에 대한 게스트 리뷰 중 최신 4개를 조회합니다. (GUEST_TO_HOST)
+     * PageRequest.of(0, 4)를 사용하여 LIMIT 4 효과를 냅니다.
+     */
+    List<Review> findByHomeAndDirectionOrderByCreatedAtDesc(Home home, ReviewDirection direction, PageRequest pageRequest);
+    
+    /**
+     * ✅ 홈에 대한 게스트 리뷰 전체 목록을 최신순으로 조회합니다. (GUEST_TO_HOST)
+     */
+    List<Review> findByHomeAndDirectionOrderByCreatedAtDesc(Home home, ReviewDirection direction);
+    
+    /**
+     * ✅ 홈에 대한 게스트 리뷰 전체 목록을 최신순으로 조회하며, 
+     * 각 Review에 연결된 Reply를 즉시 로딩(Fetch Join)합니다.
+     */
+    @Query("SELECT r FROM Review r LEFT JOIN FETCH r.reply WHERE r.home = :home AND r.direction = :direction ORDER BY r.createdAt DESC")
+    List<Review> findByHomeAndDirectionWithReply(@Param("home") Home home, @Param("direction") ReviewDirection direction);
 }

@@ -51,4 +51,7 @@ public class Review {
 
     @Column(columnDefinition = "timestamp") private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    @OneToOne(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Reply reply;
 }

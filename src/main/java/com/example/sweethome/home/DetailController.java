@@ -10,13 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.sweethome.review.Review;
+import com.example.sweethome.review.ReviewDirection;
+import com.example.sweethome.review.ReviewDto;
+import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
 import com.example.sweethome.wishlist.Wishlist;
 import com.example.sweethome.wishlist.WishlistFolder;
@@ -38,6 +44,7 @@ public class DetailController {
     private final HomePhotoRepository homePhotoRepository;
     private final WishlistRepository wishlistRepository;
     private final WishlistFolderRepository wishlistFolderRepository;
+    private final ReviewRepository reviewRepository;
 
     /** 상세 페이지: /home/detail/{idx} */
     @GetMapping("/{idx}")
@@ -172,7 +179,36 @@ public class DetailController {
         model.addAttribute("checkout", checkout);
         model.addAttribute("adults", adults);
         model.addAttribute("children", children);
+        
+        
+        // ✅ 4. 리뷰 관련 데이터 추가 (GUEST_TO_HOST 기준)
+        
+     // 4-1. 호스트 활동 기간 (기존 로직 유지)
+        /*
+        // 요청에 따라 활동 기간 계산 로직을 삭제합니다.
+        if (home.getHost() != null && home.getHost().getCreatedAt() != null) {
+            LocalDate hostJoinDate = home.getHost().getCreatedAt().toLocalDate();
+            long years = ChronoUnit.YEARS.between(hostJoinDate, LocalDate.now());
+            model.addAttribute("hostMemberSince", years > 0 ? years : 1);
+        }
+        */
+        
+        // 4-2. 총 리뷰 개수 (GUEST_TO_HOST)
+        int reviewCount = reviewRepository.countByHomeAndDirection(home, ReviewDirection.GUEST_TO_HOST); 
+        model.addAttribute("reviewCount", reviewCount); 
 
+        // 4-3. 평균 평점 (GUEST_TO_HOST)
+        Double avgRating = reviewRepository.findAverageRatingByHomeAndDirection(home, ReviewDirection.GUEST_TO_HOST);
+        // 소수점 한 자리까지 반올림
+        model.addAttribute("rating", avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0);
+
+        // 4-4. 최신 리뷰 4개 (GUEST_TO_HOST)
+        // PageRequest.of(0, 4)를 사용해 상위 4개만 가져옵니다.
+        List<Review> recentReviews = reviewRepository.findByHomeAndDirectionOrderByCreatedAtDesc(
+            home, ReviewDirection.GUEST_TO_HOST, PageRequest.of(0, 4)
+        );
+        model.addAttribute("recentReviews", recentReviews);
+        
         return "home/detail";
     }
 
@@ -180,5 +216,26 @@ public class DetailController {
     @GetMapping
     public String redirectToList() {
         return "redirect:/home";
+    }
+    
+    // ✅ 리뷰 모달 팝업용 전체 리뷰 조회 (JSON API)
+    @GetMapping("/{idx}/reviews/all")
+    @ResponseBody
+    public List<ReviewDto> getAllReviews(@PathVariable("idx") int idx) {
+        Home home = homeRepository.findById(idx)
+                .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + idx));
+        
+     // GUEST_TO_HOST 리뷰 전체 목록을 최신순으로 조회
+        // Fetch Join을 사용하여 Review와 Reply를 한 번에 가져와 Lazy Loading 오류 방지
+        List<Review> reviews = reviewRepository.findByHomeAndDirectionWithReply(
+            home, 
+            ReviewDirection.GUEST_TO_HOST // 게스트가 호스트에게 쓴 리뷰만 조회
+        );
+        
+        // ✅ Review 엔티티 목록을 ReviewDto 목록으로 변환하여 반환
+        return reviews.stream()
+                .map(ReviewDto::fromEntity)
+                .collect(Collectors.toList());
+        
     }
 }
