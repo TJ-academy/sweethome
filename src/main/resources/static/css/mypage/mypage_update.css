@@ -3,15 +3,11 @@
   background: #fff;
   border: 1px solid #eee;
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   padding: 60px 70px;
   min-height: 650px;
   transition: box-shadow 0.3s ease;
 }
 
-.mypage-content-area:hover {
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
-}
 
 /* 제목 */
 .mypage-content-area h1 {
