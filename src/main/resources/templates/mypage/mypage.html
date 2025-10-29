@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}"> 
     <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}"> 
     <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+	<link rel="stylesheet" th:href="@{/css/mypage/mypage_intro.css}">
     
     <style>
         /* CSS는 필요에 따라 추가 */
@@ -25,30 +26,50 @@
                 <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
             </div>
 
-            <div class="mypage-content-col">
-                <div class="mypage-content-area">
-                    <h1>마이페이지</h1>
-                    
-                    <div>
-                        <p><strong>프로필사진:</strong> <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img" style="max-width: 100px; max-height: 100px; border-radius: 50%;"></p>
-                        <p><strong>Email:</strong> <span th:text="${user.email}">이메일</span></p>
-                        <p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
-                        <p><strong>이름:</strong> <span th:text="${user.username}">이름</span></p>
-                        <p><strong>전화번호:</strong> <span th:text="${user.phone}">전화번호</span></p>
-                        <p><strong>생년월일:</strong> <span th:text="${user.birthday}">생년월일</span></p>
-                        <p><strong>가입일:</strong> <span th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">가입일</span></p>
-                    </div>
-                    
-                    <div class="d-flex justify-content-end mb-3">
-					  <a th:href="@{/mypage/updateForm}" class="btn btn-primary">
-					    회원정보 수정
-					  </a>
-					</div>
-                    
-                    <a href="/mypage/delete" onclick="return confirmDelete();">회원탈퇴</a><br>
-                </div>
-            </div>
-        </div>
+			<div class="mypage-content-col">
+			  <div class="mypage-content-area">
+			    <h1>마이페이지</h1>
+
+			    <!-- 프로필 영역 -->
+			    <div class="profile-section">
+			      <img th:src="${user.profileImg}" alt="Profile Image" class="profile-img">
+			      <div class="profile-info">
+			        <p class="user-nickname" th:text="${user.nickname}">한나래</p>
+			        <p class="user-email" th:text="${user.email}">0511skfo@naver.com</p>
+			      </div>
+			    </div>
+
+			    <!-- 상세 정보 -->
+			    <div class="info-section">
+			      <div class="info-row">
+			        <span class="label">이름</span>
+			        <span class="value" th:text="${user.username}">강한나래</span>
+			      </div>
+			      <div class="info-row">
+			        <span class="label">전화번호</span>
+			        <span class="value" th:text="${user.phone}">010-7563-7855</span>
+			      </div>
+			      <div class="info-row">
+			        <span class="label">생년월일</span>
+			        <span class="value" th:text="${user.birthday}">2002-05-11</span>
+			      </div>
+			      <div class="info-row">
+			        <span class="label">가입일</span>
+			        <span class="value" th:text="${#temporals.format(user.joinAt, 'yyyy-MM-dd HH:mm:ss')}">
+			          2025-10-15 02:40:59
+			        </span>
+			      </div>
+			    </div>
+
+			    <!-- 버튼 -->
+			    <div class="btn-area">
+			      <a th:href="@{/mypage/updateForm}" class="btn-edit">회원정보 수정</a>
+			      <a href="/mypage/delete" class="delete-account" onclick="return confirm('정말 탈퇴하시겠습니까?');">
+			        회원탈퇴
+			      </a>
+			    </div>
+			  </div>
+			</div>
     </div>
     
     
