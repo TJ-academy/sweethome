@@ -1,5 +1,4 @@
-<img width="774" height="815" alt="image" src="https://github.com/user-attachments/assets/1ed8637a-0364-42ed-9600-81aeb8c4a6ed" /># 🏠 HomeSweetHome
-
+# 🏠 HomeSweetHome
 > 숙소 예약부터 일정·체크인 관리, 게스트와의 실시간 소통까지
 > 숙박 운영에 필요한 모든 기능을 하나로 담은 통합 관리 플랫폼
 > 
@@ -31,10 +30,10 @@
 |------|------------|
 | **Frontend (Web)** | HTML, CSS, JavaScript, Thymeleaf, Bootstrap 5, FullCalendar.js |
 | **Frontend (App)** | Flutter |
-| **Backend** | Spring Boot, Spring Security, WebSocket(STOMP), JPA / MyBatis |
+| **Backend** | Spring Boot, Spring Security, WebSocket(STOMP), JPA / MyBatis, lombok |
 | **DB** | MySQL |
 | **API 연동** | Kakao Map API, Daum Map API, KakaoPay API, SMTP(Jakarta Mail) |
-| **Tools** | GitHub, Figma, Eclipse, IntelliJ |
+| **Tools** | GitHub, Figma, Eclipse|
 | **Design** | [Figma 디자인 바로가기](https://www.figma.com/design/YSjc45WehXFYvqh77Dk7ej/HomeSweetHome) |
 
 ---
