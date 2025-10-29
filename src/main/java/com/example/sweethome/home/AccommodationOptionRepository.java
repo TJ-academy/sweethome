@@ -28,4 +28,7 @@ public interface AccommodationOptionRepository extends JpaRepository<Accommodati
     
     @Modifying
     void deleteByHome_Idx(int homeIdx);
+    
+    @Query("SELECT ao FROM AccommodationOption ao WHERE ao.option.optionId = :optionId")
+    List<AccommodationOption> findByOptionIdCustom(@Param("optionId") int optionId);
 }

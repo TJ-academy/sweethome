@@ -614,7 +614,7 @@ public class HomeService {
             return List.of();
         }
 
-        // 2️⃣ 각 숙소의 좋아요 개수 조회
+        // 2️ 각 숙소의 좋아요 개수 조회
         // 조회된 서울 숙소 ID 리스트 추출
         List<Integer> seoulHomeIds = seoulHomes.stream()
             .map(Home::getIdx)
@@ -630,7 +630,7 @@ public class HomeService {
                         arr -> (Long) arr[1]
                 ));
 
-        // 3️⃣ Home + 좋아요 개수 결합 및 좋아요 수 기준으로 내림차순 정렬
+        // 3️ Home + 좋아요 개수 결합 및 좋아요 수 기준으로 내림차순 정렬
         List<HomeResponseDto> seoulHomeList = seoulHomes.stream()
                 .map(home -> new HomeResponseDto(
                         home,
@@ -638,10 +638,83 @@ public class HomeService {
                 ))
                 .collect(Collectors.toList());
 
-        // 4️⃣ 좋아요 개수(likeCount) 기준으로 내림차순 정렬
+        // 4️ 좋아요 개수(likeCount) 기준으로 내림차순 정렬
         seoulHomeList.sort((dto1, dto2) -> Long.compare(dto2.getLikeCount(), dto1.getLikeCount()));
 
         return seoulHomeList;
+    }
+    
+    //장기숙박인기숙소조회
+    public List<HomeResponseDto> getLongTermPopularHomesWithLikeCounts() {
+        final int LONG_TERM_OPTION_ID = 44; // 장기 숙박을 나타내는 option_id
+
+        // 1. option_id가 44인 AccommodationOption 목록을 조회하여 해당 숙소 ID(acc_id = home.idx) 추출
+        
+        List<AccommodationOption> longTermOptions = accommodationOptionRepository.findByOptionIdCustom(LONG_TERM_OPTION_ID);
+
+        Set<Integer> longTermHomeIds = longTermOptions.stream()
+                .filter(AccommodationOption::isExist) 
+                .map(ao -> ao.getHome().getIdx())
+                .collect(Collectors.toSet());
+        
+        if (longTermHomeIds.isEmpty()) {
+            return List.of();
+        }
+
+        // 2. 해당 ID 목록으로 Home 엔티티 조회 (findAllById 사용)
+        List<Home> longTermHomes = homeRepository.findAllById(longTermHomeIds);
+
+        // 3. 모든 숙소의 좋아요 개수 조회 (기존 로직 재사용)
+        List<Object[]> allLikeCounts = wishlistRepository.countWishlistsByHome();
+        
+        Map<Integer, Long> likeCountMap = allLikeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 4. Home + 좋아요 개수 결합 및 DTO로 변환
+        List<HomeResponseDto> longTermHomeList = longTermHomes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+
+        // 5. 좋아요 개수(likeCount) 기준으로 내림차순 정렬
+        longTermHomeList.sort((dto1, dto2) -> Long.compare(dto2.getLikeCount(), dto1.getLikeCount()));
+
+        return longTermHomeList;
+    }
+    
+    //단체 숙소
+    public List<HomeResponseDto> getLargePopularHomesWithLikeCounts() {
+        final int MIN_PEOPLE = 4; // 단체 숙소의 최소 인원 기준
+
+        // 1. maxPeople이 MIN_PEOPLE 이상인 Home 목록 조회
+        List<Home> largeHomes = homeRepository.findByMaxPeopleGreaterThanEqual(MIN_PEOPLE);
+        
+        // 2. 모든 숙소의 좋아요 개수 조회 (기존 로직 재사용)
+        List<Object[]> allLikeCounts = wishlistRepository.countWishlistsByHome();
+        
+        Map<Integer, Long> likeCountMap = allLikeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 3. Home + 좋아요 개수 결합 및 DTO로 변환
+        List<HomeResponseDto> largeHomeList = largeHomes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+
+        // 4. 좋아요 개수(likeCount) 기준으로 내림차순 정렬
+        largeHomeList.sort((dto1, dto2) -> Long.compare(dto2.getLikeCount(), dto1.getLikeCount()));
+
+        return largeHomeList;
     }
     
       

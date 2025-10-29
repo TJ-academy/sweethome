@@ -171,11 +171,16 @@
 							<div
 								th:if="${reservation.reservationStatus.name() == 'COMPLETED'}"
 								class="mt-2">
-								<a
-									th:href="@{|/review/write?reservationId=${reservation.reservationIdx}|}"
-									class="btn btn-outline-primary">리뷰 작성하기</a> <a
-									th:href="@{|/review/list?homeId=${reservation.reservedHome.idx}|}"
-									class="btn btn-outline-secondary">리뷰 보기</a>
+								<div th:if="${!hasHostReviewedGuest}">
+									<a
+										th:href="@{|/host/review/write?reservationId=${reservation.reservationIdx}|}"
+										class="btn btn-primary">게스트 리뷰 작성하기</a>
+								</div>
+
+								<div th:if="${hasHostReviewedGuest}">
+									<button class="btn btn-success" disabled>게스트 리뷰 작성 완료
+									</button>
+								</div>
 							</div>
 						</div>
 

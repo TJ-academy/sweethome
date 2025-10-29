@@ -1,4 +1,9 @@
-package com.example.sweethome.user;
+package com.example.sweethome.user.noti;
+
+import java.time.LocalDateTime;
+
+import com.example.sweethome.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +19,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,6 +38,8 @@ public class Notification {
     // receiver (varchar(50), FK) -> User 엔티티와 ManyToOne 관계 (User.email 참조)
     @ManyToOne 
     @JoinColumn(name = "receiver", referencedColumnName = "email", nullable = false)
+    @ToString.Exclude // 💡 toString 호출 시 receiver 필드를 제외
+    @JsonIgnore       // 💡 JSON 직렬화 시 이 필드를 제외
     private User receiver;
 
     // title (varchar(200))

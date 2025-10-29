@@ -14,5 +14,8 @@ public interface HomeRepository extends JpaRepository<Home, Integer> {
     
     //검색
     List<Home> findByLocationContainingIgnoreCaseAndMaxPeopleGreaterThanEqual(String locationKeyword, int maxPeople);
+    
+    //단체숙소 조회
+    List<Home> findByMaxPeopleGreaterThanEqual(int maxPeople);
 }
 
