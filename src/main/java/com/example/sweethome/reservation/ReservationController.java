@@ -2,6 +2,7 @@ package com.example.sweethome.reservation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import com.example.sweethome.home.Home;
 import com.example.sweethome.home.HomeRepository;
 import com.example.sweethome.user.User;
 import com.example.sweethome.user.UserRepository;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class ReservationController {
 	private final ReservationRepository reservationRepository; // Repository 주입 가정
     private final UserRepository userRepository; // User Repository 주입 가정
     private final HomeRepository homeRepository; // Home Repository 주입 가정
+    private final NotificationService notiservice;
 
 	@GetMapping("/reservationStart")
 	public String reservationStart(
@@ -102,6 +105,21 @@ public class ReservationController {
                 .build();
 
         reservationRepository.save(reservation);
+        
+        String homeName = reservedHome.getTitle().length() > 10 
+        		? reservedHome.getTitle().substring(0, 10) + "..." 
+                : reservedHome.getTitle();
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd");
+
+        String formattedStartDate = reservation.getStartDate().format(formatter);
+        String formattedEndDate = reservation.getEndDate().format(formatter);
+
+        String resDate = formattedStartDate + " ~ " + formattedEndDate;
+        notiservice.sendNotification(booker, 
+        		"\"" + homeName + "\" 예약 신청이 완료됐습니다.", 
+        		homeName + ", " + resDate,
+        		"RESERVATION");
         
         // 4. 예약 성공 페이지로 리다이렉트
         // 예약 완료 후에는 보통 PRG 패턴에 따라 리다이렉트합니다.

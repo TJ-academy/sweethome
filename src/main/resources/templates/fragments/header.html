@@ -156,7 +156,7 @@ const notiContainer = document.getElementById('notiContainer');
 const markAllReadBtn = document.getElementById('markAllReadBtn');
 
 //알림 버튼 누르면 알림창 팝업
-notiButton.addEventListener('click', function(e) {
+notiButton?.addEventListener('click', function(e) {
     const isVisible = notiPopup.style.display === 'block';
     
     notiPopup.style.display = isVisible ? 'none' : 'block';
@@ -171,13 +171,15 @@ notiButton.addEventListener('click', function(e) {
 
 //밖에 누르면 팝업 닫기
 document.addEventListener('click', () => {
-	const isClickedOutside = !notiContainer.contains(event.target);
-    const isDropdownVisible = notiPopup.style.display === 'block';
+	if(email) {
+		const isClickedOutside = !notiContainer.contains(event.target);
+	    const isDropdownVisible = notiPopup.style.display === 'block';
 
-    if (isClickedOutside && isDropdownVisible) {
-        notiPopup.style.display = 'none';
-        notiButton.setAttribute('aria-expanded', 'false');
-    }
+	    if (isClickedOutside && isDropdownVisible) {
+	        notiPopup.style.display = 'none';
+	        notiButton.setAttribute('aria-expanded', 'false');
+	    }
+	}
 });
 
 //웹소켓 연결
@@ -254,9 +256,11 @@ function showNotification() {
             if(noti.notiType === "MESSAGE") {
             	window.location.href='/chat/rooms';
             } else if(noti.notiType === "RESERVATION") {
-            	window.location.href='/mypage/reservations';
-            } else if(noti.notiType === "REVIEW") {
-            	window.location.href='/mypage/reviews';
+            	window.location.href='/mypage/reservation';
+            } else if(noti.notiType === "HOSTREVIEW") {
+            	window.location.href='/host/review/list';
+            } else if(noti.notiType === "GUESTREVIEW") {
+            	window.location.href='/mypage/review';
             }
         });
     });

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.sweethome.home.Home;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
 import com.example.sweethome.reservation.ReservationStatus;
@@ -22,6 +23,7 @@ import com.example.sweethome.review.Review;
 import com.example.sweethome.review.ReviewDirection;
 import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
+import com.example.sweethome.user.noti.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class MyReviewController {
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
     private final ReplyRepository replyRepository;
+    private final NotificationService notiservice;
 
     // ★ 목록 페이지
     @GetMapping("/review")
@@ -169,7 +172,23 @@ public class MyReviewController {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
+        
+        Home reservedHome = r.getReservedHome();
+        String message = savedReview.getContent().length() > 10 
+        		? savedReview.getContent().substring(0, 10) + "..." 
+				: savedReview.getContent();
+        
+        //게스트가 호스트거에
+        User host = reservedHome.getHost();
+        String homeName = reservedHome.getTitle().length() > 10 
+        		? reservedHome.getTitle().substring(0, 10) + "..." 
+                : reservedHome.getTitle();
+        
+        notiservice.sendNotification(host, 
+        		"게스트가 \"" + homeName + "\"에 리뷰를 달았습니다.", 
+        		message,
+        		"HOSTREVIEW");
 
         return "redirect:/mypage/review/detail?reservationId=" + reservationId + "&direction=" + direction.name();
     }
