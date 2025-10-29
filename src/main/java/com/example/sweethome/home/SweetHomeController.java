@@ -28,6 +28,11 @@ public class SweetHomeController {
 
     @GetMapping("/writeOne")
     public String goWriteOne(HttpSession session) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         if (session.getAttribute("homeWriteDTO") == null) {
             session.setAttribute("homeWriteDTO", new HomeWriteDTO());
             log.info("새 HomeWriteDTO 세션 초기화 (writeOne)");
@@ -40,6 +45,11 @@ public class SweetHomeController {
 
     @GetMapping("/writeFour")
     public String goWriteFour(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
 
@@ -61,15 +71,32 @@ public class SweetHomeController {
         dto.setAddress(address);
         dto.setDetailAddress(detailAddress);
         session.setAttribute("homeWriteDTO", dto);
+        
         return "redirect:/home/writeFive";
     }
 
     @GetMapping("/writeFive")
-    public String showWriteFive(HttpSession session, Model model) {
+    public String showWriteFive(HttpSession session, Model model, @RequestParam("homeType") String homeType,
+            @RequestParam("address") String address,
+            @RequestParam("detailAddress") String detailAddress) {
+    	
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
+        //쿼리스트링값 여기 저장
+        dto.setHomeType(homeType);
+        dto.setAddress(address);
+        dto.setDetailAddress(detailAddress);
+        
+        User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+
+        dto.setHostId(userProfile.getEmail());       
+
         if (dto == null) return "redirect:/home/writeOne";
 
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeFive";
     }
 
@@ -78,20 +105,27 @@ public class SweetHomeController {
                                   HttpSession session) {
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
-
+        
         dto.setMaxPeople(updatedDto.getMaxPeople());
         dto.setRoom(updatedDto.getRoom());
         dto.setBed(updatedDto.getBed());
         dto.setBath(updatedDto.getBath());
         session.setAttribute("homeWriteDTO", dto);
+        
         return "redirect:/home/writeSix";
     }
 
     @GetMapping("/writeSix")
     public String showWriteSix(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeSix";
     }
 
@@ -100,10 +134,16 @@ public class SweetHomeController {
 
     @GetMapping("/writeSeven")
     public String showWriteSeven(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
         model.addAttribute("groupedOptions", homeService.getGroupedOptions());
+        
         return "home/writeSeven";
     }
 
@@ -115,14 +155,21 @@ public class SweetHomeController {
 
         dto.setOptionIds(updatedDto.getOptionIds());
         session.setAttribute("homeWriteDTO", dto);
+        
         return "redirect:/home/writeEight";
     }
 
     @GetMapping("/writeEight")
     public String showWriteEight(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeEight";
     }
 
@@ -140,14 +187,21 @@ public class SweetHomeController {
 
         dto.setThumbnail(thumbnail);
         session.setAttribute("homeWriteDTO", dto);
+        
         return "redirect:/home/writeNine";
     }
 
     @GetMapping("/writeNine")
     public String showWriteNine(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeNine";
     }
 
@@ -165,14 +219,21 @@ public class SweetHomeController {
 
         dto.setHomeImages(homeImages);
         session.setAttribute("homeWriteDTO", dto);
+        
         return "redirect:/home/writeTen";
     }
 
     @GetMapping("/writeTen")
     public String showWriteTen(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeTen";
     }
 
@@ -196,9 +257,15 @@ public class SweetHomeController {
 
     @GetMapping("/writeEleven")
     public String showWriteEleven(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeEleven";
     }
 
@@ -217,9 +284,15 @@ public class SweetHomeController {
 
     @GetMapping("/writeTwelve")
     public String showWriteTwelve(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
         model.addAttribute("homeWriteDTO", dto);
+        
         return "home/writeTwelve";
     }
 
@@ -229,7 +302,9 @@ public class SweetHomeController {
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
 
+        dto.setLocation(updatedDto.getLocation());
         dto.setCostBasic(updatedDto.getCostBasic());
+        dto.setCostExpen(updatedDto.getCostExpen());
         dto.setCheckIn(updatedDto.getCheckIn());
         dto.setCheckOut(updatedDto.getCheckOut());
         session.setAttribute("homeWriteDTO", dto);
@@ -237,12 +312,20 @@ public class SweetHomeController {
         return "redirect:/home/writeThirteen";
     }
 
-    // ================= WriteThirteen: 해시태그 최종 =================
 
     @GetMapping("/writeThirteen")
     public String showWriteThirteen(HttpSession session, Model model) {
+    	User userProfile = (User) session.getAttribute("userProfile");
+        if (userProfile == null) {
+            return "redirect:/user/login";
+        }
+        
         HomeWriteDTO dto = (HomeWriteDTO) session.getAttribute("homeWriteDTO");
         if (dto == null) return "redirect:/home/writeOne";
+        
+        System.out.println("현재 DTO 상태:");
+        System.out.println(dto);
+
         model.addAttribute("homeWriteDTO", dto);
         return "home/writeThirteen";
     }
@@ -291,6 +374,7 @@ public class SweetHomeController {
         return "home/writeComplete";
     }
     
+    /*
     @GetMapping("/write")
     public String showWriteForm(HttpSession session, Model model) {
         User userProfile = (User) session.getAttribute("userProfile");
@@ -338,5 +422,6 @@ public class SweetHomeController {
         redirectAttributes.addFlashAttribute("homeWriteDTO", homeWriteDTO);
         return "redirect:/home/write";
     }
+    */
 
 }

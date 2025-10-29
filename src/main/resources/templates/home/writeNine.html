@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>숙소 등록 9단계 - 숙소 사진 등록</title>
+<title>숙소 사진 등록</title>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -392,7 +392,7 @@ $(document).ready(function() {
             <!-- 로고 이미지를 넣어주세요 -->
             <img src="/img/icon/logo.png" width="100" alt="로고">
         </div>
-        <button class="exit-button" onclick="location.href='/'">저장 후 나가기</button>
+        <button class="exit-button" onclick="location.href='/'">나가기</button>
     </div>
 
     <div class="main-content-selection">
@@ -403,7 +403,7 @@ $(document).ready(function() {
         </p>
         
         <div class="image-upload-container">
-            <form id="writeNineForm" th:action="@{/home/writeTen}" method="post" th:object="${homeWriteDTO}" enctype="multipart/form-data">
+            <form id="writeNineForm" th:action="@{/home/writeNine}" method="post" th:object="${homeWriteDTO}" enctype="multipart/form-data">
                 
                 <!-- DTO 상태 유지를 위한 Hidden 필드 (이전 단계 데이터) -->
                 <input type="hidden" th:field="*{hostId}" />
