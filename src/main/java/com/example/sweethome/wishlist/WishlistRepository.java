@@ -16,8 +16,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
 	/**
 	 * 특정 숙소(Home)에 대해 특정 유저(User)가 좋아요를 이미 눌렀는지 확인
-	 * 
-	 * @param home 좋아요 대상 숙소
+	 * * @param home 좋아요 대상 숙소
 	 * @param user 좋아요를 누른 유저
 	 * @return 존재하면 true, 아니면 false
 	 */
@@ -25,21 +24,29 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
 	/**
 	 * 특정 폴더(WishlistFolder)에 저장된 모든 위시리스트 항목을 조회합니다.
-	 * 
-	 * @param folder 조회 대상 폴더
+	 * * @param folder 조회 대상 폴더
 	 * @return 해당 폴더에 속한 Wishlist 목록
 	 */
 	List<Wishlist> findByFolder(WishlistFolder folder);
 
 	/**
 	 * 특정 폴더에 속한 Wishlist 목록을 조회하며, 연결된 Home 엔티티를 즉시(Eagerly) 가져옵니다.
-	 * 
-	 * @param folder 조회 대상 폴더
+	 * * @param folder 조회 대상 폴더
 	 * @return 해당 폴더에 속한 Wishlist 목록 (Home이 로드된 상태)
 	 */
 	@Query("SELECT w FROM Wishlist w JOIN FETCH w.home WHERE w.folder = :folder")
 	List<Wishlist> findByFolderWithHome(@Param("folder") WishlistFolder folder);
 
+    /**
+     * 🚀 성능 개선용: 특정 유저의 모든 위시리스트 항목을 조회하며, 
+     * 연관된 폴더(Folder)와 숙소(Home) 엔티티를 모두 즉시(Eagerly) 로드합니다.
+     * 이 메서드는 DetailController의 N+1 문제를 해결하기 위해 사용됩니다.
+     * @param user 조회 대상 유저
+     * @return 해당 유저의 모든 Wishlist 목록 (Folder, Home이 로드된 상태)
+     */
+    @Query("SELECT w FROM Wishlist w JOIN FETCH w.folder wf JOIN FETCH w.home h WHERE w.user = :user")
+    List<Wishlist> findAllWishlistsByUserWithFolderAndHome(@Param("user") User user);
+    
 	/**
 	 * 특정 유저의 모든 폴더별 위시리스트 항목 개수를 조회합니다. 반환 값: List<Object[]> -> [folderIdx, count]
 	 */
