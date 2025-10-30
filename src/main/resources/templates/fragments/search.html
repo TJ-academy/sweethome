@@ -248,6 +248,9 @@
 	    const initialAdults = /*[[${adults != null ? adults : 0}]]*/ 0; 
 	    const initialChildren = /*[[${children != null ? children : 0}]]*/ 0;
 	    
+	    // ⭐⭐ [추가] 컨트롤러에서 전달받은 현재 필터 값 (초기화, 값이 없으면 빈 문자열) ⭐⭐
+	    const currentFilter = /*[[${currentFilter != null ? currentFilter : ''}]]*/ '';
+	    
 	    // ----------------------------------------------------------------------
 	    // 1. 여행지/여행자 관련 요소
 	    // ----------------------------------------------------------------------
@@ -310,7 +313,8 @@
 	        document.querySelector('.decrement-btn[data-type="child"]').disabled = childCount === 0;
 	    }
 	
-	    function performSearch() {
+	    // ⭐⭐⭐ [수정] performSearch 함수를 필터 값을 인수로 받도록 수정 ⭐⭐⭐
+	    function performSearch(newFilter = currentFilter) { // 기본값으로 현재 필터 사용
 	        const keyword = destinationInput.value.trim();
 	        const checkin = document.getElementById('checkin').value;
 	        const checkout = document.getElementById('checkout').value;
@@ -323,10 +327,15 @@
 	        searchParams.append('keyword', keyword);
 	        searchParams.append('adults', adultCount);
 	        searchParams.append('children', childCount);
+	        
 	        if(checkin) searchParams.append('checkin', checkin);
 	        if(checkout) searchParams.append('checkout', checkout);
-	        // 해시태그 배열을 쿼리 파라미터로 추가 (예: &hashtags=태그1&hashtags=태그2)
+	        
+	        // 해시태그 배열을 쿼리 파라미터로 추가
             selectedTags.forEach(tag => searchParams.append('hashtags', tag));
+            
+            // ⭐⭐ [추가] 필터 값을 쿼리 파라미터로 추가 ⭐⭐
+            if(newFilter) searchParams.append('filter', newFilter);
 	        
 	        window.location.href = `/search?${searchParams.toString()}`;
 	    }
@@ -385,13 +394,15 @@
 	
 	    searchButton.addEventListener('click', function(event) {
 	        event.preventDefault();
-	        performSearch();
+	        // 검색 버튼 클릭 시 현재 필터 값을 포함하여 검색 실행
+	        performSearch(currentFilter); 
 	    });
 	
 	    destinationInput.addEventListener('keypress', function(event) {
 	        if (event.key === 'Enter') {
 	            event.preventDefault();
-	            performSearch();
+	            // Enter 키 입력 시 현재 필터 값을 포함하여 검색 실행
+	            performSearch(currentFilter);
 	        }
 	    });
 	    
@@ -402,6 +413,8 @@
 	    // ----------------------------------------------------------------------
 	    const filterBtn = document.querySelector('.filterBtn');
 	    const filterPopup = document.getElementById('filterPopup');
+	    // ⭐⭐ [추가] 필터 라디오 버튼들을 가져옵니다. ⭐⭐
+	    const filterRadios = document.querySelectorAll('input[name="filter"]');
 	
 	    filterBtn.addEventListener('click', function(e) {
 	        e.stopPropagation();
@@ -413,6 +426,24 @@
 	        e.stopPropagation();
 	    });
 	    
+	    // ⭐⭐⭐ [핵심 추가 로직] 라디오 버튼 변경 감지 및 즉시 검색 실행 ⭐⭐⭐
+	    filterRadios.forEach(radio => {
+	        // 1. 초기 필터 상태 설정: 페이지 로드 시 현재 필터 값이 있다면 해당 라디오 버튼을 체크합니다.
+	        if (radio.value === currentFilter) {
+	            radio.checked = true;
+	        }
+	        
+	        // 2. change 이벤트 리스너: 라디오 버튼 선택 시 즉시 검색 실행
+	        radio.addEventListener('change', function() {
+	            if (this.checked) {
+	                // 필터 팝업을 닫고
+	                filterPopup.style.display = 'none'; 
+	                // 새로운 필터 값을 포함하여 검색 실행
+	                performSearch(this.value); 
+	            }
+	        });
+	    });
+
 	    // ----------------------------------------------------------------------
 	    // 3. 해시태그 관련 요소 (문제가 되었던 부분)
 	    // ----------------------------------------------------------------------

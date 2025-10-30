@@ -46,16 +46,5 @@ public class HomeApiController {
         return response;
     }
 
-    //숙소 검색
-    @GetMapping("/search")
-    public List<HomeResponseDto> searchHomes(
-            @RequestParam("keyword") String keyword,
-            @RequestParam(value = "adults", defaultValue = "0") int adults,
-            @RequestParam(value = "children", defaultValue = "0") int children) {
-
-        List<HomeResponseDto> searchResults = homeService.searchHomesByLocationAndMaxPeople(keyword, adults);
-
-        return searchResults;
-    }
     
 }

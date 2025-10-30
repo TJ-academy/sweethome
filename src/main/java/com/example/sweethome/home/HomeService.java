@@ -83,7 +83,7 @@ public class HomeService {
                 ))
                 .collect(Collectors.toList());
     }    
-    
+    /*
     public List<HomeResponseDto> searchHomesByLocationAndMaxPeople(String keyword, int adults) {
         // location 및 maxPeople 필터링 조건을 적용하여 Home 목록을 가져옵니다.
         List<Home> homes = homeRepository.findByLocationContainingIgnoreCaseAndMaxPeopleGreaterThanEqual(keyword, adults);
@@ -108,6 +108,67 @@ public class HomeService {
                         likeCountMap.getOrDefault(home.getIdx(), 0L)
                 ))
                 .collect(Collectors.toList());
+    }
+    */
+    public List<HomeResponseDto> searchHomesByLocationAndMaxPeople(
+            String keyword, 
+            int adults,
+            int children, 
+            String checkin, 
+            String checkout, 
+            List<String> hashtags, // 해시태그 파라미터
+            String filter // 필터(정렬 기준) 파라미터
+    ) {
+        // location 및 maxPeople 필터링 조건을 적용하여 Home 목록을 가져옵니다.
+        // (현재는 이 두 조건만 DB 쿼리에 반영하며, 나머지 조건은 추가 로직이 필요합니다.)
+        List<Home> homes = homeRepository.findByLocationContainingIgnoreCaseAndMaxPeopleGreaterThanEqual(keyword, adults);
+        
+        // ⭐⭐ [TODO] 해시태그, 날짜, 어린이 수에 대한 추가 필터링 로직이 필요합니다.
+        // if (hashtags != null && !hashtags.isEmpty()) { ... }
+        
+        if (homes.isEmpty()) return List.of();
+
+        List<Integer> homeIds = homes.stream().map(Home::getIdx).collect(Collectors.toList());
+
+        // 최적화: 검색된 숙소 ID들만 대상으로 좋아요 개수 조회 ('recommend' 필터에 사용)
+        List<Object[]> likeCounts = wishlistRepository.countWishlistsByHomeIds(homeIds);
+
+        Map<Integer, Long> likeCountMap = likeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // 3️⃣ Home + 좋아요 결합 → DTO 반환
+        List<HomeResponseDto> results = homes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+        
+        // ⭐⭐⭐ [핵심 추가 로직] 필터링 조건에 따라 최종 결과 정렬 ⭐⭐⭐
+        if (filter != null) {
+            switch (filter) {
+                case "price":
+                    // ➡️ 최저가 순: costBasic(기본 비용) 기준 오름차순 정렬
+                    // 💡 수정: HomeResponseDto에서 Home 엔티티를 거쳐 costBasic에 접근합니다.
+                    results.sort((dto1, dto2) -> Integer.compare(dto1.getHome().getCostBasic(), dto2.getHome().getCostBasic()));
+                    break;
+                case "review":
+                    // ➡️ 후기 많은 순: (reviewCount 필드를 사용하여 내림차순 정렬)
+                    // 💡 수정: HomeResponseDto에 추가된 reviewCount 필드를 사용합니다.
+                    results.sort((dto1, dto2) -> Long.compare(dto2.getReviewCount(), dto1.getReviewCount()));
+                    break;
+                case "recommend":
+                    // ➡️ 추천 많은 순: 좋아요 개수(likeCount) 기준 내림차순 정렬
+                    results.sort((dto1, dto2) -> Long.compare(dto2.getLikeCount(), dto1.getLikeCount()));
+                    break;
+                // default: 필터가 없거나 다른 값이면 기본 정렬 유지
+            }
+        }
+
+        return results;
     }
     
 

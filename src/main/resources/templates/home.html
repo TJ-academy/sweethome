@@ -15,7 +15,7 @@
 <div th:insert="fragments/header :: menuBar"></div>
 <div th:insert="fragments/search :: searchSection"></div>
 
-<div class="container d-flex justify-content-center align-items-center py-4" th:if="${param.keyword == null}">
+<div class="container d-flex justify-content-center align-items-center" th:if="${param.keyword == null}">
     <button 
         id="openRouletteModal" 
         class="btn btn-lg shadow-sm random" 
