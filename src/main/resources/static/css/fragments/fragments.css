@@ -174,6 +174,28 @@
 	justify-content: space-between; 
 }
 
+/* 1. 컨테이너의 너비를 고정하거나 최대화하여 중앙에 배치 */
+.navbar .container-fluid {
+    /* 기존: 100% 너비를 사용하지만, 특정 max-width를 설정하여 내용물을 중앙에 모으는 효과 */
+    max-width: 1380px; /* 메인 컨텐츠(.container)와 유사한 너비로 설정 */
+    padding-left: 15px; /* 양옆 기본 여백 (부트스트랩 기본값 유지 또는 조정) */
+    padding-right: 15px;
+    margin-left: auto; /* 중앙 정렬 */
+    margin-right: auto; /* 중앙 정렬 */
+}
+
+/* 2. 로고와 메뉴 항목 사이의 간격 확보 */
+.navbar-nav {
+    /* 로고 영역 (navbar-brand)과 메뉴 목록 (navbar-nav) 사이의 간격 */
+    margin-left: auto !important; /* ms-auto 클래스에 의해 이미 적용됨 */
+}
+
+/* 3. 메뉴바 자체의 상하 여백 */
+.navbar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
 /* 여행자 항목 내부의 인풋/레이블 영역이 공간을 최대한 차지하도록 */
 .search-item:last-child > div:first-child {
 	flex-grow: 1; 
