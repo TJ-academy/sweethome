@@ -189,7 +189,7 @@ function connect() {
         return;
     }
 	
-	const socket = new SockJS('/ws');
+	const socket = new SockJS('/ws-notify');
 	stompClient = Stomp.over(socket);
 	
 	stompClient.connect({}, function(frame) {
@@ -252,16 +252,41 @@ function showNotification() {
        	//알림 클릭했을 때
     	item.addEventListener('click', (e) => {
             e.stopPropagation(); // 알림 항목 클릭이 외부 클릭으로 간주되어 닫히지 않도록 방지
-            markAsRead(noti.id, item);
-            if(noti.notiType === "MESSAGE") {
-            	window.location.href='/chat/rooms';
-            } else if(noti.notiType === "RESERVATION") {
-            	window.location.href='/mypage/reservation';
-            } else if(noti.notiType === "HOSTREVIEW") {
-            	window.location.href='/host/review/list';
-            } else if(noti.notiType === "GUESTREVIEW") {
-            	window.location.href='/mypage/review';
+            
+            const notiIndex = notiDBList.findIndex(n => n.id === noti.id);
+
+            if (notiIndex === -1) {
+                console.warn("알림 ID를 notiDBList에서 찾을 수 없습니다:", id);
+                return;
             }
+
+            fetch(`/notifications/${noti.id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('읽음 처리 실패');
+                }
+                
+                // UI 갱신
+                notiDBList[notiIndex].status = 'READ';
+                item.classList.remove('new');
+                showNotification(); // 배지 업데이트 및 목록 정렬 유지
+                
+                if(noti.notiType === "MESSAGE") {
+                	window.location.href='/chat/rooms';
+                } else if(noti.notiType === "RESERVATION") {
+                	window.location.href='/mypage/reservation';
+                } else if(noti.notiType === "HOSTREVIEW") {
+                	window.location.href='/host/review/list';
+                } else if(noti.notiType === "GUESTREVIEW") {
+                	window.location.href='/mypage/review';
+                }
+            })
+            .catch(err => console.error('읽음 처리 중 오류:', err));
         });
     });
 	console.log("newCount : " + newCount);
@@ -301,47 +326,6 @@ function getNotiFromDB() {
 	});
 }
 
-function markAsRead(id, element) {
-	// 알림 항목을 notiDBList에서 찾습니다.
-    const notiIndex = notiDBList.findIndex(n => n.id === id);
-    const noti = notiDBList[notiIndex];
-
-    if (notiIndex === -1) {
-        console.warn("알림 ID를 notiDBList에서 찾을 수 없습니다:", id);
-        return;
-    }
-    
-	// 이미 읽은 상태라면 바로 닫기
-    /* if (!noti || noti.status === 'READ') {
-        notiPopup.style.display = 'none';
-        notiButton.setAttribute('aria-expanded', 'false');
-        return;
-    } */
-
-    fetch(`/notifications/${id}/read`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('읽음 처리 실패');
-        }
-        
-        // 데이터 상태 업데이트 및 UI 즉시 갱신
-        notiDBList[notiIndex].status = 'READ';
-        element.classList.remove('new');
-        showNotification(); // 배지 업데이트 및 목록 정렬 유지
-
-        // 알림 하나 읽음 처리 후 팝업 닫기
-        /* notiPopup.style.display = 'none';
-        notiButton.setAttribute('aria-expanded', 'false'); */
-    })
-    .catch(error => {
-        console.error('Error marking as read:', error);
-    });
-}
 
 function markAllAsRead() {
 	const notRead = notiDBList.filter(n => n.status === 'NEW');
