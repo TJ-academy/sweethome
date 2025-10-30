@@ -374,7 +374,7 @@ body {
 const myNickname = '[[${myNickname}]]';
 const myEmail = '[[${myEmail}]]';
 const roomId = /*[[${roomId}]]*/ null;
-/* let stompClient = null; */
+let chatStompClient = null;
 
 const messageInput = document.getElementById('messageInput');
 const chatForm = document.getElementById('chatForm');
@@ -386,6 +386,8 @@ const removePreview = document.getElementById("removePreview");
 // 선택된 채팅방 정보 (전역 저장)
 window.currentRoomId = null;
 window.otherEmail = null;
+
+connectRoom(myEmail);
 
 //페이지 로딩 시 선택된 채팅방있으면 그걸로 바로 출력
 window.addEventListener('DOMContentLoaded', () => {
@@ -471,7 +473,7 @@ async function openChatRoom(element) {
     window.otherEmail = data.otherEmail;
 
     // ✅ WebSocket 연결
-    connectRoom(data.roomId, data.myEmail);
+    //connectRoom(data.roomId, data.myEmail);
 
 	// ✅ 마지막 메시지 기준으로 읽음 상태 갱신 요청
 	if (data.messages.length > 0) {
@@ -486,6 +488,7 @@ async function openChatRoom(element) {
 	        roomItem.style.display = "none";
 	      }
 	      console.log("읽음 상태 업데이트 완료");
+	      console.log("lastRead: " + lastMsgId);
 	    }
 	  }).catch(err => console.error("읽음 처리 실패:", err));
 	}
@@ -497,19 +500,31 @@ async function openChatRoom(element) {
   }
 }
 
-/** ✅ WebSocket 연결 */
-function connectRoom(roomId, myEmail) {
-  if (stompClient) stompClient.disconnect(() => console.log("이전 방 연결 해제"));
-  const socket = new SockJS('/ws');
-  stompClient = Stomp.over(socket);
+/** ✅ WebSocket 연결 */  //roomId, 
+function connectRoom(myEmail) {
+  //if (chatStompClient) chatStompClient.disconnect(() => console.log("이전 방 연결 해제"));
+  const socket = new SockJS('/ws-chat');
+  chatStompClient = Stomp.over(socket);
 
-  stompClient.connect({}, () => {
-    console.log('Connected to room: ' + roomId);
+  chatStompClient.connect({}, () => {
+    console.log('Connected to chat: ');
 
     // ✅ 받은 myEmail 그대로 전달
-    stompClient.subscribe(`/topic/chat/${roomId}`, (output) => {
+    /* chatStompClient.subscribe(`/topic/chat/${roomId}`, (output) => {
       const msg = JSON.parse(output.body);
       showRealtimeMessage(msg, myEmail);
+    }); */
+    
+    document.querySelectorAll('.chat-room').forEach(room => {
+        const roomId = room.dataset.roomId;
+        chatStompClient.subscribe(`/topic/chat/${roomId}`, function(message) {
+            const msg = JSON.parse(message.body);
+            if (window.currentRoomId) {
+            	showRealtimeMessage(msg, myEmail);
+            } else {
+            	updateChatListPreview(msg, myEmail);
+            }
+        });
     });
   });
 }
@@ -543,11 +558,11 @@ function showRealtimeMessage(message, myEmail) {
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
   
-  updateChatListPreview(message);
+  updateChatListPreview(message, myEmail);
 }
 
-/* 채팅방 목록의 마지막 메시지 갱신 */
-function updateChatListPreview(message) {
+/* 채팅방 목록 갱신 */
+function updateChatListPreview(message, myEmail) {
   const roomItem = document.querySelector(`.chat-room[data-room-id="${message.roomId}"]`);
   if (!roomItem) return;
 
@@ -570,18 +585,25 @@ function updateChatListPreview(message) {
     hour12: true
   });
 
-  // 다른 사람이 메시지 보내만 “읽지 않은 수” +1
-  if (message.senderEmail !== myEmail) {
+  // 다른 사람이 메시지 보냈고, 
+  // 지금 그 채팅방을 보고 있지 않으면 
+  // “읽지 않은 수” +1
+  if ((message.senderEmail !== myEmail)
+		  && (window.currentRoomId != message.roomId)) {
     let unreadEl = roomItem.querySelector(".unread-count");
     if (!unreadEl) {
       unreadEl = document.createElement("div");
       unreadEl.className = "unread-count";
-      unreadEl.textContent = "1";
+      //unreadEl.textContent = "1";
       roomItem.appendChild(unreadEl);
-    } else {
+    } /* else {
       unreadEl.textContent = parseInt(unreadEl.textContent) + 1;
       unreadEl.style.display = "block";
-    }
+    } */
+    
+    let count = parseInt(unreadEl.innerText || '0');
+    count += 1;
+    unreadEl.innerText = count;
   }
 }
 
@@ -617,8 +639,8 @@ chatForm.addEventListener("submit", async (e) => {
 
 /* 메시지 전송 */
 function sendMessage(content, img="-") {
-  if (stompClient && stompClient.connected) {
-    stompClient.send("/app/message/send", {}, JSON.stringify({
+  if (chatStompClient && chatStompClient.connected) {
+	  chatStompClient.send("/app/message/send", {}, JSON.stringify({
       roomId: window.currentRoomId,
       senderNickname: myNickname,
       senderEmail: myEmail,
