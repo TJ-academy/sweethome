@@ -1,4 +1,6 @@
-
+/* ===============================
+   리뷰 상세 페이지 (UI 개선 버전)
+   =============================== */
 
 .mypage-content-area {
   background: #fff;
@@ -8,6 +10,7 @@
   min-height: 700px;
 }
 
+/* 제목 */
 .mypage-content-area h2 {
   font-size: 26px;
   font-weight: 700;
@@ -17,7 +20,7 @@
   padding-bottom: 10px;
 }
 
-
+/* 버튼 */
 .mypage-content-area .btn {
   border-radius: 10px;
   font-weight: 600;
@@ -30,120 +33,114 @@
   border-color: #ccc;
   color: #444;
 }
-
 .btn-outline-secondary:hover {
   background: #f3f3f3;
   color: #111;
 }
-
 .btn-primary {
   background-color: #4db2ff;
   border: none;
   box-shadow: none;
 }
-
 .btn-primary:hover {
   background-color: #3ca3ef;
-  box-shadow: none;
 }
 
-
+/* 카드 */
 .card {
   border-radius: 18px;
   border: 1px solid #eee;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
 }
-
+.card:hover {
+  transform: translateY(-2px);
+}
 .card-body {
-  padding: 28px 30px;
+  padding: 36px 38px;
 }
 
-.card h6 {
-  font-size: 15px;
-  font-weight: 600;
-  color: #333;
-}
-
+/* 숙소 정보 */
 .fs-5 {
-  font-size: 17px !important;
-  font-weight: 600;
+  font-size: 18px !important;
+  font-weight: 700;
   color: #111;
 }
-
-
-hr {
-  border-color: #f0f0f0;
-  margin: 25px 0;
-}
-
-
 .info-line {
   font-size: 14px;
   color: #777;
 }
 
-
+/* 별점 영역 */
 .star-display {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  margin-top: 8px;
+  margin-bottom: 12px;
 }
-
 .star-display i {
   font-style: normal;
-  font-size: 1.8rem;
+  font-size: 2rem;
   color: #ddd;
   transition: color 0.25s ease;
 }
-
 .star-display i.active {
   color: #ffc107;
 }
 
-
-.mypage-content-area p {
+/* 후기 내용 */
+.review-content-box {
+  background: #fafafa;
+  border-radius: 14px;
+  padding: 24px 26px;
+  margin-top: 20px;
+  border: 1px solid #f0f0f0;
+}
+.review-content-box h6 {
+  color: #888;
   font-size: 15px;
-  color: #555;
-  line-height: 1.6;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.review-content-box p {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.7;
   margin: 0;
+  white-space: pre-line;
 }
 
-
+/* 호스트 답글 */
 .badge.text-bg-info {
   background-color: #5ac8fa !important;
 }
-
 .card.bg-light {
   background: #f8f9fa !important;
   border-radius: 14px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-
 .text-end .btn-outline-secondary {
   border-color: #ccc;
   color: #444;
 }
-
 .text-end .btn-outline-secondary:hover {
   background: #f3f3f3;
   color: #111;
 }
 
-
+/* 반응형 */
 @media (max-width: 992px) {
   .mypage-content-area {
     padding: 40px 24px;
   }
-
   .card-body {
     padding: 22px 20px;
   }
-
-  .mypage-content-area h2 {
-    font-size: 22px;
+  .fs-5 {
+    font-size: 16px !important;
   }
-
   .star-display i {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 }

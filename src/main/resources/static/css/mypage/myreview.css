@@ -1,7 +1,12 @@
+@charset "UTF-8";
+
+/* ===============================
+   마이페이지 기본 구조
+=============================== */
 .mypage-content-area {
   background: #fff;
   border-radius: 20px;
-
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   padding: 60px 70px;
   min-height: 700px;
 }
@@ -15,8 +20,9 @@
   padding-bottom: 10px;
 }
 
-
-
+/* ===============================
+   탭 스타일
+=============================== */
 .nav-tabs {
   border-bottom: 2px solid #f1f1f1;
   margin-bottom: 25px;
@@ -34,67 +40,73 @@
 
 .nav-tabs .nav-link:hover {
   background: #f8f9fa;
-  color: #4db2ff;
+  color: #4DB2FF;
 }
 
 .nav-tabs .nav-link.active {
-  color: #4db2ff;
-  background: #eaf6ff;
+  color: #4DB2FF;
+  background: #EAF6FF;
   border: none;
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(77, 178, 255, 0.12);
 }
 
-
+/* ===============================
+   리뷰 카드
+=============================== */
 .review-card {
-  border: 1px solid #eee;
+  border: 1px solid #DBE9FF;
   border-radius: 18px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(77, 178, 255, 0.12);
   transition: all 0.25s ease;
 }
 
 .review-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-color: #4DB2FF;
+  box-shadow: 0 6px 15px rgba(77, 178, 255, 0.25);
+  background-color: #FAFDFF;
 }
 
 .review-card .card-body {
-  padding: 24px 26px;
+  padding: 1.6rem 1.8rem;
 }
 
+/* 제목 */
 .review-card h5.card-title {
   font-size: 17px;
   font-weight: 600;
   color: #111;
 }
 
-.review-card p {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.6;
-}
-
+/* 날짜 */
 .review-card small.text-muted {
   font-size: 13px;
   color: #888 !important;
 }
 
+/* 본문 */
+.review-card p {
+  font-size: 14.5px;
+  color: #444;
+  line-height: 1.6;
+  white-space: pre-line;
+}
 
-.review-card .badge {
-  font-size: 13px;
+/* 별점 뱃지 */
+.review-card .badge.text-bg-primary {
+  background-color: #FFD700 !important;
+  color: #222 !important;
   font-weight: 600;
+  font-size: 0.9rem;
   padding: 6px 10px;
   border-radius: 8px;
 }
 
-.text-bg-primary {
-  background-color: #4db2ff !important;
-}
-
-.text-bg-success {
-  background-color: #4dbb85 !important;
-}
-
-
+/* ===============================
+   버튼
+=============================== */
 .review-card .btn {
   border-radius: 10px;
   font-size: 13.5px;
@@ -104,47 +116,50 @@
 }
 
 .review-card .btn-outline-secondary {
-  border-color: #ccc;
-  color: #444;
+  border-color: #CFE3FF;
+  color: #4a4a4a;
 }
-
 .review-card .btn-outline-secondary:hover {
-  background-color: #f2f2f2;
-  color: #111;
+  background-color: #F2F8FF;
+  border-color: #4DB2FF;
+  color: #4DB2FF;
 }
 
 .review-card .btn-outline-primary {
-  border-color: #4db2ff;
-  color: #4db2ff;
+  border-color: #4DB2FF;
+  color: #4DB2FF;
 }
-
 .review-card .btn-outline-primary:hover {
-  background-color: #4db2ff;
+  background-color: #4DB2FF;
   color: #fff;
   box-shadow: 0 3px 6px rgba(77, 178, 255, 0.25);
 }
 
-
+/* ===============================
+   비어 있을 때
+=============================== */
 .empty-state {
   text-align: center;
-  font-size: 15px;
-  color: #777;
-  background: #fafafa;
-  padding: 40px 0;
-  border-radius: 12px;
+  background-color: #fff;
+  border: 1px solid #DBE9FF;
+  border-radius: 20px;
+  padding: 80px 0;
+  color: #9BB9D7;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 8px rgba(77, 178, 255, 0.1);
   margin-top: 40px;
 }
 
-
+/* ===============================
+   반응형
+=============================== */
 @media (max-width: 992px) {
   .mypage-content-area {
     padding: 40px 24px;
   }
-
   .review-card .card-body {
-    padding: 20px;
+    padding: 22px 20px;
   }
-
   .review-card h5.card-title {
     font-size: 16px;
   }
