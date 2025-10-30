@@ -12,9 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface AccommodationOptionRepository extends JpaRepository<AccommodationOption, AccommodationOptionId> {
 	
 	// 특정 Home 엔티티(숙소)에 연결된 모든 AccommodationOption 목록을 조회합니다.
-    // 🚀 성능 개선: Option 엔티티를 JOIN FETCH하여 N+1 문제를 방지합니다.
-    @Query("SELECT ao FROM AccommodationOption ao JOIN FETCH ao.option o WHERE ao.home = :home") // 👈 JOIN FETCH 적용
-    List<AccommodationOption> findByHome(@Param("home") Home home); // 👈 @Param 적용
+    // AccommodationOption 엔티티의 'home' 필드를 기준으로 검색합니다.
+    List<AccommodationOption> findByHome(Home home);
     
     /**
      * ✅ 숙소 ID 리스트를 받아 해당 숙소들의 옵션 정보를 한번에 조회합니다.
@@ -30,6 +29,9 @@ public interface AccommodationOptionRepository extends JpaRepository<Accommodati
     @Modifying
     void deleteByHome_Idx(int homeIdx);
     
-    @Query("SELECT ao FROM AccommodationOption ao WHERE ao.option.optionId = :optionId")
+    /**
+     * 🚀 N+1 최적화: 특정 옵션 ID에 해당하는 AccommodationOption과 연관된 Home 엔티티를 JOIN FETCH로 한 번에 조회합니다.
+     */
+    @Query("SELECT ao FROM AccommodationOption ao JOIN FETCH ao.home h WHERE ao.option.optionId = :optionId")
     List<AccommodationOption> findByOptionIdCustom(@Param("optionId") int optionId);
 }
