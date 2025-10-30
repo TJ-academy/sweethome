@@ -1,9 +1,13 @@
 package com.example.sweethome.user;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -110,38 +114,71 @@ public class HostController {
 	@GetMapping("/today")
 	public String today(HttpSession session, Model model) {
 
-		User user = (User) session.getAttribute("userProfile");
-		if (user == null)
-			return "redirect:/user/login";
+	    User user = (User) session.getAttribute("userProfile");
+	    if (user == null) {
+	        return "redirect:/user/login";
+	    }
 
-		// 1. 호스트의 모든 숙소 목록 조회 (숙소 필터링용)
-		// 🌟 추가된 부분
-        List<Home> myHomes = homeRepository.findByHost(user);
-        
-        // 2. 오늘 날짜 예약 내역 조회 (오늘 체크인, 체크아웃, 숙박 중인 예약)
-        // 이 부분은 서비스 레이어에서 처리하는 것이 좋으나, 임시로 리포지토리 메서드를 가정합니다.
-        // 현재 코드로만 판단할 때, '오늘의 예약 리스트'를 가져오는 로직이 필요합니다.
-        // 임시로 모든 예약을 가져오는 것으로 대체하고, 실제 구현 시 날짜 기반 쿼리로 변경해야 합니다.
-        // List<Reservation> todayReservations = reservationRepository.findTodayBookingsForHost(user.getEmail()); 
-        // findTodayBookingsForHost 메서드가 없다고 가정하고, 일단 모든 예약을 가져와서 템플릿에서 테스트할 수 있도록 합니다.
-        // List<Reservation> todayReservations = reservationRepository.findByReservedHome_Host(user);
-        
-        // 실제 운영 환경에서는 오늘 날짜에 해당하는 예약만 필터링해야 합니다.
-        // 임시로 호스트의 모든 확정된 예약을 가져와 템플릿에 전달합니다. (정확한 '오늘'의 예약 구현은 서비스 레이어에서 별도의 날짜 쿼리 필요)
-        List<Reservation> todayReservations = reservationRepository.findByReservedHome_Host(user);
+	    LocalDate today = LocalDate.now();
 
-        model.addAttribute("user", user);
-        // 🌟 숙소 필터링용 목록 추가
-        model.addAttribute("myHomes", myHomes); 
-        // 🌟 오늘의 예약 목록 추가
-        model.addAttribute("todayReservations", todayReservations); 
-        
-        // 오늘 날짜 (템플릿에 전달)
-        model.addAttribute("todayDate", java.time.LocalDate.now());
+	    // 1. 호스트의 모든 숙소 목록 조회 (모든 탭에서 공통 사용)
+	    List<Home> myHomes = homeRepository.findByHost(user);
 
-		return "host/today";
+	    // --- 2. 모든 예약 목록 조회 및 필터링 ---
+
+	    // A. '오늘' 탭 데이터
+	    List<Reservation> todayReservations = reservationRepository.findTodayBookingsForHost(user, today);
+
+	    // Null 체크 및 빈 리스트 할당 + 리스트 내 null 객체 필터링
+	    if (todayReservations == null) {
+	        todayReservations = List.of(); // 빈 리스트 할당
+	    } else {
+	        todayReservations = todayReservations.stream()
+	                                              .filter(Objects::nonNull) // null 요소 제거
+	                                              .collect(Collectors.toList());
+	    }
+
+	    // B. '예정' 탭 데이터
+	    List<Reservation> upcomingReservations = reservationRepository.findUpcomingCheckInsByHost(user, today);
+	    if (upcomingReservations == null) {
+	        upcomingReservations = List.of(); // 빈 리스트 할당
+	    } else {
+	        upcomingReservations = upcomingReservations.stream()
+	                                                   .filter(Objects::nonNull) // null 요소 제거
+	                                                   .collect(Collectors.toList());
+	    }
+
+	    // C. '예약' 탭 데이터
+	    List<ReservationStatus> requestStatuses = Arrays.asList(
+	        ReservationStatus.REQUESTED,
+	        ReservationStatus.CANCEL_REQUESTED
+	    );
+	    List<Reservation> requestReservations = reservationRepository.findReservationsByReservedHome_HostAndReservationStatusIn(
+	            user, requestStatuses);
+	    if (requestReservations == null) {
+	        requestReservations = List.of(); // 빈 리스트 할당
+	    } else {
+	        requestReservations = requestReservations.stream()
+	                                                 .filter(Objects::nonNull) // null 요소 제거
+	                                                 .collect(Collectors.toList());
+	    }
+
+	    // 3. Model에 데이터 바인딩
+	    model.addAttribute("user", user);
+	    model.addAttribute("myHomes", myHomes);
+
+	    // 탭별 데이터 전송
+	    model.addAttribute("todayReservations", todayReservations);
+	    model.addAttribute("upcomingReservations", upcomingReservations);
+	    model.addAttribute("requestReservations", requestReservations);
+
+	    model.addAttribute("todayDate", today);
+	    model.addAttribute("todayDateTime", java.time.LocalDateTime.now()); // 예정 탭 필터링 기준을 위해 추가
+	    model.addAttribute("currentTab", "today"); // 초기 활성 탭
+
+	    return "host/today";
 	}
-	
+
 	@org.springframework.web.bind.annotation.RequestMapping(
 	        value = "/reservation/detail/{reservationId}",
 	        method = {org.springframework.web.bind.annotation.RequestMethod.GET,
