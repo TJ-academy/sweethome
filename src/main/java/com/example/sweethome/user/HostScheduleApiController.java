@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import com.example.sweethome.reservation.CalendarEventDTO;
 import com.example.sweethome.reservation.DayScheduleItemDTO;
 import com.example.sweethome.reservation.Reservation;
 import com.example.sweethome.reservation.ReservationRepository;
+import com.example.sweethome.reservation.ReservationStatus;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -90,6 +92,15 @@ public class HostScheduleApiController {
         // 호스트의 숙소 예약 중 달력 표시 구간과 겹치는 것만
         List<Reservation> reservations = reservationRepository
                 .findOverlappingByHostAndRange(host, start, end);
+
+        //List<CalendarEventDTO> events = new ArrayList<>();
+        
+        // 예약 상태가 'CANCEL_REQUESTED', 'CANCELLED', 'REJECTED'인 예약은 제외
+        reservations = reservations.stream()
+                .filter(r -> !r.getReservationStatus().equals(ReservationStatus.CANCEL_REQUESTED)
+                        && !r.getReservationStatus().equals(ReservationStatus.CANCELLED)
+                        && !r.getReservationStatus().equals(ReservationStatus.REJECTED))
+                .collect(Collectors.toList());
 
         List<CalendarEventDTO> events = new ArrayList<>();
 
@@ -157,8 +168,12 @@ public class HostScheduleApiController {
         if (host == null) return ResponseEntity.status(401).build();
 
         // ✅ 정확히 일치로 분리 조회
-        List<Reservation> checkIns  = reservationRepository.findCheckInsByHostAndDate(host, date);
-        List<Reservation> checkOuts = reservationRepository.findCheckOutsByHostAndDate(host, date);
+        //List<Reservation> checkIns  = reservationRepository.findCheckInsByHostAndDate(host, date);
+        //List<Reservation> checkOuts = reservationRepository.findCheckOutsByHostAndDate(host, date);
+        
+     // ✅ 정확히 일치로 분리 조회 (ReservationRepository에서 새로운 메서드 사용)
+        List<Reservation> checkIns  = reservationRepository.findActiveCheckInsByHostAndDate(host, date);
+        List<Reservation> checkOuts = reservationRepository.findActiveCheckOutsByHostAndDate(host, date);
 
         List<DayScheduleItemDTO> items = new ArrayList<>();
 

@@ -9,19 +9,6 @@
   <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
   <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
   <link rel="stylesheet" th:href="@{/css/host/today.css}">
-<style>
-/* 필터 영역 분리 문제 해결 */
-.hidden {
-    display: none !important;
-}
-
-/* 필터 칩 래퍼들에도 필요 시 추가 */
-.status-filter-wrap.hidden,
-.period-filter-wrap.hidden,
-.request-filter-wrap.hidden {
-    display: none !important;
-}
-</style>
 </head>
 <body>
 <div th:insert="~{fragments/header :: menuBar}"></div>
@@ -59,9 +46,9 @@
           </div>
 
           <div class="chip-wrap period-filter-wrap hidden" id="filter-upcoming" th:classappend="${currentTab == 'upcoming' ? '' : 'hidden'}">
-          	  <button class="chip period-chip" data-period="3">3일 이내</button>
-              <button class="chip period-chip" data-period="7">7일 이내</button>
               <button class="chip period-chip active" data-period="30">30일 이내</button>
+              <button class="chip period-chip" data-period="7">7일 이내</button>
+              <button class="chip period-chip" data-period="3">3일 이내</button>
           </div>
 
           <div class="chip-wrap request-filter-wrap hidden" id="filter-requests" th:classappend="${currentTab == 'requests' ? '' : 'hidden'}">
@@ -83,39 +70,40 @@
               </thead>
 
               <tbody id="reservation-list">
-    
+                <!-- 오늘 예약 목록 -->
                 <th:block th:each="r : ${todayReservations}">
-                    <tr th:data-tab="today"
-                        th:data-home-idx="${r.reservedHome.idx}"
-                        th:attr="data-status-category=${#strings.equals(#temporals.format(r.startDate, 'yyyy-MM-dd'), todayDate) ? 'checkin' :
-                        (#strings.equals(#temporals.format(r.endDate, 'yyyy-MM-dd'), todayDate) ? 'checkout' : 'inuse')}"
-                        
-                        th:classappend="${currentTab == 'today' ? '' : 'hidden'}"
-                        >
-                        <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
-                    </tr>
+                  <tr th:data-tab="today"
+                      th:data-home-idx="${r.reservedHome.idx}"
+                      th:attr="data-status-category=${#strings.equals(#temporals.format(r.startDate, 'yyyy-MM-dd'), todayDate) ? 'checkin' :
+                      (#strings.equals(#temporals.format(r.endDate, 'yyyy-MM-dd'), todayDate) ? 'checkout' : 'inuse')}">
+                    <!-- 예약 정보를 표시하는 fragment 삽입 -->
+                    <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
+                  </tr>
                 </th:block>
 
+                <!-- 예정 예약 목록 -->
                 <th:block th:each="r : ${upcomingReservations}">
-                    <tr th:data-tab="upcoming"
-                        th:data-home-idx="${r.reservedHome.idx}"
-                        th:attr="data-start-date=${#temporals.format(r.startDate, 'yyyyMMdd')}"
-                        th:classappend="${currentTab == 'upcoming' ? '' : 'hidden'}"
-                        >
-                        <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
-                    </tr>
+                  <tr th:data-tab="upcoming"
+                      th:data-home-idx="${r.reservedHome.idx}"
+                      th:attr="data-start-date=${#temporals.format(r.startDate, 'yyyyMMdd')}"
+                      th:classappend="${currentTab == 'upcoming' ? '' : 'hidden'}">
+                    <!-- 예약 정보를 표시하는 fragment 삽입 -->
+                    <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
+                  </tr>
                 </th:block>
 
+                <!-- 예약 요청 목록 -->
                 <th:block th:each="r : ${requestReservations}">
-                    <tr th:data-tab="requests"
-                        th:data-home-idx="${r.reservedHome.idx}"
-                        th:attr="data-request-type=${r.reservationStatus.name() == 'REQUESTED' ? 'requested' : 'cancel'}"
-                        th:classappend="${currentTab == 'requests' ? '' : 'hidden'}"
-                        >
-                        <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
-                    </tr>
+                  <tr th:data-tab="requests"
+                      th:data-home-idx="${r.reservedHome.idx}"
+                      th:attr="data-request-type=${r.reservationStatus.name() == 'REQUESTED' ? 'requested' : 'cancel'}"
+                      th:classappend="${currentTab == 'requests' ? '' : 'hidden'}">
+                    <!-- 예약 정보를 표시하는 fragment 삽입 -->
+                    <th:block th:insert="~{host/today :: reservationRowContent(r=${r})}"></th:block>
+                  </tr>
                 </th:block>
 
+                <!-- 예약이 없을 때 표시할 메시지 -->
                 <tr id="empty-message-row" class="hidden">
                   <td colspan="5" class="text-center p-4 text-muted">선택된 조건에 맞는 예약이 없습니다.</td>
                 </tr>
@@ -129,25 +117,26 @@
   </div>
 </div>
 
-<div th:fragment="reservationRowContent(r)" style="display: none;">
+<!-- 예약 행을 처리하는 fragment 정의 -->
+<th:block th:fragment="reservationRowContent(r)">
     <td>
         <a th:href="@{|/host/reservation/detail/${r != null ? r.reservationIdx : ''}|}">
             <div class="home-cell">
-                <div class="home-title" th:text="${r != null ? r.reservedHome.title : 'Unknown Home'}"></div>
-                <div class="home-meta" th:text="${r != null ? r.reservedHome.location : 'Unknown Location'}"></div>
+                <div class="home-title" th:text="${r != null ? r.reservedHome.title : 'Unknown Home'}">평온한 집</div>
+                <div class="home-meta" th:text="${r != null ? r.reservedHome.location : 'Unknown Location'}">수원시</div>
             </div>
         </a>
     </td>
     
     <td>
         <a th:href="@{|/host/reservation/detail/${r != null ? r.reservationIdx : ''}|}" 
-           th:text="${r != null ? r.booker.nickname : 'Unknown Guest'}"></a>
+           th:text="${r != null ? r.booker.nickname : 'Unknown Guest'}">게스트 닉네임</a>
     </td>
     
     <td>
-        <span th:text="${r != null ? #temporals.format(r.startDate, 'MM/dd') : 'MM/DD'}"></span>
+        <span th:text="${r != null ? #temporals.format(r.startDate, 'MM/dd') : 'MM/DD'}">10/30</span>
         ~
-        <span th:text="${r != null ? #temporals.format(r.endDate, 'MM/dd') : 'MM/DD'}"></span>
+        <span th:text="${r != null ? #temporals.format(r.endDate, 'MM/dd') : 'MM/DD'}">11/02</span>
     </td>
     
     <td>
@@ -163,13 +152,15 @@
     <td>
         <a th:href="@{|/host/reservation/detail/${r != null ? r.reservationIdx : ''}|}" class="btn btn-outline-primary btn-sm">상세</a>
     </td>
-</div>
+</th:block>
+
+
 <script th:inline="javascript">
     /* <![CDATA[ */
     const TODAY_DATE_YMD = '[[${#temporals.format(todayDate, "yyyyMMdd")}]]';
     const rows = document.querySelectorAll('#reservation-list tr[data-tab]');
     const emptyMessageRow = document.getElementById('empty-message-row');
-    let activeTab = '[[${currentTab}]]'; // 서버에서 넘겨받은 초기 탭을 사용
+    let activeTab = 'today';
     let activeHomeIdx = 'all';
 
     // 1. 메인 탭 전환 및 필터 초기화
@@ -180,7 +171,7 @@
             
             activeTab = e.target.getAttribute('data-tab');
 
-            // 💡 탭별 필터 영역 표시/숨김 강화
+            // 탭별 필터 영역 표시/숨김
             document.getElementById('filter-today').classList.add('hidden');
             document.getElementById('filter-upcoming').classList.add('hidden');
             document.getElementById('filter-requests').classList.add('hidden');
@@ -217,17 +208,13 @@
             
             let isVisible = true;
 
-            // 💡 1) 메인 탭 필터링: 활성 탭과 다르면 무조건 숨기고 다음 행으로
+            // 1) 메인 탭 필터링
             if (rowTab !== activeTab) {
-                row.classList.add('hidden'); 
-                return; 
+                isVisible = false;
             }
 
-            // 활성 탭에 속하는 경우에만 초기 표시 (이후 필터링 로직을 따름)
-            row.classList.remove('hidden');
-
             // 2) 숙소 필터링
-            if (activeHomeIdx !== 'all' && rowHomeIdx !== activeHomeIdx) {
+            if (isVisible && activeHomeIdx !== 'all' && rowHomeIdx !== activeHomeIdx) {
                 isVisible = false;
             }
 
@@ -242,14 +229,13 @@
                     const rowStartDateStr = row.getAttribute('data-start-date'); // YYYYMMDD
                     const periodDays = parseInt(filterValue, 10);
                     
-                    if (periodDays !== 30) {
+                    if (periodDays !== 30) { // 30일 이내는 기본적으로 가져온 데이터 전체를 의미
                         const rowStartDate = new Date(rowStartDateStr.substring(0, 4), rowStartDateStr.substring(4, 6) - 1, rowStartDateStr.substring(6, 8));
                         
                         const diffTime = rowStartDate.getTime() - today.getTime();
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                         
-                        // 체크인 예정일이 오늘 날짜보다 크고 (diffDays > 0) 필터 기간 이내인 경우만 표시
-                        if (diffDays > periodDays || diffDays <= 0) { 
+                        if (diffDays > periodDays || diffDays <= 0) {
                             isVisible = false;
                         }
                     }
@@ -275,8 +261,6 @@
     // 3. 숙소 필터 이벤트 리스너 (공통)
     document.querySelectorAll('.home-filter-wrap .chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
-            document.querySelectorAll('.home-filter-wrap .chip').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
             activeHomeIdx = e.target.getAttribute('data-home-idx');
             updateReservationList();
         });
