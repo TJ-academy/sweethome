@@ -86,6 +86,7 @@ public class ChatController {
 		map.put("lastRead", guestCU.getLastRead());
 		map.put("otherEmail", host.getEmail());
 		map.put("otherNickname", host.getNickname());
+		map.put("otherProfileImg", host.getProfileImg());
 		map.put("messages", messageList);
 		model.addAllAttributes(map);
 		
@@ -143,6 +144,7 @@ public class ChatController {
 		map.put("lastRead", me.getLastRead());
 		map.put("otherEmail", other.getUser().getEmail());
 		map.put("otherNickname", other.getUser().getNickname());
+		map.put("otherProfileImg", other.getUser().getProfileImg());
 		map.put("messages", messageList);
 		
 		return map;

@@ -316,6 +316,12 @@ body {
     <div th:each="room : ${roomsList}" class="chat-room"
          th:attr="data-room-id=${room.roomId}, data-room-name=${room.roomName}"
          onclick="openChatRoom(this)">
+      <div class="profile-img">
+	    <img class="chat-room-img"
+	    th:src="${room.profileImg}" alt="프로필" 
+	    onerror="this.src='/img/userProfile/default.png'"
+	    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+	  </div>
       <div class="room-name" th:text="${room.roomName}">상대방 이름</div>
       <div class="last-message" th:text="${room.lastMessage}">마지막 메시지</div>
       <div class="last-message-time" th:text="${#dates.format(room.lastMessageTime, 'MM/dd HH:mm')}">
@@ -421,6 +427,7 @@ async function openChatRoom(element) {
     window.otherEmail = data.otherEmail;
     window.myNickname = data.myNickname;
     window.otherNickname = data.otherNickname;
+    window.otherProfileImg = data.otherProfileImg;
     
     chatBox.innerHTML = "";
 	data.messages.forEach(msg => {
@@ -429,8 +436,18 @@ async function openChatRoom(element) {
 	    ? "message message-out"
 	    : "message message-in";
 	
-	  div.innerHTML = `
-	    <div class="meta ${msg.senderEmail === data.myEmail ? 'meta-right' : 'meta-left'}">
+	  div.innerHTML = `<div class="meta ${msg.senderEmail === data.myEmail ? 'meta-right' : 'meta-left'}">`;
+	  if (msg.senderEmail !== data.myEmail) {
+		  div.innerHTML += `
+		  	  <img class="otherProfileImg" 
+			  src="${otherProfileImg}" alt="프로필" 
+	  	      onerror="this.src='/img/userProfile/default.png'"
+	  		  style="width: 30px; height: 30px; 
+		  	  border-radius: 50%; object-fit: cover; 
+		  	  margin-right:5px;">`;
+	  }
+
+	  div.innerHTML += `
 	      <span class="nickname">${msg.senderNickname}</span>
 	      <span class="time">${new Date(msg.sendedAt).toLocaleTimeString('ko-KR', {
 	        hour:'2-digit', minute:'2-digit', hour12:true
