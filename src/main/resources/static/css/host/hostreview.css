@@ -1,0 +1,501 @@
+@charset "UTF-8";
+
+/* ===============================
+   기본 레이아웃
+=============================== */
+body {
+  background-color: #f8fbff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #222;
+}
+
+/* ===============================
+   제목 영역
+=============================== */
+h1.mb-4 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.text-muted {
+  font-size: 0.95rem;
+  color: #777 !important;
+}
+
+/* ===============================
+   빈 상태 표시
+=============================== */
+.empty-state {
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #dbe9ff;
+  border-radius: 20px;
+  padding: 80px 0;
+  color: #9bb9d7;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(77, 178, 255, 0.1);
+}
+
+/* ===============================
+   리뷰 카드 (리스트용)
+=============================== */
+.review-card {
+  border: 1px solid #dbe9ff;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(77, 178, 255, 0.08);
+  transition: all 0.2s ease;
+}
+.review-card:hover {
+  transform: translateY(-3px);
+  border-color: #4DB2FF;
+  box-shadow: 0 6px 12px rgba(77, 178, 255, 0.25);
+  background-color: #fafdff;
+}
+.review-card .card-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.4rem 1.6rem;
+}
+
+/* 카드 상단 (숙소 + 별점) */
+.review-card h5.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  color: #222;
+}
+.review-card small {
+  font-size: 0.85rem;
+  color: #666;
+}
+.review-card .badge.text-bg-success {
+  background-color: #FFD700 !important; /* ⭐ 금색 별점 */
+  color: #111 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* 후기 본문 */
+.review-card p {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+/* 하단 상태 뱃지 */
+.review-card .badge.bg-info {
+  background-color: #e4f4ff !important;
+  color: #1e87d3 !important;
+  font-weight: 600;
+}
+.review-card .badge.bg-warning {
+  background-color: #fff4d9 !important;
+  color: #b68a00 !important;
+  font-weight: 600;
+}
+
+/* 카드 3개씩 배치 */
+.vstack.gap-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* ===============================
+   답글 작성 / 수정 카드 공통
+=============================== */
+.card.bg-light {
+  background-color: #ffffff !important;
+  border: 1px solid #dbe9ff;
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(77, 178, 255, 0.1);
+  transition: all 0.2s ease;
+}
+.card.bg-light:hover {
+  box-shadow: 0 5px 15px rgba(77, 178, 255, 0.2);
+  border-color: #4DB2FF;
+  background-color: #fafdff;
+}
+
+.card-header {
+  background-color: #f3f9ff;
+  border-bottom: 1px solid #dbe9ff;
+  border-radius: 16px 16px 0 0 !important;
+  color: #222;
+}
+.card-header h5 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+.card .badge.text-bg-success {
+  background-color: #FFD700 !important;
+  color: #111 !important;
+  font-weight: 600;
+}
+.card-body p {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.6;
+}
+.card-text.border-start {
+  background-color: #f8fcff;
+  border-left: 4px solid #4DB2FF !important;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+}
+
+/* ===============================
+   폼 영역 (작성 + 수정)
+=============================== */
+label.form-label {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+textarea.form-control {
+  border: 1px solid #cfe3ff;
+  background-color: #fafdff;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  color: #222;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+textarea.form-control:focus {
+  border-color: #4DB2FF;
+  box-shadow: 0 0 0 3px rgba(77, 178, 255, 0.15);
+  outline: none;
+}
+
+/* ===============================
+   버튼 (공통)
+=============================== */
+.btn {
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+/* 파란 버튼 */
+.btn-primary {
+  background-color: #4DB2FF;
+  border: none;
+  color: #fff;
+}
+.btn-primary:hover {
+  background-color: #2f9cff;
+}
+
+/* 회색 버튼 */
+.btn-secondary {
+  background-color: #dee7f2;
+  border: none;
+  color: #333;
+}
+.btn-secondary:hover {
+  background-color: #d0e7ff;
+  color: #1a1a1a;
+}
+
+/* 리스트 내부 버튼 */
+.review-card .btn {
+  font-size: 0.85rem;
+  padding: 5px 12px;
+}
+.review-card .btn-outline-secondary {
+  border-color: #cbd7e6;
+  color: #555;
+}
+.review-card .btn-outline-secondary:hover {
+  background-color: #f2f8ff;
+  border-color: #4DB2FF;
+  color: #4DB2FF;
+}
+.review-card .btn-outline-primary {
+  border-color: #4DB2FF;
+  color: #4DB2FF;
+}
+.review-card .btn-outline-primary:hover {
+  background-color: #4DB2FF;
+  color: #fff;
+}
+
+/* ===============================
+   반응형
+=============================== */
+@media (max-width: 768px) {
+  .col-md-9 {
+    margin-top: 2rem;
+  }
+}
+
+
+/* ===============================
+   답글 작성 / 수정 카드 통합 디자인
+=============================== */
+.reply-card {
+  background-color: #fff;
+  border: 1px solid #dbe9ff;
+  border-radius: 18px;
+  box-shadow: 0 2px 6px rgba(77, 178, 255, 0.12);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+.reply-card:hover {
+  box-shadow: 0 6px 14px rgba(77, 178, 255, 0.25);
+  border-color: #4DB2FF;
+  background-color: #fafdff;
+}
+
+/* 카드 내부: 리뷰 원문 섹션 */
+.reply-card .review-section {
+  background-color: #f8fcff;
+  padding: 1.5rem 1.8rem;
+  border-bottom: 1px solid #dbe9ff;
+}
+.reply-card .review-section h5 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.reply-card .review-section small {
+  color: #666;
+}
+.reply-card .review-section p {
+  margin-top: 0.8rem;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.55;
+  border-left: 4px solid #4DB2FF;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+}
+
+/* 카드 내부: 답글 폼 섹션 */
+.reply-card .form-section {
+  padding: 1.8rem;
+}
+.reply-card label.form-label {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+.reply-card textarea.form-control {
+  border: 1px solid #cfe3ff;
+  background-color: #fafdff;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  color: #222;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.reply-card textarea.form-control:focus {
+  border-color: #4DB2FF;
+  box-shadow: 0 0 0 3px rgba(77, 178, 255, 0.15);
+  outline: none;
+}
+.reply-card .btn-area {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* 버튼 통일 */
+.reply-card .btn {
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.reply-card .btn-primary {
+  background-color: #4DB2FF;
+  border: none;
+  color: #fff;
+}
+.reply-card .btn-primary:hover {
+  background-color: #2f9cff;
+}
+.reply-card .btn-secondary {
+  background-color: #dee7f2;
+  border: none;
+  color: #333;
+}
+.reply-card .btn-secondary:hover {
+  background-color: #d0e7ff;
+  color: #1a1a1a;
+}
+
+/* ===============================
+   리뷰 상세 페이지 전용 스타일
+=============================== */
+.detail-review {
+  border: 1px solid #dbe9ff;
+  border-radius: 18px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(77, 178, 255, 0.12);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.detail-review:hover {
+  box-shadow: 0 6px 15px rgba(77, 178, 255, 0.25);
+  border-color: #4DB2FF;
+  background-color: #fafdff;
+}
+
+/* 카드 헤더 */
+.detail-review .card-header {
+  background-color: #f3f9ff;
+  border-bottom: 1px solid #dbe9ff;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 18px 18px 0 0 !important;
+}
+.detail-review .card-header h5 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #222;
+}
+.detail-review .card-header .badge {
+  background-color: #FFD700 !important;
+  color: #111 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* 카드 본문 */
+.detail-review .card-body {
+  padding: 1.6rem 1.8rem;
+}
+.detail-review .card-body h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  color: #555;
+}
+.detail-review .card-body p.card-text {
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #f8fcff;
+  border-left: 4px solid #4DB2FF;
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.detail-review small.text-muted {
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-top: 0.6rem;
+}
+
+/* ===============================
+   호스트 답글 영역
+=============================== */
+.host-reply-card {
+  border: 1px solid #dbe9ff;
+  border-radius: 18px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(77, 178, 255, 0.12);
+  padding: 1.5rem 1.8rem;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+.host-reply-card:hover {
+  border-color: #4DB2FF;
+  box-shadow: 0 6px 15px rgba(77, 178, 255, 0.22);
+  background-color: #fafdff;
+}
+.host-reply-card p {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.55;
+  margin-bottom: 0.6rem;
+}
+.host-reply-card small {
+  font-size: 0.85rem;
+  color: #777;
+}
+.host-reply-card .btn {
+  margin-top: 0.8rem;
+}
+
+/* 답글이 없을 때 (빈 상태 카드) */
+.reply-empty {
+  background-color: #fffdf7;
+  border: 1px dashed #ffd85c;
+  border-radius: 18px;
+  text-align: center;
+  padding: 2.5rem 1rem;
+  box-shadow: 0 2px 6px rgba(255, 216, 92, 0.15);
+  color: #b68a00;
+}
+.reply-empty p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  color: #b68a00;
+}
+.reply-empty .btn-warning {
+  background-color: #ffd85c;
+  border: none;
+  color: #111;
+  font-weight: 600;
+}
+.reply-empty .btn-warning:hover {
+  background-color: #ffcb28;
+  color: #111;
+}
+
+/* ===============================
+   하단 버튼 영역
+=============================== */
+.back-btn-area {
+  margin-top: 3rem;
+  text-align: center;
+}
+.back-btn-area .btn-secondary {
+  font-size: 0.95rem;
+  font-weight: 500;
+  background-color: #dee7f2;
+  color: #333;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+}
+.back-btn-area .btn-secondary:hover {
+  background-color: #d0e7ff;
+  color: #1a1a1a;
+}
+
+/* ===============================
+   반응형 보정
+=============================== */
+@media (max-width: 768px) {
+  .detail-review .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .detail-review .card-body {
+    padding: 1.2rem;
+  }
+  .host-reply-card {
+    padding: 1.2rem;
+  }
+}
+
