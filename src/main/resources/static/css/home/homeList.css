@@ -170,3 +170,14 @@ h2 {
     display: block; /* 캔버스 하단 여백 제거 */
 }
 
+.random {
+	border-color: #4DB2FF; 
+	color: #4DB2FF; 
+	background: white;
+}
+
+.random:hover {
+	background-color: #4DB2FF;
+	color: white; 
+	border-color: white;
+}
