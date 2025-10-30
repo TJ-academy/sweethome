@@ -12,14 +12,8 @@
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
 <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
 <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
-<style>
-.star-badge {
-	font-weight: 600;
-}
+<link rel="stylesheet" th:href="@{/css/mypage/myreview_detail.css}">
 
-.info-line {
-	color: #6c757d;
-}
 </style>
 </head>
 <body>
@@ -68,10 +62,11 @@
 
 							<div
 								class="d-flex align-items-center justify-content-between mb-2">
-								<div class="star-badge">
-									<span class="badge text-bg-warning"
-										th:text="|★ ${review.star}|">★ 5</span>
+								<div class="star-display">
+								  <i th:each="i : ${#numbers.sequence(1,5)}"
+								     th:classappend="${i <= review.star} ? 'active' : ''">★</i>
 								</div>
+
 								<small class="text-muted"
 									th:text="${#temporals.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.01
 									12:00</small>
