@@ -1,9 +1,11 @@
 package com.example.sweethome.home;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.sweethome.user.User;
 
@@ -23,5 +25,20 @@ public interface HomeRepository extends JpaRepository<Home, Integer> {
     
     //단체숙소 조회
     List<Home> findByMaxPeopleGreaterThanEqual(int maxPeople);
+    
+ // Fetch Join을 사용하여 Home과 Host를 한 번에 가져옵니다.
+    @Query("SELECT h FROM Home h JOIN FETCH h.host")
+    List<Home> findAllHomesWithHost();
+
+    @Query("SELECT h FROM Home h JOIN FETCH h.host WHERE h.location LIKE CONCAT('%', :location, '%')")
+    List<Home> findByLocationContainingIgnoreCaseWithHost(@Param("location") String location);
+    
+    // HomeRepository.java (인터페이스)
+    @Query("SELECT h FROM Home h "
+         + "JOIN FETCH h.host "              // Host 정보 Eager 로딩
+         + "LEFT JOIN FETCH h.homePhoto "    // HomePhoto 정보 Eager 로딩
+         + "LEFT JOIN FETCH h.hashtag "      // Hashtag 정보 Eager 로딩 (Hashtag 엔티티가 Home과 OneToOne/ManyToOne 관계라고 가정)
+         + "WHERE h.idx = :idx")
+    Optional<Home> findByIdWithAll(@Param("idx") int idx);
 }
 

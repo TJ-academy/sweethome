@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.sweethome.home.HomeResponseDto;
 import com.example.sweethome.home.HomeService;
@@ -30,18 +31,19 @@ public class HomeController {
         List<HomeResponseDto> homeList = homeService.getHomeListWithLikeCounts();
         model.addAttribute("homeList", homeList);
 
-        // 2. 서울의 인기 숙소 조회
-        List<HomeResponseDto> seoulHomeList = homeService.getSeoulPopularHomesWithLikeCounts();
-        model.addAttribute("seoulHomeList", seoulHomeList); 
-        
-        // 3. 장기숙박 인기 숙소 조회
-        List<HomeResponseDto> longTermHomeList = homeService.getLongTermPopularHomesWithLikeCounts();
-        model.addAttribute("longTermHomeList", longTermHomeList);
-        
-	    // 4. 단체 숙소 인기 목록 조회 
-        List<HomeResponseDto> largeHomeList = homeService.getLargePopularHomesWithLikeCounts();
-        model.addAttribute("largeHomeList", largeHomeList);
-        
+		/*
+		 * // 2. 서울의 인기 숙소 조회 List<HomeResponseDto> seoulHomeList =
+		 * homeService.getSeoulPopularHomesWithLikeCounts();
+		 * model.addAttribute("seoulHomeList", seoulHomeList);
+		 * 
+		 * // 3. 장기숙박 인기 숙소 조회 List<HomeResponseDto> longTermHomeList =
+		 * homeService.getLongTermPopularHomesWithLikeCounts();
+		 * model.addAttribute("longTermHomeList", longTermHomeList);
+		 * 
+		 * // 4. 단체 숙소 인기 목록 조회 List<HomeResponseDto> largeHomeList =
+		 * homeService.getLargePopularHomesWithLikeCounts();
+		 * model.addAttribute("largeHomeList", largeHomeList);
+		 */
         // 사용자 프로필 세션 처리
         User userProfile = (User) session.getAttribute("userProfile");
         if (session.getAttribute("kakaouser") != null) {
@@ -52,6 +54,24 @@ public class HomeController {
         }
 
         return "home";
+    }
+    
+    @GetMapping("/api/home/seoul")
+    @ResponseBody
+    public List<HomeResponseDto> getSeoulHomesApi() {
+        return homeService.getSeoulPopularHomesWithLikeCounts();
+    }
+
+    @GetMapping("/api/home/longterm")
+    @ResponseBody
+    public List<HomeResponseDto> getLongTermHomesApi() {
+        return homeService.getLongTermPopularHomesWithLikeCounts();
+    }
+
+    @GetMapping("/api/home/largegroup")
+    @ResponseBody
+    public List<HomeResponseDto> getLargeGroupHomesApi() {
+        return homeService.getLargePopularHomesWithLikeCounts();
     }
 
     /** ✅ /home은 "/"로 리다이렉트 */

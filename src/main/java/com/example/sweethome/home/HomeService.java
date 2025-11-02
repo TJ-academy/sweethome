@@ -153,7 +153,9 @@ public class HomeService {
                 case "price":
                     // ➡️ 최저가 순: costBasic(기본 비용) 기준 오름차순 정렬
                     // 💡 수정: HomeResponseDto에서 Home 엔티티를 거쳐 costBasic에 접근합니다.
-                    results.sort((dto1, dto2) -> Integer.compare(dto1.getHome().getCostBasic(), dto2.getHome().getCostBasic()));
+                   //  results.sort((dto1, dto2) -> Integer.compare(dto1.getHome().getCostBasic(), dto2.getHome().getCostBasic()));
+                	 results.sort((dto1, dto2) -> Integer.compare(dto1.getCostBasic(), dto2.getCostBasic()));
+                     
                     break;
                 case "review":
                     // ➡️ 후기 많은 순: (reviewCount 필드를 사용하여 내림차순 정렬)

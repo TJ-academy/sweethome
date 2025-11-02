@@ -5,57 +5,115 @@
 <title>홈 스윗 홈</title>
 
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet" crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+	crossorigin="anonymous"></script>
 
 <link rel="stylesheet" th:href="@{/css/home/homeList.css}">
 </head>
 
 <body>
-<div th:insert="fragments/header :: menuBar"></div>
-<div th:insert="fragments/search :: searchSection"></div>
+	<div th:insert="fragments/header :: menuBar"></div>
+	<div th:insert="fragments/search :: searchSection"></div>
 
-<div class="container d-flex justify-content-center align-items-center" th:if="${param.keyword == null}">
-    <button 
-        id="openRouletteModal" 
-        class="btn btn-lg shadow-sm random" 
-        data-bs-toggle="modal" 
-        data-bs-target="#rouletteModal">
-        <img src="/img/icon/tripRandom.png" width="30" class="me-2" alt="랜덤 아이콘">
-        여행지 룰렛
-    </button>
-</div>
+	<div class="container d-flex justify-content-center align-items-center"
+		th:if="${param.keyword == null}">
+		<button id="openRouletteModal" class="btn btn-lg shadow-sm random"
+			data-bs-toggle="modal" data-bs-target="#rouletteModal">
+			<img src="/img/icon/tripRandom.png" width="30" class="me-2"
+				alt="랜덤 아이콘"> 여행지 룰렛
+		</button>
+	</div>
 
-<div class="container">
-    <div class="list-header-toggle" id="listHeaderToggle">
-        <h2 th:text="${param.keyword != null ? '검색 결과' : '전체 숙소 목록'}">전체 숙소 목록</h2>
-        <span class="toggle-arrow"></span>
-    </div>
-    <div id="homeListContainer" class="row">
-        <div class="home-item" th:each="homeDto, iterStat : ${homeList}" 
-             th:classappend="${iterStat.index >= 10} ? 'hidden-item'">
-            <a th:href="@{/home/detail/{homeIdx}(
-			    homeIdx=${homeDto.home.idx}, 
+	<div class="container">
+		<div class="list-header-toggle" id="listHeaderToggle">
+			<h2 th:text="${param.keyword != null ? '검색 결과' : '전체 숙소 목록'}">전체
+				숙소 목록</h2>
+			<span class="toggle-arrow"></span>
+		</div>
+		<div id="homeListContainer" class="row">
+			<div class="home-item" th:each="homeDto, iterStat : ${homeList}"
+				th:classappend="${iterStat.index >= 10} ? 'hidden-item'">
+				<a
+					th:href="@{/home/detail/{homeIdx}(
+			    homeIdx=${homeDto.idx}, 
 			    keyword=${keyword}, 
 			    checkin=${checkin}, 
 			    checkout=${checkout}, 
 			    adults=${adults}, 
-			    children=${children})}" class="home-link">
-                <img th:src="${homeDto.home.thumbnail != null && !homeDto.home.thumbnail.isEmpty() ? homeDto.home.thumbnail : '/images/no-image.jpg'}"
-                     alt="숙소 이미지" class="home-img">
-            </a>
-            <div class="home-text">
-                <h3 class="home-title" th:text="${homeDto.home.title}">숙소 제목</h3>
-                <p class="home-desc" th:text="${homeDto.home.address}">숙소 주소</p>
-                <p class="home-like">❤️ <span th:text="${homeDto.likeCount}">0</span></p>
+			    children=${children})}"
+					class="home-link"> <img
+					th:src="${homeDto.thumbnail != null && !homeDto.thumbnail.isEmpty() ? homeDto.thumbnail : '/images/no-image.jpg'}"
+					alt="숙소 이미지" class="home-img">
+				</a>
+				<div class="home-text">
+					<h3 class="home-title" th:text="${homeDto.title}">숙소 제목</h3>
+					<p class="home-desc" th:text="${homeDto.address}">숙소 주소</p>
+					<p class="home-like">
+						❤️ <span th:text="${homeDto.likeCount}">0</span>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div th:if="${#lists.isEmpty(homeList)}" class="no-home">
+			<p>등록된 숙소가 없습니다.</p>
+		</div>
+	</div>
+
+<div class="container seoul-list-container"
+    th:if="${param.keyword == null}">
+    <div class="list-header-toggle" id="seoulListHeader">
+    <h2>서울의 인기 숙소</h2>
+    <span class="toggle-arrow"></span>
+    </div>
+    <div id="seoulHomeListContainer" class="row">
+        <div id="seoulHomeListPlaceholder" class="text-center py-5"
+            style="grid-column: 1/-1;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     </div>
-    <div th:if="${#lists.isEmpty(homeList)}" class="no-home">
-        <p>등록된 숙소가 없습니다.</p>
-    </div>
 </div>
 
+	<div class="container long-term-list-container"
+		th:if="${param.keyword == null}">
+		<div class="list-header-toggle" id="longTermListHeaderToggle">
+			<h2>장기 숙박 인기 숙소</h2>
+			<span class="toggle-arrow"></span>
+		</div>
+		<div id="longTermHomeListContainer" class="row">
+			<div id="longTermListPlaceholder" class="text-center py-5"
+				style="grid-column: 1/-1;">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container large-group-list-container"
+		th:if="${param.keyword == null}">
+		<div class="list-header-toggle" id="largeGroupListHeaderToggle">
+			<h2>단체로 놀기 좋은 넓은 숙소</h2>
+			<span class="toggle-arrow"></span>
+		</div>
+		<div class="row large-group-home-list"
+			id="largeGroupHomeListContainer">
+			<div id="largeGroupListPlaceholder" class="text-center py-5"
+				style="grid-column: 1/-1;">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- 가희 - 로딩속도 개선중
 <div class="container seoul-list-container" th:if="${param.keyword == null}">
     <h2>서울의 인기 숙소</h2>
     <div class="row seoul-home-list">
@@ -125,92 +183,184 @@
         <p>현재 단체 숙소 인기 숙소가 없습니다.</p>
     </div>
 </div>
+-->
 
-<div class="modal fade" id="rouletteModal" tabindex="-1" aria-labelledby="rouletteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex flex-column align-items-center">
-            
-            <div class="roulette-display">
-                <canvas id="regionRoulette" width="300" height="300"></canvas> 
-                <div id="roulette-pointer"></div>
-            </div>
-            
-            <div id="spinIcon" class="mt-3 text-primary fw-bold" style="font-size: 1.2rem; cursor: pointer; user-select: none;">
-                <img src="/img/icon/random.png" width="30">
-            </div>
+	<div class="modal fade" id="rouletteModal" tabindex="-1"
+		aria-labelledby="rouletteModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="d-flex flex-column align-items-center">
 
-            <p id="rouletteResult" class="mt-3 fs-5 fw-bold text-center" style="min-height: 1.5rem;"></p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
+						<div class="roulette-display">
+							<canvas id="regionRoulette" width="300" height="300"></canvas>
+							<div id="roulette-pointer"></div>
+						</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // ==========================================================
-    // 공통 토글 설정 함수 (기존 로직 유지)
-    // ==========================================================
-    function setupToggle(headerId, containerId) { 
-        const headerToggle = document.getElementById(headerId);
-        if (!headerToggle) return; 
+						<div id="spinIcon" class="mt-3 text-primary fw-bold"
+							style="font-size: 1.2rem; cursor: pointer; user-select: none;">
+							<img src="/img/icon/random.png" width="30">
+						</div>
 
-        const arrow = headerToggle.querySelector('.toggle-arrow');
-        const items = document.querySelectorAll('#' + containerId + ' .home-item');
-        const initialCount = items.length;
+						<p id="rouletteResult" class="mt-3 fs-5 fw-bold text-center"
+							style="min-height: 1.5rem;"></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        if (initialCount <= 10) {
-            if (arrow) arrow.style.display = 'none';
-            return; 
-        }
+	<script>
+// ==========================================================
+// 1. 공통 토글 설정 함수 (최상단으로 이동)
+// ==========================================================
+function setupToggle(headerId, containerId) { 
+    // ... (setupToggle 함수 전체 코드는 그대로 유지) ...
+    const headerToggle = document.getElementById(headerId);
+    if (!headerToggle) return; 
 
-        let isExpanded = false; 
+    const arrow = headerToggle.querySelector('.toggle-arrow');
+    const items = document.querySelectorAll('#' + containerId + ' .home-item');
+    const initialCount = items.length;
 
-        function collapseList() {
-            items.forEach((item, index) => {
-                if (index >= 10) {
-                    item.style.display = 'none';
-                }
-            });
-            if (arrow) arrow.classList.add('collapsed');
-            isExpanded = false;
-        }
-
-        function expandList() {
-            items.forEach(item => {
-                item.style.display = 'block'; 
-            });
-            if (arrow) arrow.classList.remove('collapsed');
-            isExpanded = true;
-        }
-        
-        collapseList();
-
-        headerToggle.addEventListener('click', function() {
-            if (isExpanded) {
-                collapseList();
-            } else {
-                expandList();
-            }
-        });
+    if (initialCount <= 10) {
+        if (arrow) arrow.style.display = 'none';
+        return; 
     }
 
-    // ==========================================================
-    // 토글 설정 적용 (기존 로직 유지)
-    // ==========================================================
+    let isExpanded = false; 
+
+    function collapseList() {
+        items.forEach((item, index) => {
+            if (index >= 10) {
+                item.style.display = 'none';
+            }
+        });
+        if (arrow) arrow.classList.add('collapsed');
+        isExpanded = false;
+    }
+
+    function expandList() {
+        items.forEach(item => {
+            item.style.display = 'block'; 
+        });
+        if (arrow) arrow.classList.remove('collapsed');
+        isExpanded = true;
+    }
+    
+    collapseList();
+
+    headerToggle.addEventListener('click', function() {
+        if (isExpanded) {
+            collapseList();
+        } else {
+            expandList();
+        }
+    });
+}
+
+// ==========================================================
+// 2. HTML 렌더링 함수 (최상단으로 이동)
+// ==========================================================
+function renderHomeItem(homeDto) {
+    const url = '/home/detail/' + homeDto.idx; // 쿼리 파라미터는 여기서는 생략
+    const imgSrc = homeDto.thumbnail && homeDto.thumbnail.length > 0 
+                   ? homeDto.thumbnail : '/images/no-image.jpg';
+    
+    return `
+        <div class="home-item">
+            <a href="${url}" class="home-link">
+                <img src="${imgSrc}" alt="숙소 이미지" class="home-img">
+            </a>
+            <div class="home-text">
+                <h3 class="home-title">${homeDto.title}</h3>
+                <p class="home-desc">${homeDto.address}</p>
+                <p class="home-like">❤️ <span class="likeCount">${homeDto.likeCount}</span></p>
+            </div>
+        </div>
+    `;
+}
+
+// ==========================================================
+// 3. 비동기 로드 함수 (최상단으로 이동)
+// ==========================================================
+function loadAsyncList(apiPath, targetContainerId, listToggleHeaderId) {
+    const targetContainer = document.getElementById(targetContainerId);
+    if (!targetContainer) return;
+
+    fetch(apiPath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            let htmlContent = '';
+            
+            if (data.length === 0) {
+                htmlContent = '<div class="no-home" style="grid-column: 1 / -1;"><p>현재 등록된 숙소가 없습니다.</p></div>';
+            } else {
+                // 데이터 배열을 순회하며 HTML 아이템 생성
+                data.forEach((homeDto, index) => {
+                    let itemClass = 'home-item';
+                    if (index >= 10 && listToggleHeaderId) {
+                         itemClass += ' hidden-item-async'; 
+                    }
+                    htmlContent += renderHomeItem(homeDto, itemClass);
+                });
+            }
+            
+            // 기존 스피너/플레이스홀더 내용을 새 목록으로 교체
+            targetContainer.innerHTML = htmlContent;
+            
+            // 토글 기능 다시 초기화 
+            if(listToggleHeaderId) {
+                // 간단히 CSS로 처리: .hidden-item-async { display: none; }
+                const itemsToHide = targetContainer.querySelectorAll('.hidden-item-async');
+                itemsToHide.forEach(item => item.style.display = 'none');
+                
+                // setupToggle 함수가 이 시점에서는 이미 정의되어 있으므로 정상 호출됨
+                setupToggle(listToggleHeaderId, targetContainerId);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching home list:", apiPath, error);
+            targetContainer.innerHTML = '<div class="no-home" style="grid-column: 1 / -1;"><p>숙소 목록을 불러오는 데 실패했습니다.</p></div>';
+        });
+}
+
+
+// ==========================================================
+// 4. DOMContentLoaded 이벤트 리스너 (실행 코드: 가장 아래로 이동)
+// ==========================================================
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- (기존 setupToggle, 룰렛 로직은 모두 이 안에 유지) ---
+
+    // 1. 초기 로딩 목록에 대한 토글 설정 (기존 로직 유지)
     setupToggle('listHeaderToggle', 'homeListContainer');
+    // 아래 두 줄은 비동기 로딩이 시작된 직후에는 컨테이너가 로딩 중이므로 setupToggle을 호출해도 됩니다. 
+    // 다만, 비동기 로딩이 완료되면 다시 한번 호출될 것입니다.
     setupToggle('longTermListHeaderToggle', 'longTermHomeListContainer');
     setupToggle('largeGroupListHeaderToggle', 'largeGroupHomeListContainer');
     
+    
+    // 2. 비동기 로딩 호출 (기존 로직 유지)
+    if (!new URLSearchParams(window.location.search).get('keyword')) {
+        loadAsyncList('/api/home/seoul', 'seoulHomeListContainer', 'seoulListHeader');
+        loadAsyncList('/api/home/longterm', 'longTermHomeListContainer', 'longTermListHeaderToggle');
+        loadAsyncList('/api/home/largegroup', 'largeGroupHomeListContainer', 'largeGroupListHeaderToggle');
+    }
+
     // ==========================================================
     // 지역 룰렛 로직 (기존 로직 유지)
     // ==========================================================
@@ -273,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         });
     }
-
+    
     // 룰렛 돌리기 실행 함수
     function spinRoulette() {
         if (isSpinning) return;
@@ -331,8 +481,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 룰렛 클릭 이벤트 리스너 연결
     spinIcon.addEventListener('click', spinRoulette);
-    
 });
 </script>
+
 </body>
 </html>

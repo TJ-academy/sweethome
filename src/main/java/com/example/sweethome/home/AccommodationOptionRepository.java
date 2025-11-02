@@ -34,4 +34,10 @@ public interface AccommodationOptionRepository extends JpaRepository<Accommodati
      */
     @Query("SELECT ao FROM AccommodationOption ao JOIN FETCH ao.home h WHERE ao.option.optionId = :optionId")
     List<AccommodationOption> findByOptionIdCustom(@Param("optionId") int optionId);
+    
+    /**
+     * 🚀 N+1 최적화: 특정 Home에 연결된 AccommodationOption 목록과 연관된 Option 엔티티를 JOIN FETCH로 한 번에 조회합니다.
+     */
+    @Query("SELECT ao FROM AccommodationOption ao JOIN FETCH ao.option o WHERE ao.home = :home")
+    List<AccommodationOption> findByHomeWithOption(@Param("home") Home home); // ⭐️ 이 메서드를 사용해야 합니다.
 }

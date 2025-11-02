@@ -3,236 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="|${home.title} 상세 정보|">숙소 상세 정보</title>
-<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
-<script type="text/javascript">
-    // 카카오 지도 API가 로드된 후 실행되는 코드
-    kakao.maps.load(function() {
-    	/*
-        var geocoder = new kakao.maps.services.Geocoder();
-        
-     // Thymeleaf에서 전달된 home.address 값을 JavaScript 변수로 사용
-        var address = /*[[${home.address}]] '';  // home.address 값을 Thymeleaf에서 가져오기
-        
-        geocoder.addressSearch(address, function(result, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                var mapContainer = document.getElementById('map');
-                var mapOption = {
-                    center: coords,
-                    level: 3
-                };
-                var map = new kakao.maps.Map(mapContainer, mapOption);
-                var marker = new kakao.maps.Marker({
-                    position: coords
-                });
-                marker.setMap(map);
-            }
-        });
-        */
-        
-    	var address = /*[[${home.address}]]*/ '서울특별시 중구 을지로 79'; // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
-
-    	var geocoder = new kakao.maps.services.Geocoder();
-    	geocoder.addressSearch(address, function(result, status) {
-    	    if (status === kakao.maps.services.Status.OK) {
-    	        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-    	        var mapContainer = document.getElementById('map');
-    	        var mapOption = {
-    	            center: coords,
-    	            level: 3
-    	        };
-    	        var map = new kakao.maps.Map(mapContainer, mapOption);
-    	        var marker = new kakao.maps.Marker({
-    	            position: coords
-    	        });
-    	        marker.setMap(map);
-    	    }
-    	});
-
-    });
-</script>
-<style>
-body {
-	font-family: Arial, sans-serif;
-	line-height: 1.6;
-	margin: 0;
-	padding: 20px;
-	background-color: #f4f4f4;
-}
-
-.container {
-	max-width: 1200px;
-	margin: auto;
-	background: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.gallery {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	margin-bottom: 20px;
-}
-
-.main-img, .sub-img {
-	flex: 1;
-	min-width: 200px;
-	max-height: 300px;
-	overflow: hidden;
-}
-
-.main-img img, .sub-img img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border-radius: 5px;
-}
-
-.main-img {
-	flex-basis: 50%;
-}
-
-.info-section {
-	display: flex;
-	justify-content: space-between;
-	gap: 40px;
-}
-
-.description-box, .booking-box {
-	flex: 1;
-}
-
-.booking-box {
-	border: 1px solid #ddd;
-	padding: 20px;
-	border-radius: 8px;
-}
-
-.price {
-	font-size: 2em;
-	font-weight: bold;
-	color: #333;
-	margin-bottom: 20px;
-}
-
-.host-info {
-	display: flex;
-	align-items: center;
-	margin-top: 20px;
-	padding-top: 20px;
-	border-top: 1px solid #eee;
-}
-
-.host-img {
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	margin-right: 10px;
-	object-fit: cover;
-}
-
-#map {
-            width: 100%;
-            height: 400px;
-        }
-.review-card {
-	border-bottom: 1px solid #eee;
-	padding: 15px 0;
-}
-
-.facility-group {
-	display: flex;
-	justify-content: space-between;
-	margin-top: 20px;
-}
-
-.policy-item {
-	flex: 1;
-	padding: 0 10px;
-}
-</style>
-
+<link rel="stylesheet" th:href="@{/css/home/detail.css}">
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+	crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+	crossorigin="anonymous"></script>
 </head>
 <body>
-<div th:insert="fragments/header :: menuBar"></div>
-<div th:insert="fragments/search :: searchSection"></div>
+	<div th:insert="fragments/header :: menuBar"></div>
+	<div th:insert="fragments/search :: searchSection(
+    keyword=${keyword}, 
+    checkin=${checkin}, 
+    checkout=${checkout}, 
+    adults=${adults}, 
+    children=${children})"></div>
 
 	<div class="container">
 
 		<h1 th:text="${home.title}">숙소 제목</h1>
 
 		<p>
-			<span th:text="|최대 인원: ${home.maxPeople}명|">최대 인원</span>
-			<span th:text="| · 침실 ${home.room}개|"> · 침실</span>
-			<span th:text="| · 침대 ${home.bed}개|"> · 침대</span>
-			<span th:text="| · 욕실 ${home.bath}개|"> · 욕실</span>
+			<span th:text="|최대 인원: ${home.maxPeople}명|">최대 인원</span> <span
+				th:text="| · 침실 ${home.room}개|"> · 침실</span> <span
+				th:text="| · 침대 ${home.bed}개|"> · 침대</span> <span
+				th:text="| · 욕실 ${home.bath}개|"> · 욕실</span>
 		</p>
 
-<!-- 좋아요 버튼 (우측 상단) -->
-<div class="like-button">
-    <button class="btn btn-primary" th:if="${userProfile != null}" data-bs-toggle="modal" data-bs-target="#likeModal">
-        좋아요
-    </button>
-    <button class="btn btn-primary" th:if="${userProfile == null}" onclick="window.location.href='/user/login'">
-        로그인 후 좋아요
-    </button>
-</div>
+		<!-- 좋아요 버튼 (우측 상단) -->
+		<div class="like-button">
 
-<!-- 좋아요 폴더 선택 모달 -->
-<div class="modal fade" id="likeModal" tabindex="-1" aria-labelledby="likeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <form id="wishlistForm" th:action="@{/wishlist/add}" method="post">
-                    <input type="hidden" name="homeIdx" th:value="${home.idx}" />
-                    <input type="hidden" name="userEmail" th:value="${userProfile?.email ?: ''}" />
-                    <button type="submit" class="btn btn-primary">추가하기</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+			<form th:action="@{/wishlist/remove}" method="post"
+				th:if="${userProfile != null and isLiked}" style="display: inline;">
 
-    
+				<input type="hidden" name="homeIdx" th:value="${home.idx}" />
+
+				<button type="submit" class="btn btn-secondary">
+					<i class="bi bi-heart-fill"></i> 좋아요 취소
+				</button>
+			</form>
+
+			<button class="btn btn-primary"
+				th:if="${userProfile != null and !isLiked}" data-bs-toggle="modal"
+				data-bs-target="#likeModal">
+				<i class="bi bi-heart"></i> 좋아요
+			</button>
+
+			<button class="btn btn-primary" th:if="${userProfile == null}"
+				th:onclick="|window.location.href='/home/like?homeId=${home.idx}'|">로그인 후 좋아요</button>
+		</div>
+
+
+		<!-- 좋아요 폴더 선택 모달 -->
+		<div
+			th:replace="~{home/selectWishFolder :: wishModal(${home}, ${folders}, ${userProfile})}"></div>
+
+
 		<p th:if="${rating != null}">
 			<span class="rating" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★
 				4.9 · 후기 12개</span>
 		</p>
 
-<div class="gallery">
-    <div class="main-img">
-        <img th:src="${homePhoto.imgOne != null ? homePhoto.imgOne : '/images/default_main_image.jpg'}" 
-             src="/images/sample_main.jpg" alt="메인 숙소 이미지">
-    </div>
+		<div class="gallery">
+			<div class="main-img">
+				<img
+					th:src="${homePhoto.images != null and !#lists.isEmpty(homePhoto.images) ? homePhoto.images[0] : '/images/default_main_image.jpg'}"
+					src="/images/sample_main.jpg" alt="메인 숙소 이미지">
+			</div>
 
-    <th:block th:each="image, iterStat : ${homePhoto.images}">
-        <div class="sub-img" th:if="${iterStat.index > 0}">
-            <img th:src="${image}" 
-                 src="/images/sample_sub.jpg" alt="서브 숙소 이미지">
-        </div>
-    </th:block>
+			<th:block th:each="image, iterStat : ${homePhoto.images}"
+				th:if="${iterStat.index > 0 and iterStat.index < 5}">
+				<div class="sub-img">
+					<img th:src="${image}" src="/images/sample_sub.jpg" alt="서브 숙소 이미지">
+				</div>
+			</th:block>
 
-    </div>
-    
+		</div>
+
+		<div class="mt-3" th:if="${#lists.size(homePhoto.images) > 5}">
+			<button type="button" class="btn btn-outline-secondary"
+				data-bs-toggle="modal" data-bs-target="#allPhotoModal">사진
+				모두 보기</button>
+		</div>
+
+		<div
+			th:replace="~{home/detailAllPhoto :: allPhotoModal(${homePhoto}, ${home})}"></div>
+
 		<div class="info-section">
 
 
 			<div class="description-box">
 				<h2>숙소 설명</h2>
 
-				<div id="original-description" style="display:none;" th:attr="data-full-content=${home.description}">
-					<p>숙소 설명 원본이 들어갑니다.</p>
+				<!-- 서버에서 온 HTML을 그대로 숨긴 영역에 렌더(escape 없이) -->
+				<div id="original-description" style="display: none;">
+					<th:block th:utext="${home.description}"></th:block>
 				</div>
-				
-				<div id="short-description">
-					</div>
 
-				<button id="toggle-button" onclick="toggleDescription()" style="display: none;">더 보기</button>
+				<!-- 잘라낸 텍스트가 보일 자리 -->
+				<div id="short-description" style="white-space: pre-line;"></div>
+				<button id="toggle-button" onclick="toggleDescription()"
+					style="display: none;">더 보기</button>
+
+
+
+				<button id="toggle-button" onclick="toggleDescription()"
+					style="display: none;">더 보기</button>
 
 				<div class="host-info" th:if="${home.host != null}">
 					<img class="host-img" th:src="${home.host.profileImg}"
@@ -242,59 +123,72 @@ body {
 						<p th:if="${hostMemberSince != null}"
 							th:text="|호스트 활동 기간: ${hostMemberSince}년|">호스트 활동 기간: 3년</p>
 						<form th:action="@{/chat/room/question}" method="post">
-						    <input type="hidden" name="nickname" th:value="${home.host.nickname}" />
-						    <button type="submit">문의하기</button>
+							<input type="hidden" name="host"
+								th:value="${home.host.email}" />
+							<button type="submit">문의하기</button>
 						</form>
 					</div>
 				</div>
 			</div>
 
-			<form th:action="@{/home/reservationStart}" method="get" class="booking-box" id="bookingForm">
+			<form th:action="@{/home/reservationStart}" method="get"
+				class="booking-box" id="bookingForm">
 				<input type="hidden" name="reservedHome" th:value="${home.idx}" />
-				
+
 				<input type="hidden" id="basicCost" th:value="${home.costBasic}" />
-                <input type="hidden" id="expenCost" th:value="${home.costExpen}" />
-                
-                <input type="hidden" id="nights" name="nights" value="0" />
-                <input type="hidden" id="totalCost" name="totalMoney" value="0" />
+				<input type="hidden" id="expenCost" th:value="${home.costExpen}" />
 
-
+				<input type="hidden" id="nights" name="nights" value="0" /> <input
+					type="hidden" id="totalCost" name="totalMoney" value="0" />
+				<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#compareModal">
+					위시리스트와 비교하기
+				</button>
 				<div class="price">
 					<span
-						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">720,000원</span>
-					<span> · 1박 기준</span>
+						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원~|">720,000원</span>
+					<span> &nbsp; (1박 기준)</span>
 				</div>
-
 				<div class="dates">
-					<label for="startDate">체크인</label> <input type="date"
-						id="startDate" name="startDate"
-						th:value="${startDate != null} ? ${#temporals.format(startDate,'yyyy-MM-dd')} : ''"
-						th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" /> <label
-						for="endDate">체크아웃</label> <input type="date" id="endDate"
-						name="endDate"
-						th:value="${endDate != null} ? ${#temporals.format(endDate,'yyyy-MM-dd')} : ''"
-						th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
+					<label for="startDate">체크인</label> 
+					<input type="date"
+					    id="startDate" 
+					    name="startDate"
+					    th:value="${checkin}" 
+					    th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" />
+				    
+					<label for="endDate">체크아웃</label> 
+					<input type="date" 
+					    id="endDate"
+					    name="endDate"
+					    th:value="${checkout}"
+					    th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
 				</div>
-
-				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|" 
-				   style="font-size: 0.9em; margin-bottom: 5px; color: #555;">
-					이 숙소의 최대 인원은 10명 (어린이 제외)입니다.
-				</p>
+				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|"
+					style="font-size: 0.9em; margin-bottom: 5px; color: #555;">이
+					숙소의 최대 인원은 10명 (어린이 제외)입니다.</p>
 
 				<select name="adult" id="guests">
-					<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
-						th:value="${guest}" th:text="|성인 ${guest}명|">성인 2명</option>
-				</select>
-                
+				    <option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
+				        th:value="${guest}" 
+				        th:text="|성인 ${guest}명|"
+				        th:selected="${guest == adults}"> 성인 2명
+				    </option>
+				</select> 
+				
 				<select name="child" id="children" style="margin-top: 10px;">
-					<option value="0">어린이 0명</option>
-					<option th:each="child : ${#numbers.sequence(1, 5)}"
-						th:value="${child}" th:text="|어린이 ${child}명|">어린이 1명</option>
+				    <option value="0" th:selected="${children == null or children == 0}">어린이 0명</option> 
+				    
+				    <option th:each="child : ${#numbers.sequence(1, 5)}"
+				        th:value="${child}" 
+				        th:text="|어린이 ${child}명|"
+				        th:selected="${child == children}"> 어린이 1명
+				    </option>
 				</select>
-                
-                <div id="total-price-box" style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
-                    <p id="totalPriceDisplay" style="font-size: 1.2em; font-weight: bold;">날짜를 선택해 주세요.</p>
-                </div>
+				<div id="total-price-box"
+					style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
+					<p id="totalPriceDisplay"
+						style="font-size: 1.2em; font-weight: bold;">날짜를 선택해 주세요.</p>
+				</div>
 
 
 				<button type="submit">예약하기</button>
@@ -302,277 +196,739 @@ body {
 			</form>
 
 
+		</div>
+
+		<div class="bedroom-section">
+			<h2>숙박 장소</h2>
+
+			<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
+				<div th:text="|침실 ${iterStat.count}|">침실 1</div>
+				<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
 			</div>
 
-	<div class="bedroom-section">
-		<h2>숙박 장소</h2>
-
-		<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
-			<div th:text="|침실 ${iterStat.count}|">침실 1</div>
-			<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
+			<div th:if="${rooms == null}">
+				<div th:text="|침실 ${home.room}개|">침실 3개</div>
+				<div th:text="${home.address}"></div>
+			</div>
 		</div>
 
-		<div th:if="${rooms == null}">
-			<div th:text="|침실 ${home.room}개|">침실 3개</div>
-			<div th:text="${home.address}"></div>
-		</div>
-	</div>
-<!-- 
-	<div class="map-section">
-		<h2>위치</h2>
-		<p th:text="${home.address}">대한민국, 경상북도 포항시</p>
-	</div>
--->
+		<!-- 지도를 표시할 div -->
+		<div id="map"></div>
 
-    <!-- 지도를 표시할 div -->
-    <div id="map"></div>
+		<div class="review-section mt-5">
+			<h2 th:if="${reviewCount > 0}" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
+			<h2 th:if="${reviewCount == 0}">아직 작성된 후기가 없습니다.</h2>
 
-    
-	<div class="review-section">
-		<h2>★ 4.9 · 후기 12개</h2>
+			<div class="row g-4" th:if="${!#lists.isEmpty(recentReviews)}">
+				<div class="col-md-6" th:each="review : ${recentReviews}" th:if="${review.writer != null}">
+					<div class="review-card p-3 border rounded-3 h-100">
+						<div class="d-flex align-items-center mb-2">
+							<img th:src="${review.writer.profileImg != null ? review.writer.profileImg : '/images/host_default.jpg'}"
+								src="/images/host_default.jpg" alt="게스트 이미지" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+							<div>
+								<p class="fw-bold mb-0" th:text="${review.writer.username}"></p>
+								<small class="text-muted" th:text="${#temporals.format(review.createdAt, 'yyyy년 M월')}"></small>
+							</div>
+						</div>
+						
+						<p class="small mb-2">
+						  <span style="color: gold;">
+						    <span th:each="i : ${#numbers.sequence(1,5)}"
+						          th:text="${i <= (review?.star ?: 0)} ? '★' : '☆'">☆</span>
+						  </span>
+						  <span th:text="${review?.star ?: 0}">4</span>
+						</p>
+						
+						<p class="review-text mb-0" style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: pre-line;" 
+							th:text="${review.content}">
+							모든 것이 완벽했고 오션뷰가 정말 좋았습니다. 숙소도 깨끗하고 호스트님도 친절하셔서 다음에도 꼭 재방문할 거예요.
+						</p>
+						
+						<div th:if="${review.reply != null and review.reply.content != null}" class="reply-preview mt-3 small text-muted">
+						    <p class="mb-0 fw-semibold">호스트 답변:</p>
+						    <p class="mb-0 text-truncate" th:text="${review.reply.content}"></p>
+						</div>
 
-		<div class="review-card">
-			<p>박*근</p>
-			<p>호스트 활동 기간 3년</p>
-			<p>모든 것이 완벽했고 오션뷰가 정말 좋았습니다...</p>
-			<button>더보기</button>
-		</div>
-	</div>
-
-	<div class="amenities-section">
-		<h2>숙소 편의시설</h2>
-		<ul>
-			<li th:if="${hashtag != null and hashtag.wifi}">와이파이</li>
-			<li th:if="${hashtag != null and hashtag.tv}">TV</li>
-			<li th:if="${hashtag != null and hashtag.kitchen}">주방</li>
-			<li th:if="${hashtag != null and hashtag.freePark}">무료 주차</li>
-			<li th:if="${hashtag != null and hashtag.selfCheckin}">셀프 체크인</li>
-			<li th:if="${hashtag != null and hashtag.coldWarm}">냉난방</li>
-			<li th:if="${hashtag != null and hashtag.petFriendly}">반려동물 동반</li>
-			<li th:if="${hashtag != null and hashtag.barrierFree}">장애물 없는 시설</li>
-			<li th:if="${hashtag != null and hashtag.elevator}">엘리베이터</li>
-		</ul>
-
-		<div th:if="${optionsByGroup != null and not #maps.isEmpty(optionsByGroup)}">
-			<th:block th:each="entry : ${optionsByGroup}">
-				<h3 th:text="${entry.key}">옵션 그룹</h3> 
-				<ul>
-					<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
-				</ul>
-			</th:block>
+					</div>
+				</div>
+			</div>
+			
+			<div class="mt-4" th:if="${reviewCount > 4}" style="text-align: right;">
+				<button type="button" class="btn btn-outline-dark rounded-pill px-4"
+					data-bs-toggle="modal" data-bs-target="#allReviewsModal"
+					style="border-color: black;">
+					후기 <span th:text="${reviewCount}">12</span>개 모두 보기
+				</button>
+			</div>
 		</div>
 		
-		<div th:if="${optionsByGroup == null or #maps.isEmpty(optionsByGroup)}">
-		    <p>등록된 추가 옵션이 없습니다.</p>
+		<div class="modal fade" id="allReviewsModal" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+		    <div class="modal-content">
+		      <div class="modal-header border-0">
+		        <h5 class="modal-title fw-bold" id="allReviewsModalLabel">전체 후기</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+		      </div>
+		      <div class="modal-body pt-0">
+		      	
+		      	<div class="d-flex align-items-center mb-4">
+		      		<h4 class="fw-bold me-2 mb-0" th:text="|★ ${rating}|">★ 4.9</h4>
+		      		<span class="text-muted" th:text="|(${reviewCount}개 후기)|">(12개 후기)</span>
+		      	</div>
+		      	
+		      	<div id="allReviewsContainer" class="row g-4">
+		          <div class="col-12 text-center text-muted">로딩 중...</div>
+		        </div>
+		      </div>
+		      <div class="modal-footer border-0">
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+		      </div>
+		    </div>
+		  </div>
 		</div>
 
-		<button>더 보기</button>
+		<div class="amenities-section">
+			<h2>숙소 편의시설</h2>
+
+			<div th:if="${#lists.isEmpty(activeTags)}">
+				<p>등록된 해시태그가 없습니다.</p>
+			</div>
+			<ul class="tag-list" th:if="${!#lists.isEmpty(activeTags)}"
+				style="display: flex; gap: .5rem; flex-wrap: wrap;">
+				<li th:each="t : ${activeTags}" th:text="${t}"
+					style="list-style: none; padding: .2rem .6rem; border: 1px solid #ddd; border-radius: 999px; font-size: .9rem;">
+					#와이파이</li>
+			</ul>
+
+			<div id="options-container"
+				th:if="${optionsByGroup != null and not #maps.isEmpty(optionsByGroup)}">
+
+				<th:block th:each="entry, iterStat : ${optionsByGroup}">
+					<div th:if="${iterStat.index == 0}">
+						<h3 th:text="${entry.key}">옵션 그룹 1</h3>
+						<ul>
+							<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
+						</ul>
+					</div>
+				</th:block>
+
+				<div id="more-options" style="display: none;">
+					<th:block th:each="entry, iterStat : ${optionsByGroup}">
+						<div th:if="${iterStat.index > 0}">
+							<h3 th:text="${entry.key}">옵션 그룹 2, 3...</h3>
+							<ul>
+								<li th:each="opt : ${entry.value}" th:text="${opt.optionName}">옵션명</li>
+							</ul>
+						</div>
+					</th:block>
+				</div>
+
+				<button id="toggle-options-button" onclick="toggleOptions()"
+					th:if="${#maps.size(optionsByGroup) > 1}">더 보기 (옵션)</button>
+
+			</div>
+
+			<div
+				th:if="${optionsByGroup == null or #maps.isEmpty(optionsByGroup)}">
+				<p>등록된 추가 옵션이 없습니다.</p>
+			</div>
+
+		</div>
+
+		<div class="rules-section">
+			<h2>알아두어야 할 사항</h2>
+			<div class="facility-group">
+				<div class="policy-item">
+					<h3>숙소 이용 규칙</h3>
+					<p th:text="|체크인 시간: ${home.checkIn}시|">체크인 시간: 15시</p>
+					<p th:text="|체크아웃 시간: ${home.checkOut}시|">체크아웃 시간: 11시</p>
+					<p th:text="|게스트 정원: ${home.maxPeople}명|">게스트 정원: 10명</p>
+					<button>더 보기</button>
+				</div>
+
+				<div class="policy-item">
+					<h3>안전 및 공간</h3>
+					<p>일산화탄소 경보기 없음</p>
+					<p>부지 내 실내 보안 카메라</p>
+					<p>화재경보기</p>
+					<button>더 보기</button>
+				</div>
+
+				<div class="policy-item">
+					<h3>환불 정책</h3>
+					<p>24시간 무료 취소 가능...</p>
+					<button>더 보기</button>
+				</div>
+
+			</div>
+		</div>
+
 	</div>
 
-	<div class="rules-section">
-		<h2>알아두어야 할 사항</h2>
-		<div class="facility-group">
-			<div class="policy-item">
-				<h3>숙소 이용 규칙</h3>
-				<p th:text="|체크인 시간: ${home.checkIn}시|">체크인 시간: 15시</p>
-				<p th:text="|체크아웃 시간: ${home.checkOut}시|">체크아웃 시간: 11시</p>
-				<p th:text="|게스트 정원: ${home.maxPeople}명|">게스트 정원: 10명</p>
-				<button>더 보기</button>
-			</div>
+	<script>
+		const MAX_LENGTH = 300; // 최대 길이 설정
 
-			<div class="policy-item">
-				<h3>안전 및 공간</h3>
-				<p>일산화탄소 경보기 없음</p>
-				<p>부지 내 실내 보안 카메라</p>
-				<p>화재경보기</p>
-				<button>더 보기</button>
-			</div>
+		// ==========================================================
+		// 1. 숙소 설명 토글 로직 (기존 및 수정된 로직)
+		// ==========================================================
 
-			<div class="policy-item">
-				<h3>환불 정책</h3>
-				<p>24시간 무료 취소 가능...</p>
-				<button>더 보기</button>
-			</div>
+		// 페이지 로드 시 실행되는 함수
+		document.addEventListener('DOMContentLoaded', function () {
+  const originalDescElement = document.getElementById('original-description');
+  const shortDescElement    = document.getElementById('short-description');
+  const toggleButton        = document.getElementById('toggle-button');
+  const MAX_LENGTH = 300;
 
-			</div>
-	</div>
+  // 1) 서버가 렌더한 "원본 HTML"을 그대로 가져온다.
+  const originalContent = originalDescElement ? originalDescElement.innerHTML : "";
 
-	</div>
+  if (!originalContent.trim()) {
+    console.log("숙소 설명 데이터가 비어 있습니다.");
+    return;
+  }
 
-<script>
-    const MAX_LENGTH = 300; // 최대 길이 설정
+  // 2) 보이는 글자만 뽑기
+  const temp = document.createElement('div');
+  temp.innerHTML = originalContent;
 
-    // ==========================================================
-    // 1. 숙소 설명 토글 로직 (기존 및 수정된 로직)
-    // ==========================================================
+  // <br>은 줄바꿈으로 인식되게 미리 \n으로 치환
+  temp.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
 
-    // 페이지 로드 시 실행되는 함수
-    document.addEventListener('DOMContentLoaded', function() {
-        const originalDescElement = document.getElementById('original-description');
-        // 'data-full-content'에서 원본 HTML 내용을 가져옴
-        const originalContent = originalDescElement ? originalDescElement.getAttribute('data-full-content') : "";
-        
-        // 순수 텍스트 내용 (길이 체크를 위해)
-        const plainTextContent = new DOMParser().parseFromString(originalContent, 'text/html').documentElement.textContent.trim();
+  // 보이는 텍스트만 (여러 공백은 1칸으로)
+  const visibleText = temp.textContent.replace(/\s+/g, ' ').trim();
 
-        const shortDescElement = document.getElementById('short-description');
-        const toggleButton = document.getElementById('toggle-button');
-        
-        // ******************** 수정된 로직 시작 ********************
-        // (HTML 태그를 유지하면서 내용 자르기)
-        if (plainTextContent.length > MAX_LENGTH) {
-            // 원본 HTML 스트링 자체를 잘라 사용합니다. (줄바꿈 태그 유지를 위함)
-            let shortHTMLContent = originalContent.substring(0, MAX_LENGTH);
-            
-            // 줄임표를 추가합니다.
-            if (!shortHTMLContent.endsWith('...')) { 
-                 shortHTMLContent += '...'; 
-            }
-            
-            // HTML에 자른 내용을 표시 (태그 포함)
-            shortDescElement.innerHTML = shortHTMLContent;
-            
-            // 버튼 표시
-            toggleButton.style.display = 'block';
+  // 3) 300자 기준으로 초기 표시
+  if (visibleText.length > MAX_LENGTH) {
+    const shortText = visibleText.slice(0, MAX_LENGTH) + '...';
+    shortDescElement.textContent = shortText; // 안전하게 텍스트로 표시
+    toggleButton.style.display = 'inline-block';
+    shortDescElement.setAttribute('data-current-state', 'short');
+  } else {
+    // 300자 이하라면 원본 전체 HTML을 그대로 보여줌
+    shortDescElement.innerHTML = originalContent;
+    toggleButton.style.display = 'none';
+    shortDescElement.setAttribute('data-current-state', 'full');
+  }
 
-            // 상태를 "short"으로 설정
-            shortDescElement.setAttribute('data-current-state', 'short');
-        } else {
-            // 300자 이하인 경우: 전체 내용 표시 및 버튼 숨김 (HTML 포함)
-            shortDescElement.innerHTML = originalContent;
-            toggleButton.style.display = 'none';
-        }
-        // ******************** 수정된 로직 끝 ********************
-        
+							// ******************** 수정된 로직 끝 ********************
+
+							// ==========================================================
+							// 2. 예약 가격 계산 로직 (새로 추가된 로직)
+							// ==========================================================
+
+							// 2-1. 가격 정보 가져오기 (Thymeleaf Hidden Field에서)
+							const basicCostElement = document
+									.getElementById('basicCost');
+							const expenCostElement = document
+									.getElementById('expenCost');
+
+							// 값이 null이거나 숫자가 아니면 0 또는 기본값으로 설정
+							const basicCost = basicCostElement ? parseInt(basicCostElement.value) || 0
+									: 0;
+							const expenCost = expenCostElement ? parseInt(expenCostElement.value) || 0
+									: 0;
+
+							// 2-2. DOM 요소 선택
+							const startDateInput = document
+									.getElementById('startDate');
+							const endDateInput = document
+									.getElementById('endDate');
+							const totalPriceDisplay = document
+									.getElementById('totalPriceDisplay');
+							const nightsInput = document
+									.getElementById('nights');
+							const totalCostInput = document
+									.getElementById('totalCost');
+
+							// 2-3. 이벤트 리스너 등록
+							startDateInput.addEventListener('change',
+									calculatePrice);
+							endDateInput.addEventListener('change',
+									calculatePrice);
+
+							// 페이지 로드 시 초기 가격 계산 (만약 날짜가 미리 채워져 있다면)
+							calculatePrice();
+
+							/**
+							 * 특정 날짜가 주말(금요일 또는 토요일)인지 확인합니다.
+							 * @param {Date} date - 확인할 날짜 객체
+							 * @returns {boolean} 주말이면 true (금=5, 토=6)
+							 */
+							function isWeekend(date) {
+								const dayOfWeek = date.getDay();
+								// 5: 금요일, 6: 토요일
+								return dayOfWeek === 5 || dayOfWeek === 6;
+							}
+
+							/**
+							 * 체크인/체크아웃 날짜를 기반으로 총 숙박 가격을 계산합니다.
+							 */
+							function calculatePrice() {
+								const startDateStr = startDateInput.value;
+								const endDateStr = endDateInput.value;
+
+								// 날짜가 모두 선택되지 않았다면 종료
+								if (!startDateStr || !endDateStr) {
+									totalPriceDisplay.textContent = '날짜를 선택해 주세요.';
+									nightsInput.value = 0;
+									totalCostInput.value = 0;
+									return;
+								}
+
+								// Date 객체 생성 (날짜만 포함)
+								const startDate = new Date(startDateStr);
+								const endDate = new Date(endDateStr);
+
+								// 시간 부분을 00:00:00으로 설정하여 날짜 비교 정확도 향상
+								startDate.setHours(0, 0, 0, 0);
+								endDate.setHours(0, 0, 0, 0);
+
+								// 유효성 검사: 체크아웃이 체크인보다 이전이거나 같으면 에러
+								if (endDate <= startDate) {
+									totalPriceDisplay.textContent = '유효하지 않은 날짜 범위입니다.';
+									nightsInput.value = 0;
+									totalCostInput.value = 0;
+									return;
+								}
+
+								let totalCost = 0;
+								let nights = 0;
+
+								// 체크인 날짜부터 체크아웃 전날까지 반복 (1박씩 계산)
+								let currentDate = new Date(startDate);
+
+								while (currentDate < endDate) {
+									// 숙박 시작일이 주말(금/토)인지 확인하여 가격 적용
+									const costPerNight = isWeekend(currentDate) ? expenCost
+											: basicCost;
+									totalCost += costPerNight;
+									nights++;
+
+									// 다음 날짜로 이동 (1일 추가)
+									currentDate
+											.setDate(currentDate.getDate() + 1);
+								}
+
+								// 결과 업데이트
+								nightsInput.value = nights;
+								totalCostInput.value = totalCost;
+
+								// 화면에 표시 (toLocaleString으로 콤마(,) 추가)
+								const formattedTotalCost = totalCost
+										.toLocaleString('ko-KR');
+								totalPriceDisplay.innerHTML = `총 ${nights}박<br><span>${formattedTotalCost}원</span>`;
+							}
+							
+							// ==========================================================
+							// 4. 리뷰 모달 로직 추가 (수정/유지)
+							// ==========================================================
+							
+							const allReviewsModal = document.getElementById('allReviewsModal');
+							if (allReviewsModal) {
+							  // 모달이 열릴 때 리뷰를 로드
+							  allReviewsModal.addEventListener('show.bs.modal', function () {
+							    loadAllReviews(currentHomeId);
+							  });
+							}
+
+							/**
+							 * 로드된 리뷰 데이터를 HTML로 렌더링하는 함수.
+							 * @param {Array<Object>} reviews - 리뷰 객체 배열 (ReviewDto 형태)
+							 */
+							function renderReviews(reviews) {
+							  const container = document.getElementById('allReviewsContainer');
+							  container.innerHTML = ''; // 기존 내용 초기화
+
+							  if (!reviews || reviews.length === 0) {
+							    container.innerHTML = '<div class="col-12 text-center text-muted">작성된 후기가 없습니다.</div>';
+							    return;
+							  }
+
+							  reviews.forEach(review => {
+							    // ... (별점 및 날짜 포맷 로직 생략) ...
+							    const fullStars = '★'.repeat(review.star);
+							    const emptyStars = '☆'.repeat(5 - review.star);
+							    const ratingStars = `<span style="color: gold;">${fullStars}${emptyStars}</span> <span class="fw-semibold">${review.star}</span>`;
+							    
+							    const reviewDate = new Date(review.createdAt);
+							    const formattedDate = reviewDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' });
+							    
+							    // ✅ 작성자 프로필 이미지 (DTO에서 직접 접근)
+							    const profileImg = review.writerProfileImg ? review.writerProfileImg : '/images/host_default.jpg';
+							    
+							    // ✅ 호스트 답변 (reply) 처리: DTO 구조에 맞게 접근
+							    let replyHtml = '';
+							    if (review.reply && review.reply.content) {
+							      // ✅ review.reply.host.username 대신 review.reply.hostUsername 사용
+							      replyHtml = `
+							        <div class="reply-box mt-3 p-3 bg-light rounded-3 border-start border-3 border-secondary">
+							          <p class="fw-bold mb-1 small text-secondary">호스트의 답변 (${review.reply.hostUsername}):</p>
+							          <p class="mb-0 small" style="white-space: pre-line;">${review.reply.content}</p>
+							        </div>
+							      `;
+							    }
+
+							    const reviewHtml = `
+							      <div class="col-md-6">
+							        <div class="p-3 border rounded-3 h-100 shadow-sm">
+							          <div class="d-flex align-items-center mb-2">
+							              <img src="${profileImg}" alt="게스트 이미지" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+							              <div>
+							                  <p class="fw-bold mb-0">${review.writerUsername}</p>
+							                  <small class="text-muted">${formattedDate}</small>
+							              </div>
+							          </div>
+							          <p class="small mb-2">${ratingStars}</p>
+							          <p class="mb-3" style="white-space: pre-line;">${review.content}</p>
+							          ${replyHtml}
+							        </div>
+							      </div>
+							    `;
+							    container.insertAdjacentHTML('beforeend', reviewHtml);
+							  });
+							}
+							/**
+							 * 전체 리뷰 데이터를 비동기적으로 가져오는 함수.
+							 * @param {number} homeId - 현재 숙소 ID
+							 */
+							function loadAllReviews(homeId) {
+							  const container = document.getElementById('allReviewsContainer');
+							  container.innerHTML = '<div class="col-12 text-center text-muted"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">리뷰 로딩 중...</p></div>';
+							  
+							  fetch(`/home/detail/${homeId}/reviews/all`)
+							    .then(response => {
+							      if (!response.ok) {
+							        throw new Error('리뷰 로드 실패');
+							      }
+							      return response.json();
+							    })
+							    .then(reviews => {
+							      renderReviews(reviews);
+							    })
+							    .catch(error => {
+							      console.error('Error loading reviews:', error);
+							      container.innerHTML = '<div class="col-12 text-center text-danger">리뷰를 로드하는 데 실패했습니다. 서버 로그를 확인하세요.</div>';
+							    });
+							}
+
+						}); // DOMContentLoaded 끝
+
+		// "더 보기/닫기" 토글 함수 (이 함수는 밖에 두는 것이 일반적입니다)
+						function toggleDescription() {
+							  const shortDescElement = document.getElementById('short-description');
+							  const originalDescElement = document.getElementById('original-description');
+							  const toggleButton = document.getElementById('toggle-button');
+							  const MAX_LENGTH = 300;
+
+							  const state = shortDescElement.getAttribute('data-current-state') || 'short';
+							  const originalContent = originalDescElement.innerHTML;
+
+							  if (state === 'short') {
+							    // 전체 HTML 표시
+							    shortDescElement.innerHTML = originalContent;
+							    toggleButton.textContent = '닫기';
+							    shortDescElement.setAttribute('data-current-state', 'full');
+							  } else {
+							    // 다시 300자 텍스트로
+							    const temp = document.createElement('div');
+							    temp.innerHTML = originalContent;
+							    temp.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+							    const visibleText = temp.textContent.replace(/\s+/g, ' ').trim();
+							    const shortText = visibleText.slice(0, MAX_LENGTH) + (visibleText.length > MAX_LENGTH ? '...' : '');
+							    shortDescElement.textContent = shortText;
+							    toggleButton.textContent = '더 보기';
+							    shortDescElement.setAttribute('data-current-state', 'short');
+							  }
+							}
+
+
+		// ==========================================================
+		// 3. 편의시설 옵션 토글 로직 (새로 추가된 로직)
+		// ==========================================================
+
+		/**
+		 * 첫 번째 옵션 그룹을 제외한 나머지 옵션들을 표시/숨김 처리합니다.
+		 */
+		function toggleOptions() {
+			const moreOptionsDiv = document.getElementById('more-options');
+			const toggleButton = document
+					.getElementById('toggle-options-button');
+
+			if (moreOptionsDiv.style.display === 'none') {
+				// 숨겨져 있으면 표시 (더 보기)
+				moreOptionsDiv.style.display = 'block';
+				toggleButton.textContent = '숨기기';
+			} else {
+				// 표시되어 있으면 숨김 (숨기기)
+				moreOptionsDiv.style.display = 'none';
+				toggleButton.textContent = '더 보기 (옵션)';
+			}
+		}
+		
+		// ==========================================================
+        // 4. 위시리스트 숙소 비교 로직 (새로 추가)
         // ==========================================================
-        // 2. 예약 가격 계산 로직 (새로 추가된 로직)
-        // ==========================================================
         
-        // 2-1. 가격 정보 가져오기 (Thymeleaf Hidden Field에서)
-        const basicCostElement = document.getElementById('basicCost');
-        const expenCostElement = document.getElementById('expenCost');
-        
-        // 값이 null이거나 숫자가 아니면 0 또는 기본값으로 설정
-        const basicCost = basicCostElement ? parseInt(basicCostElement.value) || 0 : 0;
-        const expenCost = expenCostElement ? parseInt(expenCostElement.value) || 0 : 0;
-
-
-        // 2-2. DOM 요소 선택
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const totalPriceDisplay = document.getElementById('totalPriceDisplay');
-        const nightsInput = document.getElementById('nights');
-        const totalCostInput = document.getElementById('totalCost');
-        
-        // 2-3. 이벤트 리스너 등록
-        startDateInput.addEventListener('change', calculatePrice);
-        endDateInput.addEventListener('change', calculatePrice);
-
-        // 페이지 로드 시 초기 가격 계산 (만약 날짜가 미리 채워져 있다면)
-        calculatePrice();
-
-
         /**
-         * 특정 날짜가 주말(금요일 또는 토요일)인지 확인합니다.
-         * @param {Date} date - 확인할 날짜 객체
-         * @returns {boolean} 주말이면 true (금=5, 토=6)
+         * 비교 숙소 선택/해제 토글 및 최대 2개 제한
+         * @param {HTMLElement} element - 클릭된 <li> 요소
          */
-        function isWeekend(date) {
-            const dayOfWeek = date.getDay();
-            // 5: 금요일, 6: 토요일
-            return dayOfWeek === 5 || dayOfWeek === 6;
-        }
-
-        /**
-         * 체크인/체크아웃 날짜를 기반으로 총 숙박 가격을 계산합니다.
-         */
-        function calculatePrice() {
-            const startDateStr = startDateInput.value;
-            const endDateStr = endDateInput.value;
-            
-            // 날짜가 모두 선택되지 않았다면 종료
-            if (!startDateStr || !endDateStr) {
-                totalPriceDisplay.textContent = '날짜를 선택해 주세요.';
-                nightsInput.value = 0;
-                totalCostInput.value = 0;
+        function toggleCompareSelection(element) {
+            const homeIdx = element.getAttribute('data-home-idx');
+			const compareButton = document.getElementById('nextOrCompareBtn');
+            // 현재 보고 있는 숙소는 모달에서 선택할 수 없도록 제외
+            if (homeIdx === currentHomeId) {
+                alert("현재 보고 있는 숙소는 비교 대상에 자동 포함됩니다.");
                 return;
             }
 
-            // Date 객체 생성 (날짜만 포함)
-            const startDate = new Date(startDateStr);
-            const endDate = new Date(endDateStr);
-            
-            // 시간 부분을 00:00:00으로 설정하여 날짜 비교 정확도 향상
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
+            if (element.classList.contains('selected')) {
+                // 선택 해제
+                element.classList.remove('selected');
+                selectedHomeIds = selectedHomeIds.filter(id => id !== homeIdx);
+            } else {
+                // 선택
+                if (selectedHomeIds.length < 2) {
+                    element.classList.add('selected');
+                    selectedHomeIds.push(homeIdx);
+                } else {
+                    alert("비교할 숙소는 최대 2개까지만 선택할 수 있습니다.");
+                }
+            }
 
-            // 유효성 검사: 체크아웃이 체크인보다 이전이거나 같으면 에러
-            if (endDate <= startDate) {
-                totalPriceDisplay.textContent = '유효하지 않은 날짜 범위입니다.';
-                nightsInput.value = 0;
-                totalCostInput.value = 0;
+            // 비교 버튼 활성화/비활성화 (선택된 숙소가 1개 이상일 때)
+		if (compareButton) {
+		  compareButton.disabled = selectedHomeIds.length === 0;
+		}
+            console.log("선택된 비교 숙소 ID들:", selectedHomeIds);
+        }
+
+        /**
+         * 비교하기 버튼 클릭 시 실행. 숙소 ID를 쿼리 스트링으로 넘겨 페이지 이동.
+         */
+        function startComparison() {
+            // 현재 숙소 ID 포함 (Set을 사용하여 중복 제거)
+            let comparisonIds = new Set([currentHomeId]); 
+            
+            // 모달에서 선택된 숙소 ID 추가
+            selectedHomeIds.forEach(id => comparisonIds.add(id));
+            
+            const finalIds = Array.from(comparisonIds);
+            
+            // 현재 숙소 ID만 있는 경우 (선택된 것이 없는 경우)
+            if (finalIds.length < 2) {
+                alert("비교하려면 현재 숙소 외에 최소 1개 이상의 숙소를 선택해야 합니다.");
                 return;
             }
-
-            let totalCost = 0;
-            let nights = 0;
             
-            // 체크인 날짜부터 체크아웃 전날까지 반복 (1박씩 계산)
-            let currentDate = new Date(startDate);
+            // 쿼리 스트링 생성 (예: /compare?ids=10,20,30)
+            const urlIds = finalIds.join(',');
             
-            while (currentDate < endDate) {
-                // 숙박 시작일이 주말(금/토)인지 확인하여 가격 적용
-                const costPerNight = isWeekend(currentDate) ? expenCost : basicCost;
-                totalCost += costPerNight;
-                nights++;
-
-                // 다음 날짜로 이동 (1일 추가)
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            // 결과 업데이트
-            nightsInput.value = nights;
-            totalCostInput.value = totalCost;
-
-            // 화면에 표시 (toLocaleString으로 콤마(,) 추가)
-            const formattedTotalCost = totalCost.toLocaleString('ko-KR');
-            totalPriceDisplay.innerHTML = `총 ${nights}박<br><span>${formattedTotalCost}원</span>`;
+            // 비교 페이지 URL로 이동 (경로: /compare 로 가정)
+            window.location.href = `/compare?ids=${urlIds}`;
         }
-        
-    }); // DOMContentLoaded 끝
+	</script>
+<!-- 비교하기 모달 -->
+<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content compare-modal">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="compareModalLabel">위시리스트에서 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
 
-    // "더 보기/닫기" 토글 함수 (이 함수는 밖에 두는 것이 일반적입니다)
-    function toggleDescription() {
-        const shortDescElement = document.getElementById('short-description');
-        const originalDescElement = document.getElementById('original-description');
-        const toggleButton = document.getElementById('toggle-button');
-        
-        const currentState = shortDescElement.getAttribute('data-current-state');
-        // 원본 내용은 hidden div의 data-full-content 속성에서 가져옵니다.
-        const fullContent = originalDescElement.getAttribute('data-full-content');
-        
-        // 순수 텍스트 내용으로 길이 체크를 다시 합니다.
-        const plainTextContent = new DOMParser().parseFromString(fullContent, 'text/html').documentElement.textContent.trim();
-        
-        // HTML 문자열을 직접 잘라 태그를 유지합니다.
-        let shortHTMLContent = fullContent.substring(0, MAX_LENGTH);
-         if (!shortHTMLContent.endsWith('...')) {
-             shortHTMLContent += '...';
-         }
+      <!-- ✅ 현재 숙소 미리보기 영역 -->
+      <div class="current-home-preview">
+        <div id="selectedHomesPreview" class="d-flex flex-wrap justify-content-center gap-3">          <img th:src="${homePhoto.images != null and !#lists.isEmpty(homePhoto.images) ? homePhoto.images[0] : '/images/default_main_image.jpg'}"
+               src="/images/sample_main.jpg"
+               alt="현재 숙소 썸네일"
+               class="current-home-img">
+          <div class="current-home-info">
+            <p class="current-home-title" th:text="${home.title}">숙소 제목</p>
+            <span class="badge bg-primary-subtle text-primary fw-semibold">현재 숙소</span>
+          </div>
+        </div>
+      </div>
 
-        if (currentState === 'short') {
-            // 현재 짧은 내용 -> 전체 내용으로 변경 (HTML 포함)
-            shortDescElement.innerHTML = fullContent;
-            toggleButton.textContent = '닫기';
-            shortDescElement.setAttribute('data-current-state', 'full');
-        } else {
-            // 현재 전체 내용 -> 짧은 내용으로 변경 (HTML 포함)
-            shortDescElement.innerHTML = shortHTMLContent; 
-            toggleButton.textContent = '더 보기';
-            shortDescElement.setAttribute('data-current-state', 'short');
-        }
+      <div class="modal-body pt-0">
+
+        <!-- ✅ STEP 1: 위시리스트 폴더 목록 -->
+        <div id="wishlistStep1" th:if="${folders != null and !#lists.isEmpty(folders)}">
+          <div class="row g-4">
+            <div class="col-md-4" th:each="folder : ${folders}">
+              <div class="wishlist-card"
+                   th:attr="data-folder-id=${folder.idx}, data-folder-name=${folder.folderName}"
+                   onclick="selectFolder(this)">
+                <div class="wishlist-image-grid">
+                  <img th:each="wish, iterStat : ${folderWishlists[folder.idx]}"
+                       th:if="${iterStat.index < 4 and wish.home != null}"
+                       th:src="@{${wish.home.thumbnail}}"
+                       alt="썸네일"
+                       class="wishlist-thumb" />
+                </div>
+                <div class="wishlist-info mt-2">
+                  <p class="fw-semibold mb-0" th:text="${folder.folderName}">폴더 이름</p>
+                  <small class="text-muted"
+				     th:text="|저장된 항목 ${folderWishlists[folder.idx] != null ? #lists.size(folderWishlists[folder.idx]) : 0}개|">
+				    저장된 항목 3개
+				</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div th:if="${folders == null or #lists.isEmpty(folders)}" class="text-center text-muted">
+          <p>등록된 위시리스트 폴더가 없습니다.</p>
+        </div>
+
+        <!-- ✅ STEP 2: 선택한 폴더의 숙소 목록 -->
+        <div id="wishlistStep2" style="display:none;">
+          <div class="d-flex align-items-center mb-3">
+            <button type="button" class="btn btn-link p-0 me-2" onclick="goBackToFolders()">←</button>
+            <h6 id="selectedFolderName" class="fw-bold mb-0">폴더 이름</h6>
+          </div>
+          <div class="row g-4" id="selectedFolderHomes"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 d-flex flex-column align-items-center">
+        <p class="text-muted mb-2 small">
+          현재 숙소를 포함해 최대 3곳까지 비교 가능합니다.
+        </p>
+        <button id="nextOrCompareBtn" type="button"
+                class="btn btn-primary w-50 rounded-pill"
+                onclick="goNextStep()">다음으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script th:inline="javascript">
+  // 서버에서 전달된 folderWishlists 데이터를 JS로 안전하게 받기
+  const folderWishlists = /*[[${folderWishlists}]]*/ {};
+  let selectedFolderId = null;
+  let selectedFolderName = null;
+
+  /** ✅ 폴더 클릭 시 선택 처리 */
+  function selectFolder(element) {
+    selectedFolderId = element.getAttribute("data-folder-id");
+    selectedFolderName = element.getAttribute("data-folder-name");
+
+    // 시각적으로 선택 표시
+    document.querySelectorAll(".wishlist-card").forEach(el => el.classList.remove("selected"));
+    element.classList.add("selected");
+  }
+
+  /** ✅ “다음으로” 버튼 클릭 시 */
+  function goNextStep() {
+    if (!selectedFolderId) {
+      alert("먼저 폴더를 선택해주세요.");
+      return;
     }
-</script>
 
+    // Step1 숨기고 Step2 보이기
+    document.getElementById("wishlistStep1").style.display = "none";
+    document.getElementById("wishlistStep2").style.display = "block";
+    document.getElementById("selectedFolderName").textContent = selectedFolderName;
+
+    // 버튼 문구 변경 (다음으로 → 비교하기)
+    const nextBtn = document.getElementById("nextOrCompareBtn");
+    nextBtn.textContent = "비교하기";
+    nextBtn.onclick = startComparison;
+
+    // 폴더 안의 숙소 목록 렌더링
+    renderFolderHomes(selectedFolderId);
+  }
+
+  /** ✅ 선택한 폴더 안의 숙소 목록 렌더링 */
+  function renderFolderHomes(folderId) {
+    const container = document.getElementById("selectedFolderHomes");
+    container.innerHTML = "";
+
+    const homes = folderWishlists[folderId];
+    if (!homes || homes.length === 0) {
+      container.innerHTML = "<p class='text-center text-muted'>이 폴더에 저장된 숙소가 없습니다.</p>";
+      return;
+    }
+
+    homes.forEach(wish => {
+      if (!wish.home) return;
+      const thumb = wish.home.thumbnail || '/images/default_main_image.jpg';
+      const title = wish.home.title || '숙소 이름 없음';
+      const homeIdx = wish.home.idx;
+
+      const html = `
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm" style="cursor:pointer;"
+               data-home-idx="${homeIdx}" onclick="toggleCompareSelection(this)">
+            <img src="${thumb}" class="card-img-top rounded-3" style="aspect-ratio:1/1; object-fit:cover;">
+            <div class="card-body p-2 text-center">
+              <p class="small fw-semibold mb-0">${title}</p>
+            </div>
+          </div>
+        </div>`;
+      container.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  /** ✅ 폴더 목록으로 돌아가기 */
+function goBackToFolders() {
+  // 단계 전환
+  document.getElementById("wishlistStep2").style.display = "none";
+  document.getElementById("wishlistStep1").style.display = "block";
+
+  // 버튼 초기화
+  const nextBtn = document.getElementById("nextOrCompareBtn");
+  nextBtn.textContent = "다음으로";
+  nextBtn.onclick = goNextStep;
+	
+// ✅ 버튼 다시 활성화
+  nextBtn.disabled = false;
+
+  // ✅ 선택 상태 전부 초기화
+  selectedHomeIds = [];
+  document.querySelectorAll("#selectedFolderHomes .card.selected")
+    .forEach(card => card.classList.remove("selected"));
+
+  // ✅ 상단 미리보기 다시 그리기 (현재 숙소만 표시)
+  updateSelectedHomesPreview();
+
+  console.log("뒤로가기 시 비교 선택 초기화 완료");
+}
+</script>
+<script type="text/javascript"
+	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b272e4b2002adaa34552559ea8333230&libraries=services"></script>
+<script type="text/javascript">
+	// 카카오 지도 API가 로드된 후 실행되는 코드
+	kakao.maps.load(function() {
+
+		var address = '[[${home.address}]]' // 이 값은 Thymeleaf에서 동적으로 전달된 주소로 바뀌어야 합니다.
+
+		var geocoder = new kakao.maps.services.Geocoder();
+		geocoder.addressSearch(address, function(result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+				var mapContainer = document.getElementById('map');
+				var mapOption = {
+					center : coords,
+					level : 3
+				};
+				var map = new kakao.maps.Map(mapContainer, mapOption);
+				var marker = new kakao.maps.Marker({
+					position : coords
+				});
+				marker.setMap(map);
+			}
+		});
+
+	});
+</script>
+<script>
+	//현재 보고 있는 숙소의 ID를 Thymeleaf를 이용해 JS 변수에 저장
+	const currentHomeId = '[[${home.idx}]]'; 
+	let selectedHomeIds = []; // 모달에서 선택된 숙소 ID를 저장할 배열
+</script>
 </body>
 </html>

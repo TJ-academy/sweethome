@@ -75,4 +75,15 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     
     @Modifying
     void deleteByHome_Idx(int homeIdx);
+    
+    @Query("""
+    	    SELECT w
+    	    FROM Wishlist w
+    	    JOIN FETCH w.home h
+    	    JOIN FETCH w.folder f
+    	    WHERE w.user = :user
+    	      AND f.idx = :folderId
+    	""")
+    	List<Wishlist> findByUserAndFolderIdWithHome(@Param("user") User user,
+    	                                             @Param("folderId") Long folderId);
 }

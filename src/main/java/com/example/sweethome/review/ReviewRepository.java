@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -79,4 +80,13 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
      */
     @Query("SELECT r FROM Review r LEFT JOIN FETCH r.reply WHERE r.home = :home AND r.direction = :direction ORDER BY r.createdAt DESC")
     List<Review> findByHomeAndDirectionWithReply(@Param("home") Home home, @Param("direction") ReviewDirection direction);
+    
+    // detail 로딩 개선 중
+    // ⭐️ ReviewRepository.java 파일에 추가
+    @Query("SELECT r FROM Review r "
+         + "JOIN FETCH r.writer w " // 작성자 정보(profileImg, username)를 한 번에 가져옴
+         + "LEFT JOIN FETCH r.reply rp " // 답변 정보도 함께 가져옴 (답변이 없을 수 있으므로 LEFT JOIN)
+         + "WHERE r.home = :home AND r.direction = :direction "
+         + "ORDER BY r.createdAt DESC")
+    List<Review> findRecentReviewsWithWriterAndReply(@Param("home") Home home, @Param("direction") ReviewDirection direction, Pageable pageable);
 }

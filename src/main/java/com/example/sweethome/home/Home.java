@@ -1,6 +1,9 @@
 package com.example.sweethome.home;
 
-import com.example.sweethome.user.User; 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.sweethome.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,15 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.List;
-import java.util.ArrayList;
-import jakarta.persistence.OneToMany;
 
 @Entity
 @Getter
@@ -91,6 +93,15 @@ public class Home {
 
     // checkout (int) - 체크아웃 시간 (시간 정수 값)
     private int checkOut;
+    
+ // ⭐️ HomePhoto와의 1:1 관계 추가
+    // mappedBy = "home": HomePhoto 엔티티의 'home' 필드가 관계의 주인이므로 매핑을 위임합니다.
+    @OneToOne(mappedBy = "home") 
+    private HomePhoto homePhoto; // <--- 이 필드가 있어야 home.getHomePhoto() 사용 가능
+    
+    // ⭐️ Hashtag와의 1:1 관계 추가 (Hashtag 엔티티 수정 필요)
+    @OneToOne(mappedBy = "home") 
+    private Hashtag hashtag; // <--- 이 필드가 있어야 home.getHashtag() 사용 가능
 
     @OneToMany(mappedBy = "home")
     private List<HomeRecommend> homeRecommends = new ArrayList<>();

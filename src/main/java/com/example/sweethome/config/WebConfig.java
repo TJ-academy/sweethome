@@ -34,7 +34,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/", "/home", "/user/login", "/user/join", "/user/resetPassword", "/user/findPwd",
                         "/user/checkEmailDuplicate", "/user/checkNicknameDuplicate",
                         "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico",
-                        "/kakao_login_medium_narrow.png"
+                        "/kakao_login_medium_narrow.png",
+                        "/api/home/**"
                 );
     }
 }

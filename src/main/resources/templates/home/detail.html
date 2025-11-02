@@ -801,9 +801,9 @@
                 <div class="wishlist-info mt-2">
                   <p class="fw-semibold mb-0" th:text="${folder.folderName}">폴더 이름</p>
                   <small class="text-muted"
-                         th:text="|저장된 항목 ${#lists.size(folderWishlists[folder.idx])}개|">
-                    저장된 항목 3개
-                  </small>
+				     th:text="|저장된 항목 ${folderWishlists[folder.idx] != null ? #lists.size(folderWishlists[folder.idx]) : 0}개|">
+				    저장된 항목 3개
+				</small>
                 </div>
               </div>
             </div>

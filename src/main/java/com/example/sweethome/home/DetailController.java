@@ -107,9 +107,14 @@ public class DetailController {
         model.addAttribute("folders", folders);
     	
         // 1) Home 조회 (PK: idx)
-        Home home = homeRepository.findById(idx)
+        //Home home = homeRepository.findById(idx)
+        //        .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + idx));
+        //HomePhoto homePhoto = homePhotoRepository.findByHome(home); // Home에 해당하는 사진 데이터를 가져옵니다.
+        
+     // ⭐️ 이 쿼리를 반드시 사용하도록 HomeRepository에 정의해야 합니다.
+        Home home = homeRepository.findByIdWithAll(idx) // <--- 반드시 findByIdWithAll로 변경
                 .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + idx));
-        HomePhoto homePhoto = homePhotoRepository.findByHome(home); // Home에 해당하는 사진 데이터를 가져옵니다.
+        HomePhoto homePhoto = home.getHomePhoto(); // <--- Home 엔티티에서 직접 가져옴 (추가 쿼리 없음)
         
      // homePhoto가 null인 경우를 처리
         if (homePhoto == null) {
@@ -118,7 +123,8 @@ public class DetailController {
         }
         
         // 2) Hashtag 조회 (없을 수 있음)
-        Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
+        // Hashtag hashtag = hashtagRepository.findByHome(home).orElse(null);
+        Hashtag hashtag = home.getHashtag();
         model.addAttribute("hashtag", hashtag);
         
         // 보기 좋은 태그 리스트 생성
@@ -139,7 +145,10 @@ public class DetailController {
         // 3) 숙소 옵션 조회 및 그룹핑 (기존 로직 유지)
         // ⚠️ AccommodationOptionRepository.findByHome(home)의 내부 쿼리가 
         //    Option 엔티티를 JOIN FETCH하도록 최적화되어 있어야 N+1 문제가 해결됩니다.
-        List<AccommodationOption> accOptions = accommodationOptionRepository.findByHome(home);
+        //List<AccommodationOption> accOptions = accommodationOptionRepository.findByHome(home);
+        
+     // ⭐️ 수정된 코드: Option을 JOIN FETCH로 가져오는 메서드 사용
+        List<AccommodationOption> accOptions = accommodationOptionRepository.findByHomeWithOption(home);
         
         // AccommodationOption 목록에서 Option 엔티티를 추출하고, optionGroup별로 그룹핑합니다.
         Map<String, List<Option>> existingOptionsByGroup = accOptions.stream()
@@ -192,10 +201,9 @@ public class DetailController {
         // 소수점 한 자리까지 반올림
         model.addAttribute("rating", avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0);
 
-        // 4-4. 최신 리뷰 4개 (GUEST_TO_HOST)
-        // PageRequest.of(0, 4)를 사용해 상위 4개만 가져옵니다.
-        List<Review> recentReviews = reviewRepository.findByHomeAndDirectionOrderByCreatedAtDesc(
-            home, ReviewDirection.GUEST_TO_HOST, PageRequest.of(0, 4)
+        // 4-4. 최신 리뷰 4개 (JOIN FETCH 적용)
+        List<Review> recentReviews = reviewRepository.findRecentReviewsWithWriterAndReply(
+            home, ReviewDirection.GUEST_TO_HOST, PageRequest.of(0, 4) // PageRequest는 Pageable 인터페이스를 구현합니다.
         );
         model.addAttribute("recentReviews", recentReviews);
         
@@ -378,7 +386,9 @@ public class DetailController {
     @GetMapping("/{idx}/reviews/all")
     @ResponseBody
     public List<ReviewDto> getAllReviews(@PathVariable("idx") int idx) {
-        Home home = homeRepository.findById(idx)
+        //Home home = homeRepository.findById(idx)
+        //        .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + idx));
+    	Home home = homeRepository.findByIdWithAll(idx) // <--- 1차 수정
                 .orElseThrow(() -> new IllegalArgumentException("숙소가 존재하지 않습니다. idx=" + idx));
         
      // GUEST_TO_HOST 리뷰 전체 목록을 최신순으로 조회
