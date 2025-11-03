@@ -181,3 +181,16 @@ h2 {
 	color: white; 
 	border-color: white;
 }
+
+.home-price {
+    font-size: 1em;
+    font-weight: 400;
+    color: #222222;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.home-price strong {
+    font-size: 1.1em;
+    font-weight: 700;
+}

@@ -52,6 +52,9 @@
 				<div class="home-text">
 					<h3 class="home-title" th:text="${homeDto.title}">숙소 제목</h3>
 					<p class="home-desc" th:text="${homeDto.address}">숙소 주소</p>
+					<p class="home-price">
+					    <strong th:text="${#numbers.formatInteger(homeDto.costBasic, 0, 'COMMA')} + '원 ~'">0원 ~ </strong>
+					</p>
 					<p class="home-like">
 						❤️ <span th:text="${homeDto.likeCount}">0</span>
 					</p>
@@ -275,6 +278,10 @@ function renderHomeItem(homeDto) {
     const imgSrc = homeDto.thumbnail && homeDto.thumbnail.length > 0 
                    ? homeDto.thumbnail : '/images/no-image.jpg';
     
+    const formattedCost = homeDto.costBasic ? 
+            new Intl.NumberFormat('ko-KR').format(homeDto.costBasic) : 
+            '요금 미정';
+            
     return `
         <div class="home-item">
             <a href="${url}" class="home-link">
@@ -283,6 +290,9 @@ function renderHomeItem(homeDto) {
             <div class="home-text">
                 <h3 class="home-title">${homeDto.title}</h3>
                 <p class="home-desc">${homeDto.address}</p>
+                <p class="home-price">
+	                <strong>${formattedCost}원 ~ </strong> 
+                </p>                
                 <p class="home-like">❤️ <span class="likeCount">${homeDto.likeCount}</span></p>
             </div>
         </div>
