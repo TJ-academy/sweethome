@@ -150,11 +150,11 @@
 
 				<div class="search-item">
 					<label for="checkin" class="search-label">체크인</label> <input
-						type="date" id="checkin" placeholder="날짜 추가" th:value="${checkin}" />
+						type="date" id="checkin" placeholder="날짜 추가" th:value="${checkin}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
 				</div>
 				<div class="search-item">
 					<label for="checkout" class="search-label">체크아웃</label> <input
-						type="date" id="checkout" placeholder="날짜 추가" th:value="${checkout}" />
+						type="date" id="checkout" placeholder="날짜 추가" th:value="${checkout}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
 				</div>
 				
 				<div class="search-item" id="guest-search-item">
@@ -250,6 +250,9 @@
 	    
 	    // ⭐⭐ [추가] 컨트롤러에서 전달받은 현재 필터 값 (초기화, 값이 없으면 빈 문자열) ⭐⭐
 	    const currentFilter = /*[[${currentFilter != null ? currentFilter : ''}]]*/ '';
+        // ⭐⭐⭐ [핵심 추가] 컨트롤러에서 전달받은 해시태그 리스트를 JavaScript 배열로 가져옵니다. ⭐⭐⭐
+        // 'new java.util.ArrayList()'는 Thymeleaf에서 null 대신 빈 리스트를 반환하게 하는 안전 장치입니다.
+        const initialHashtags = /*[[${hashtags != null ? hashtags : new java.util.ArrayList()}]]*/ [];
 	    
 	    // ----------------------------------------------------------------------
 	    // 1. 여행지/여행자 관련 요소
@@ -332,7 +335,7 @@
 	        if(checkout) searchParams.append('checkout', checkout);
 	        
 	        // 해시태그 배열을 쿼리 파라미터로 추가
-            selectedTags.forEach(tag => searchParams.append('hashtags', tag));
+            selectedTags.forEach(tag => searchParams.append('hashtags', tag)); // 키를 중복하여 추가
             
             // ⭐⭐ [추가] 필터 값을 쿼리 파라미터로 추가 ⭐⭐
             if(newFilter) searchParams.append('filter', newFilter);
@@ -445,7 +448,7 @@
 	    });
 
 	    // ----------------------------------------------------------------------
-	    // 3. 해시태그 관련 요소 (문제가 되었던 부분)
+	    // 3. 해시태그 관련 요소 (해시태그 상태 유지 및 검색 로직 수정)
 	    // ----------------------------------------------------------------------
 	    const plusBtn = document.getElementById('plusBtn');
 	    const hashtagPopup = document.getElementById('hashtagPopup');
@@ -454,6 +457,46 @@
 	    
         function closeHashTagPopup() {
             hashtagPopup.style.display = 'none';
+        }
+        
+        // ⭐⭐⭐ [추가] 선택된 태그를 생성하고 이벤트를 연결하는 공통 함수 ⭐⭐⭐
+        function createSelectedTag(tagText) {
+            const tagEl = document.createElement('div');
+            tagEl.className = 'selected-tag';
+            tagEl.setAttribute('data-tag', tagText);
+            tagEl.innerHTML = `# ${tagText} <span>×</span>`;
+            selectedContainer.appendChild(tagEl);
+
+            // 개별 태그 제거 버튼 이벤트
+            tagEl.querySelector('span').addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                tagEl.remove();
+                // 원본 해시태그 항목의 active 상태 해제
+                document.querySelectorAll('.hashtag-item').forEach(originalItem => {
+                    if (originalItem.textContent.trim() === tagText) {
+                        originalItem.classList.remove('active');
+                    }
+                });
+                // ⭐ 해시태그 제거 시 검색 다시 실행
+                performSearch(currentFilter);
+            });
+        }
+        
+        // ⭐⭐⭐ [핵심 추가 로직] 초기 해시태그 상태 설정 함수 ⭐⭐⭐
+        function initializeHashtags() {
+            if (initialHashtags && initialHashtags.length > 0) {
+                initialHashtags.forEach(tagText => {
+                    // 1. 선택된 해시태그 컨테이너에 요소 추가
+                    createSelectedTag(tagText);
+                    
+                    // 2. 팝업 내 원본 해시태그 항목을 'active' 상태로 변경
+                    document.querySelectorAll('.hashtag-item').forEach(item => {
+                        if (item.textContent.trim() === tagText) {
+                            item.classList.add('active');
+                        }
+                    });
+                });
+            }
         }
 
 	    // + 버튼 클릭 시 팝업 열기/닫기
@@ -464,7 +507,7 @@
 	        hashtagPopup.style.display = hashtagPopup.style.display === 'block' ? 'none' : 'block';
 	    });
 	
-	    // 해시태그 클릭 시 선택/해제
+	    // 해시태그 클릭 시 선택/해제 (로직 수정: 선택/해제 후 즉시 검색 실행)
 	    hashtagItems.forEach(item => {
 	        item.addEventListener('click', () => {
 	            item.classList.toggle('active');
@@ -474,29 +517,16 @@
 	            if (existingTag) {
 	                existingTag.remove();
 	            } else {
-	                const tagEl = document.createElement('div');
-	                tagEl.className = 'selected-tag';
-	                tagEl.setAttribute('data-tag', tagText);
-	                tagEl.innerHTML = `# ${tagText} <span>×</span>`;
-	                selectedContainer.appendChild(tagEl);
-	
-	                // 개별 태그 제거 버튼
-	                tagEl.querySelector('span').addEventListener('click', (e) => {
-	                    e.stopPropagation(); // 태그 제거 시 팝업이 닫히지 않도록 방지
-	                    tagEl.remove();
-	                    // 원본 해시태그 항목의 active 상태 해제
-	                    document.querySelectorAll('.hashtag-item').forEach(originalItem => {
-	                        if (originalItem.textContent.trim() === tagText) {
-	                            originalItem.classList.remove('active');
-	                        }
-	                    });
-	                });
+	                createSelectedTag(tagText); // 공통 함수 사용
 	            }
+	            
+	            // ⭐ 해시태그 변경 시 검색 다시 실행
+	            performSearch(currentFilter);
 	        });
 	    });
 	    
 	    // ----------------------------------------------------------------------
-	    // 4. 외부 클릭 시 모든 팝업 닫기
+	    // 4. 외부 클릭 시 모든 팝업 닫기 및 초기화 함수 호출
 	    // ----------------------------------------------------------------------
 	    document.addEventListener('click', function(event) {
 	        // 필터 팝업 닫기 (기존 로직 유지)
@@ -518,6 +548,9 @@
                 closeHashTagPopup();
             }
 	    });
+        
+        // 초기화 함수 호출: 페이지 로드 시 이전에 선택된 해시태그 상태를 복원
+        initializeHashtags();
 
 	});
 </script>

@@ -127,6 +127,7 @@ public class HomeController {
         model.addAttribute("hashtags", hashtags); // 해시태그도 추가
         // ⭐⭐ [필수] 현재 선택된 필터 값을 뷰에 전달하여 라디오 버튼 상태 유지 및 JS에서 검색에 사용 ⭐⭐
         model.addAttribute("currentFilter", filter); 
+        model.addAttribute("hashtags", hashtags); 
 
         // 5. 세션에서 사용자 프로필 추가 (일관성 유지)
         User userProfile = (User) session.getAttribute("userProfile");
