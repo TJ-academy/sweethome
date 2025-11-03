@@ -1,149 +1,111 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>예약 요청</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-container {
-            flex: 1;
-            padding: 20px;
-            border-right: 2px solid #ddd;
-        }
-
-        .summary-container {
-            width: 300px;
-            padding: 20px;
-        }
-
-        .form-container h2, .summary-container h2 {
-            margin-bottom: 10px;
-        }
-
-        .form-container p {
-            margin-bottom: 10px;
-        }
-
-        .form-container button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .form-container button:hover {
-            background-color: #45a049;
-        }
-
-        .summary-container img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .summary-container .price {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .summary-container .details {
-            margin-top: 20px;
-        }
-
-        .summary-container .details p {
-            margin: 5px 0;
-        }
-
-        .form-container input[type="text"], .form-container select, .form-container input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>예약 요청</title>
+  <link rel="stylesheet" th:href="@{/css/home/reservationstart.css}">
 </head>
 <body>
 
-    <div class="container">
+  <div class="resv-container">
 
-        <!-- 예약 요청 폼 -->
-<div class="form-container">
-    <h2>예약 요청</h2>
-    
-    <form th:action="@{/home/reservationFinish}" method="post">
-        
-        <input type="hidden" name="reservedHomeId" th:value="${homeId}" /> 
-        <input type="hidden" name="adult" th:value="${adults}" /> 
-        <input type="hidden" name="child" th:value="${children}" />
-        <input type="hidden" name="startDate" th:value="${checkIn}" />
-        <input type="hidden" name="endDate" th:value="${checkOut}" />
-        <input type="hidden" name="totalMoney" th:value="${totalPrice}" />
-        
-        <div>
-            <p>1. 결제 시기 선택</p>
-            <input type="radio" id="now" name="payby" value="KAKAOPAY" checked>
-            <label for="now">지금 결제 (카카오페이)</label><br>
-            <input type="radio" id="later" name="payby" value="TRANSFER">
-            <label for="later">나중에 결제 (계좌이체)</label>
+    <div class="resv-form">
+      <h2>예약 요청</h2>
+
+      <form th:action="@{/home/reservationFinish}" method="post">
+
+        <input type="hidden" name="reservedHomeId" th:value="${homeId}">
+        <input type="hidden" name="adult" th:value="${adults}">
+        <input type="hidden" name="child" th:value="${children}">
+        <input type="hidden" name="startDate" th:value="${checkIn}">
+        <input type="hidden" name="endDate" th:value="${checkOut}">
+        <input type="hidden" name="totalMoney" th:value="${totalPrice}">
+
+        <div class="step-box">
+          <p>1. 결제 시기 선택</p>
+          <label><input type="radio" id="now" name="payby" value="KAKAOPAY" checked>지금 결제 (카카오페이)</label><br>
+          <label><input type="radio" id="later" name="payby" value="TRANSFER">나중에 결제 (계좌이체)</label><br>
         </div>
 
-        <div>
-            <p>2. 결제 수단 추가</p>
-            <input type="text" id="bank" name="bank" placeholder="은행명 (계좌이체 시 필수)">
-            <input type="text" id="account" name="account" placeholder="계좌번호 (계좌이체 시 필수)">
+       
+        <div class="step-box">
+          <p>2. 결제 수단 추가</p>
+          <input type="text" id="bank" name="bank" placeholder="은행명 (계좌이체 시 필수)">
+          <input type="text" id="account" name="account" placeholder="계좌번호 (계좌이체 시 필수)">
         </div>
 
-        <div>
-            <p>3. 호스트에게 보낼 메시지 작성</p>
-            <textarea id="host-message" name="message" rows="4" placeholder="메시지를 작성하세요."></textarea>
+
+        <div class="step-box">
+          <p>3. 호스트에게 보낼 메시지 작성</p>
+          <textarea id="host-message" name="message" placeholder="호스트에게 보낼 메시지를 작성하세요."></textarea>
         </div>
 
-        <div>
-            <p>4. 예약 내용 확인</p>
-            <button type="submit">예약 요청</button>
-        </div>
-        
-    </form>
-</div>
-
-        <!-- 예약 상세 정보 -->
-        <div class="summary-container">
-            <h2>예약 상세</h2>
-            <img th:src="${homeThumbnail}" alt="숙소 이미지">
-            <div class="details">
-                <p><strong>상품명:</strong><span th:text="${homeTitle}">숙소 제목</span></p>
-                <p><strong>날짜:</strong> <span th:text="${checkIn}"></span> ~ <span th:text="${checkOut}"></span></p>
-                <p><strong>성인:</strong><span th:text="${adults}">2</span>명</p>
-                <p><strong>어린이:</strong><span th:text="${children}">1</span>명</p>
-            </div>
-            <div class="price">
-                <p>총 금액: <span th:text="${totalPrice}">200000</span>원</p>
-                <p>총 숙박 일수: <span th:text="${nights}">2</span>박</p>
-            </div>
+		
+		        <div class="step-box">
+          <p>4. 예약 내용 확인</p>
+          <button type="submit" class="btn-submit">예약 요청</button>
         </div>
 
+      </form>
     </div>
-    
-    
-    
+	
+    <div class="resv-summary">
+      <h3>예약 상세</h3>
+      <img th:src="${homeThumbnail}" alt="숙소 이미지">
+      <div class="details">
+        <p><strong>상품명:</strong><span th:text="${homeTitle}">숙소 제목</span></p>
+        <p><strong>날짜:</strong> <span th:text="${checkIn}"></span> ~ <span th:text="${checkOut}"></span></p>
+        <p><strong>성인:</strong><span th:text="${adults}">2</span>명</p>
+        <p><strong>어린이:</strong><span th:text="${children}">1</span>명</p>
+      </div>
+      <div class="price">
+        총 금액: <span th:text="${totalPrice}">200000</span>원<br>
+        숙박 일수: <span th:text="${nights}">2</span>박
+      </div>
+    </div>
+
+  </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector("form");
+      const payNow = document.getElementById("now");
+      const payLater = document.getElementById("later");
+      const bankInput = document.getElementById("bank");
+      const accountInput = document.getElementById("account");
+      const messageBox = document.getElementById("host-message");
+
+      form.addEventListener("submit", function (e) {
+        let isValid = true;
+        let alertMsg = "";
+
+        const payType = payNow.checked ? "KAKAOPAY" : payLater.checked ? "TRANSFER" : "";
+        if (!payType) {
+          isValid = false;
+          alertMsg = "결제 시기를 선택해주세요.";
+        }
+
+
+        if (payType === "TRANSFER") {
+          if (bankInput.value.trim() === "" || accountInput.value.trim() === "") {
+            isValid = false;
+            alertMsg = "계좌이체를 선택하셨습니다.\n은행명과 계좌번호를 입력해주세요.";
+          }
+        }
+
+        if (messageBox.value.trim() === "") {
+          isValid = false;
+          alertMsg = "호스트에게 보낼 메시지를 작성해주세요.";
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          alert(alertMsg);
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>
