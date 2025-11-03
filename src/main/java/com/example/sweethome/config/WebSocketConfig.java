@@ -13,6 +13,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();   //chatList 접속 주소
 		registry.addEndpoint("/ws-notify").setAllowedOriginPatterns("*").withSockJS();   //header 접속 주소
+		registry.addEndpoint("/ws-flutter").setAllowedOriginPatterns("*").withSockJS();  //플러터 채팅 접속 주소
 	}
 	
 	@Override
