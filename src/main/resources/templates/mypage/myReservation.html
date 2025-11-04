@@ -76,7 +76,7 @@
 									</div>
 									<div>
 										<span class="badge text-bg-secondary"
-											th:text="${r.reservationStatus}">REQUESTED</span>
+											th:text="${r.reservationStatus.displayName}">REQUESTED</span>
 										<span class="ms-2"
 											th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">
 											총 500,000원
@@ -108,7 +108,8 @@
 										2025-10-01 ~ 2025-10-05
 									</div>
 									<div>
-										<span class="badge text-bg-success">COMPLETED</span>
+										<span class="badge text-bg-success"
+											th:text="${r.reservationStatus.displayName}">COMPLETED</span>
 										<span class="ms-2"
 											th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">
 											총 500,000원
@@ -141,7 +142,7 @@
 									</div>
 									<div>
 										<span class="badge text-bg-danger"
-											th:text="${r.reservationStatus}">CANCELLED</span>
+											th:text="${r.reservationStatus.displayName}">CANCELLED</span>
 										<span class="ms-2"
 											th:text="|총 ${#numbers.formatInteger(r.totalMoney,3,'COMMA')}원|">
 											총 500,000원
