@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;  
 
 @Service
@@ -110,6 +113,95 @@ public class HomeService {
                 .collect(Collectors.toList());
     }
     */
+    
+    //-----------나래------
+    public List<HomeResponseDto> searchHomesByLocationAndMaxPeople(
+            String keyword,
+            int adults,
+            int children,
+            String checkin,
+            String checkout,
+            List<String> hashtags,
+            String filter
+    ) {
+        int maxPeople = adults + children;
+
+        // 💡 [수정] 해시태그가 포함되어 있는지 확인하고, 없으면 NULL을 반환하도록 로직 수정.
+        // 💡 키워드 대신 해시태그의 실제 내용(예: "wifi")으로 체크해야 합니다.
+        // 💡 checkHashtag는 해당 태그가 리스트에 있으면 true, 없으면 null을 반환해야 쿼리에서 무시됩니다.
+        
+        // 헬퍼 함수: 태그 리스트에 해당 항목이 있으면 Boolean.TRUE를, 없으면 NULL을 반환
+        Function<String, Boolean> checkHashtag = (tag) -> 
+            (hashtags != null && hashtags.contains(tag)) ? Boolean.TRUE : null;
+        
+        Boolean wifi = checkHashtag.apply("Wifi");
+        Boolean tv = checkHashtag.apply("TV");
+        Boolean kitchen = checkHashtag.apply("주방");
+        Boolean freePark = checkHashtag.apply("무료주차");
+        Boolean selfCheckin = checkHashtag.apply("셀프체크인");
+        Boolean coldWarm = checkHashtag.apply("냉난방");
+        Boolean petFriendly = checkHashtag.apply("반려동물 동반");
+        Boolean barrierFree = checkHashtag.apply("방해물 없는 시설");
+        Boolean elevator = checkHashtag.apply("엘리베이터");
+        
+        // 💡 [추가] checkin/checkout 날짜 기반 필터링을 Service 레이어에서 처리해야 합니다.
+        // 현재 Repository 쿼리에는 이 로직이 없습니다.
+        
+        // HomeRepository에서 JOIN + 조건검색 수행
+        List<Home> homes = homeRepository.searchHomesByHashtagFilters(
+                keyword, maxPeople,
+                wifi, tv, kitchen, freePark,
+                selfCheckin, coldWarm, petFriendly,
+                barrierFree, elevator
+        );
+
+        if (homes.isEmpty()) return List.of();
+
+        // ----------------------------------------------------
+        // [추가해야 할 중요 로직] 예약 가능 날짜 필터링
+        // ----------------------------------------------------
+        
+        // 날짜 문자열을 LocalDate로 변환
+        LocalDate checkInDate = (checkin != null && !checkin.isEmpty()) ? LocalDate.parse(checkin) : null;
+        LocalDate checkOutDate = (checkout != null && !checkout.isEmpty()) ? LocalDate.parse(checkout) : null;
+                
+        // ✅ 좋아요 수 계산
+        List<Integer> homeIds = homes.stream().map(Home::getIdx).collect(Collectors.toList());
+        List<Object[]> likeCounts = wishlistRepository.countWishlistsByHomeIds(homeIds);
+
+        Map<Integer, Long> likeCountMap = likeCounts.stream()
+                .collect(Collectors.toMap(
+                        arr -> (Integer) arr[0],
+                        arr -> (Long) arr[1]
+                ));
+
+        // ✅ Home + 좋아요 수 → DTO 변환
+        List<HomeResponseDto> results = homes.stream()
+                .map(home -> new HomeResponseDto(
+                        home,
+                        likeCountMap.getOrDefault(home.getIdx(), 0L)
+                ))
+                .collect(Collectors.toList());
+
+        // ✅ 정렬 처리
+        if (filter != null) {
+            switch (filter) {
+                case "price": // 낮은 가격순
+                    results.sort(Comparator.comparingInt(HomeResponseDto::getCostBasic));
+                    break;
+                case "review": // 후기 많은 순
+                    results.sort((a, b) -> Long.compare(b.getReviewCount(), a.getReviewCount()));
+                    break;
+                case "recommend": // 추천(좋아요) 많은 순
+                    results.sort((a, b) -> Long.compare(b.getLikeCount(), a.getLikeCount()));
+                    break;
+            }
+        }
+
+        return results;
+    }
+
+    /*
     public List<HomeResponseDto> searchHomesByLocationAndMaxPeople(
             String keyword, 
             int adults,
@@ -172,6 +264,7 @@ public class HomeService {
 
         return results;
     }
+    */
     
 
     public Map<String, List<Option>> getGroupedOptions() {

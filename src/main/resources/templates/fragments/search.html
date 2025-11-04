@@ -317,9 +317,9 @@
 	        const checkout = document.getElementById('checkout').value;
 	        
 	        // 선택된 해시태그(파란색 active 버튼) 가져오기
-	        const selectedTags = Array.from(document.querySelectorAll('.hashtag-item.active'))
-	                                  .map(item => item.textContent.trim());
-	
+			const selectedTags = Array.from(document.querySelectorAll('.hashtag-item.active'))
+			                              .map(item => item.textContent.trim());
+	        
 	        const searchParams = new URLSearchParams();
 	        searchParams.append('keyword',  keyword);
 	        searchParams.append('adults',   adultCount);
@@ -329,8 +329,7 @@
 	        if (checkout) searchParams.append('checkout', checkout);
 	        
 	        // 해시태그 배열을 쿼리 파라미터로 추가
-            selectedTags.forEach(tag => searchParams.append('hashtags', tag));
-            
+			selectedTags.forEach(tag => searchParams.append('hashtags', tag)); 
             // 필터 값을 쿼리 파라미터로 추가
             if (newFilter) searchParams.append('filter', newFilter);
 	        

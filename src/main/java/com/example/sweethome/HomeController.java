@@ -91,53 +91,39 @@ public class HomeController {
                               @RequestParam(value = "hashtags", required = false) List<String> hashtags,
                               HttpSession session,
                               Model model) {
-        
-        // 1. 필터 값에 따라 정렬 기준 결정 (HomeService에서 직접 filter 값을 사용하여 정렬하므로 이 로직은 불필요)
-        /*
-        String orderBy = "default"; // 기본 정렬
-        if ("price".equals(filter)) {
-            orderBy = "price_asc";
-        } else if ("review".equals(filter)) {
-            orderBy = "review_count_desc";
-        } else if ("recommend".equals(filter)) {
-            orderBy = "recommend_count_desc";
-        }
-        */
-        
-        // ⭐⭐⭐ [수정] homeService.searchHomesByLocationAndMaxPeople 메서드에 모든 파라미터를 전달합니다. ⭐⭐⭐
+
+        // ✅ homeService에 모든 검색 조건 전달
         List<HomeResponseDto> searchResults = homeService.searchHomesByLocationAndMaxPeople(
-            keyword, 
-            adults, 
-            children, 
-            checkin, 
-            checkout, 
-            hashtags, 
+            keyword,
+            adults,
+            children,
+            checkin,
+            checkout,
+            hashtags,
             filter
         );
 
-
-        // 3. 검색 결과 모델에 추가
+        // ✅ 검색 결과를 모델에 추가
         model.addAttribute("homeList", searchResults);
-        
-        // 4. ✅ [추가] 모든 검색 조건 및 *현재 필터 값*을 Model에 추가하여 HTML로 전달합니다.
+
+        // ✅ 검색 조건들을 다시 View로 전달 (필터 유지, 검색조건 유지)
         model.addAttribute("keyword", keyword);
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("adults", adults);
         model.addAttribute("children", children);
-        model.addAttribute("hashtags", hashtags); // 해시태그도 추가
-        // ⭐⭐ [필수] 현재 선택된 필터 값을 뷰에 전달하여 라디오 버튼 상태 유지 및 JS에서 검색에 사용 ⭐⭐
-        model.addAttribute("currentFilter", filter); 
-        model.addAttribute("hashtags", hashtags); 
+        model.addAttribute("hashtags", hashtags);
+        model.addAttribute("currentFilter", filter);
 
-        // 5. 세션에서 사용자 프로필 추가 (일관성 유지)
+        // ✅ 로그인 사용자 정보 추가 (세션에 존재할 경우)
         User userProfile = (User) session.getAttribute("userProfile");
         if (userProfile != null) {
             model.addAttribute("userProfile", userProfile);
         }
 
+        // ✅ 검색 결과 페이지로 이동
         return "home";
-    }    
+    }
     /*
     //여행지 검색
     @GetMapping("/search")
