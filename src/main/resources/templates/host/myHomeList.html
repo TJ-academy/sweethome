@@ -1,89 +1,139 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
 <meta charset="UTF-8">
 <title>호스트 숙소 목록</title>
+
+<!-- Bootstrap -->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
 	rel="stylesheet"
 	integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
 	crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
 	integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
 	crossorigin="anonymous"></script>
+
 <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
 <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
 <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+<link rel="stylesheet" th:href="@{/css/host/homelist.css}">
+
 <style>
-    .home-card { 
-        display: flex; 
-        align-items: center; 
-        border: 1px solid #ddd; 
-        border-radius: 8px; 
-        margin-bottom: 15px;
-        padding: 10px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .home-card:hover {
-        background-color: #f8f8f8;
-    }
-    .home-thumb { 
-        width: 80px; 
-        height: 80px; 
-        border-radius: 6px; 
-        object-fit: cover; 
-        margin-right: 15px; 
-    }
-    .home-info { line-height: 1.4; flex-grow: 1; }
-    .home-title { font-weight: 600; font-size: 1.1rem; }
-    .home-meta { font-size: 0.9rem; color: #666; }
-    .home-price { font-weight: 700; color: #007bff; }
+/* ===== 상단 영역 ===== */
+.mypage-content-area {
+    min-height: auto !important; /* ✅ 고정 높이 해제 */
+    padding: 0 !important;       /* ✅ 내부 여백 제거 (불필요하면 유지) */
+    border: none !important;     /* ✅ 테두리도 필요 없으면 제거 */
+    background: transparent !important; /* ✅ 배경 흰색 제거 */
+    
+}
+
+.mypage-content-col {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important; /* ✅ 혹시 하단 패딩도 있으면 제거 */
+}
 </style>
 </head>
-<body>
-	<div th:insert="~{fragments/header :: menuBar}"></div>
-	<div class="mypage-layout-wrap container">
-		<div class="row">
-			<div class="mypage-sidebar-col col-lg-3">
-				<div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
-			</div>
-		
-			<div class="mypage-content-col col-lg-9">
-                <div class="mypage-content-area">
-                    <h1>등록 숙소 목록</h1>
-                    
-                    <a th:href="@{/home/writeOne}" class="btn btn-primary mb-3">새 숙소 등록</a>
-                    
-                    <div th:if="${#lists.isEmpty(myHomes)}" class="alert alert-info">
-                        현재 등록된 숙소가 없습니다.
-                    </div>
-                    
-                    <div th:each="home : ${myHomes}">
-                        <a th:href="@{/host/detail/{idx}(idx=${home.idx})}" style="text-decoration: none; color: inherit;">
-                            <div class="home-card">
-                                <img class="home-thumb" th:src="${home.thumbnail}" alt="숙소 썸네일"
-                                     onerror="this.src='/images/no-image.png'">
-                                <div class="home-info">
-                                    <div class="home-title" th:text="${home.title}">[예시] 편안한 강남 원룸</div>
-                                    <div class="home-meta" th:text="${home.location}">서울시 강남구</div>
-                                    <div class="home-meta">
-                                        <span th:text="${home.homeType}">APARTMENT</span>
-                                        <span>|</span>
-                                        <span th:text="|최대 ${home.maxPeople}인|">최대 4인</span>
-                                    </div>
-                                    <div class="home-price" th:text="|1박 기준: ${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">
-                                        1박 기준: 100,000원
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
 
+<body>
+<div th:insert="~{fragments/header :: menuBar}"></div>
+<div class="title-row d-flex justify-content-between align-items-center">
+
+<div class="mypage-layout-wrap container">
+    <div class="row">
+        <div class="mypage-sidebar-col col-lg-3">
+            <div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
+        </div>
+
+        <div class="mypage-content-col col-lg-9">
+            <div class="mypage-content-area">
+                <!-- 제목 + +버튼 -->
+                <div class="title-row">
+                    <h1>등록 숙소 목록</h1>
+                    <a th:href="@{/home/writeOne}" class="add-home-btn">
+                        <i class="bi bi-plus-lg"></i>
+                    </a>
+                </div>
+
+                <!-- 보기 전환 버튼 -->
+                <div class="view-toggle">
+                    <button id="gridViewBtn" class="btn btn-outline-primary active" title="카드형 보기">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                    </button>
+                    <button id="listViewBtn" class="btn btn-outline-secondary" title="목록형 보기">
+                        <i class="bi bi-list"></i>
+                    </button>
                 </div>
             </div>
+			<th:block th:if="${#lists.isEmpty(myHomes)}">
+			    <div class="alert alert-info m-0 p-0">현재 등록된 숙소가 없습니다.</div>
+			</th:block>
+
+            <!-- 숙소 목록 -->
+            <div id="homeContainer" class="home-list grid-view">
+                <a th:each="home : ${myHomes}" 
+                   th:href="@{/host/detail/{idx}(idx=${home.idx})}" 
+                   style="text-decoration: none; color: inherit;">
+                    <div class="home-card">
+                        <img class="home-thumb" th:src="${home.thumbnail}" alt="숙소 썸네일"
+                             onerror="this.src='/images/no-image.png'">
+                        <div class="home-info">
+                            <div class="home-meta" th:text="${home.location}">서울시 강남구</div>
+                            <div class="home-title" th:text="${home.title}">[예시] 편안한 강남 원룸</div>
+                            <div class="home-meta">
+                                <span th:text="${home.homeType}">APARTMENT</span>
+                                <span>|</span>
+                                <span th:text="|최대 ${home.maxPeople}인|">최대 4인</span>
+                            </div>
+                            <div class="home-price"
+                                 th:text="|1박 기준: ${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원|">
+                                1박 기준: 100,000원
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
         </div>
     </div>
+</div>
+
+<!-- 보기 전환 스크립트 -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const gridBtn = document.getElementById("gridViewBtn");
+    const listBtn = document.getElementById("listViewBtn");
+    const container = document.getElementById("homeContainer");
+
+    // 이전에 저장된 보기 모드 불러오기 (localStorage)
+    const savedView = localStorage.getItem("homeViewMode");
+    if (savedView === "list") {
+        container.classList.remove("grid-view");
+        container.classList.add("list-view");
+        gridBtn.classList.remove("active");
+        listBtn.classList.add("active");
+    }
+
+    gridBtn.addEventListener("click", () => {
+        container.classList.remove("list-view");
+        container.classList.add("grid-view");
+        gridBtn.classList.add("active");
+        listBtn.classList.remove("active");
+        localStorage.setItem("homeViewMode", "grid");
+    });
+
+    listBtn.addEventListener("click", () => {
+        container.classList.remove("grid-view");
+        container.classList.add("list-view");
+        listBtn.classList.add("active");
+        gridBtn.classList.remove("active");
+        localStorage.setItem("homeViewMode", "list");
+    });
+});
+</script>
+
 </body>
 </html>
