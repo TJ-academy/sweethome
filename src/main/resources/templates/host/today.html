@@ -175,9 +175,32 @@
     const TODAY_DATE_YMD = '[[${#temporals.format(todayDate, "yyyyMMdd")}]]';
     const rows = document.querySelectorAll('#reservation-list tr[data-tab]');
     const emptyMessageRow = document.getElementById('empty-message-row');
+    /*
     let activeTab = '[[${currentTab}]]'; // 서버에서 넘겨받은 초기 탭을 사용
     let activeHomeIdx = 'all';
-
+	*/
+	//나래수정 시작
+	let activeTab = 'today'; 
+    
+    let activeHomeIdx = 'all';
+    
+    // 💡 추가 1: 초기 로드 시 today 탭 버튼과 필터 영역을 강제로 활성화/표시
+    document.querySelectorAll('.host-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.host-tabs .tab-btn[data-tab="today"]').classList.add('active');
+    
+    document.getElementById('filter-today').classList.remove('hidden');
+    document.getElementById('filter-upcoming').classList.add('hidden');
+    document.getElementById('filter-requests').classList.add('hidden');
+    
+    // 숙소 필터 초기화 확인 (선택 사항이지만 안전을 위해)
+    document.querySelectorAll('.home-filter-wrap .chip').forEach(chip => chip.classList.remove('active'));
+    document.querySelector('.home-filter-wrap .chip[data-home-idx="all"]').classList.add('active');
+    
+    // 내부 필터 '전체 오늘 일정' 활성화 확인
+    document.querySelectorAll('#filter-today .chip').forEach(chip => chip.classList.remove('active'));
+    document.querySelector('#filter-today .chip:first-child').classList.add('active');
+    //나래수정끝
+    
     // 1. 메인 탭 전환 및 필터 초기화
     document.querySelectorAll('.host-tabs .tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -208,6 +231,9 @@
     // 2. 통합 필터링 로직 함수
     function updateReservationList() {
         let visibleCount = 0;
+        
+        //초기상태 필터적용을 위해 모든 행 초기화
+        rows.forEach(row => row.classList.remove('hidden'));
         
         // 현재 탭의 내부 필터 값 가져오기
         const activeInnerFilter = document.querySelector('#filter-' + activeTab + ' .chip.active');
