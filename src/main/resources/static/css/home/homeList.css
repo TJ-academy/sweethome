@@ -97,9 +97,34 @@ h2 {
 }
 
 .home-like {
-  font-size: 13px;
-  color: var(--home-red);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
+
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: #999;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.1);
+  color: #ff6b81;
+}
+
+.like-btn.liked i {
+  color: #ff4b5c;
+}
+
+.like-count {
+  font-size: 15px;
+  color: #444;
+}
+
 
 /* 숙소 없음 */
 .no-home {

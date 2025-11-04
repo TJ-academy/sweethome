@@ -9,8 +9,8 @@
 		<div class="main-content">
 			<div class="search-container">
 				<div class="search-item" id="destination-search-item">
-					<label for="destination" class="search-label">여행지</label> <input
-						type="text" id="destination" placeholder="여행지 검색" th:value="${keyword}" />
+					<label for="destination" class="search-label">여행지</label>
+					<input type="text" id="destination" placeholder="여행지 검색" th:value="${keyword}" />
 					<div class="recommendation-list" id="recommendation-list">
 						<div class="recommendation-item" data-region="서울">
 							<div class="item-icon icon-city">🏛️</div>
@@ -23,8 +23,7 @@
 							<div class="item-icon icon-city">🎡</div>
 							<div class="item-text">
 								<div class="item-title">경기</div>
-								<div class="item-description">수도권 최대 규모의 해양문화공간과 복합 테마파크를
-									즐길 수 있는 곳</div>
+								<div class="item-description">수도권 최대 규모의 해양문화공간과 복합 테마파크를 즐길 수 있는 곳</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="인천">
@@ -38,32 +37,28 @@
 							<div class="item-icon icon-city">🔬</div>
 							<div class="item-text">
 								<div class="item-title">대전</div>
-								<div class="item-description">과학 명소와 황톳길, 메타세콰이어 숲 등 생태환경이
-									풍부한 도시</div>
+								<div class="item-description">과학 명소와 황톳길, 메타세콰이어 숲 등 생태환경이 풍부한 도시</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="세종">
 							<div class="item-icon icon-city">🌳</div>
 							<div class="item-text">
 								<div class="item-title">세종</div>
-								<div class="item-description">국립수목원, 호수공원 등 다양한 휴식 공간이 있는
-									행정 중심 복합도시</div>
+								<div class="item-description">국립수목원, 호수공원 등 다양한 휴식 공간이 있는 행정 중심 복합도시</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="충남">
 							<div class="item-icon icon-sea">🌊</div>
 							<div class="item-text">
 								<div class="item-title">충남</div>
-								<div class="item-description">광활한 갯벌과 고운 백사장, 아름다운 일출을 간직한
-									서해의 명소</div>
+								<div class="item-description">광활한 갯벌과 고운 백사장, 아름다운 일출을 간직한 서해의 명소</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="충북">
 							<div class="item-icon icon-mountain">⛰️</div>
 							<div class="item-text">
 								<div class="item-title">충북</div>
-								<div class="item-description">단양 패러글라이딩, 이끼터널 등 자연경관이 아름다운
-									내륙의 명소</div>
+								<div class="item-description">단양 패러글라이딩, 이끼터널 등 자연경관이 아름다운 내륙의 명소</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="광주">
@@ -77,101 +72,107 @@
 							<div class="item-icon icon-sea">🎋</div>
 							<div class="item-text">
 								<div class="item-title">전남</div>
-								<div class="item-description">죽녹원, 느러지전망대, 해상케이블카 등 아름다운
-									비경과 자연이 가득한 곳</div>
+								<div class="item-description">죽녹원, 느러지전망대, 해상케이블카 등 아름다운 비경과 자연이 가득한 곳</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="전북">
 							<div class="item-icon icon-city">韓</div>
 							<div class="item-text">
 								<div class="item-title">전북</div>
-								<div class="item-description">단풍으로 유명한 내장산과 근대 유산이 풍부한 군산
-									등 역사가 깊은 예향의 고장</div>
+								<div class="item-description">단풍으로 유명한 내장산과 근대 유산이 풍부한 군산 등 역사가 깊은 예향의 고장</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="대구">
 							<div class="item-icon icon-city">🥖</div>
 							<div class="item-text">
 								<div class="item-title">대구</div>
-								<div class="item-description">서문시장, 근대골목 등 볼거리와 먹거리가 가득한
-									활기 넘치는 도시</div>
+								<div class="item-description">서문시장, 근대골목 등 볼거리와 먹거리가 가득한 활기 넘치는 도시</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="경북">
 							<div class="item-icon icon-mountain">🏘️</div>
 							<div class="item-text">
 								<div class="item-title">경북</div>
-								<div class="item-description">퇴계 선생의 가르침이 남아있는 도산서원, 독도 일출
-									등 역사와 자연이 공존하는 곳</div>
+								<div class="item-description">퇴계 선생의 가르침이 남아있는 도산서원, 독도 일출 등 역사와 자연이 공존하는 곳</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="부산">
 							<div class="item-icon icon-sea">🌉</div>
 							<div class="item-text">
 								<div class="item-title">부산</div>
-								<div class="item-description">해운대, 송도 등 바다의 정석을 보여주는 우리나라
-									최대 해양도시</div>
+								<div class="item-description">해운대, 송도 등 바다의 정석을 보여주는 우리나라 최대 해양도시</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="울산">
 							<div class="item-icon icon-sea">🐳</div>
 							<div class="item-text">
 								<div class="item-title">울산</div>
-								<div class="item-description">태화강 국가정원, 간절곶 등 생태정원과 해양문화가
-									어우러진 산업 수도</div>
+								<div class="item-description">태화강 국가정원, 간절곶 등 생태정원과 해양문화가 어우러진 산업 수도</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="경남">
 							<div class="item-icon icon-sea">⛴️</div>
 							<div class="item-text">
 								<div class="item-title">경남</div>
-								<div class="item-description">한려해상국립공원, 진주성과 같이 바다와 역사가
-									조화를 이루는 곳</div>
+								<div class="item-description">한려해상국립공원, 진주성과 같이 바다와 역사가 조화를 이루는 곳</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="강원">
 							<div class="item-icon icon-mountain">❄️</div>
 							<div class="item-text">
 								<div class="item-title">강원</div>
-								<div class="item-description">설악산, 경포대 등 웅장한 산맥과 동해안 바다가
-									어우러진 대한민국 대표 휴양지</div>
+								<div class="item-description">설악산, 경포대 등 웅장한 산맥과 동해안 바다가 어우러진 대한민국 대표 휴양지</div>
 							</div>
 						</div>
 						<div class="recommendation-item" data-region="제주">
 							<div class="item-icon icon-island">🍊</div>
 							<div class="item-text">
 								<div class="item-title">제주</div>
-								<div class="item-description">돌과 바람, 오름과 푸른 바다가 함께하는 대한민국
-									최고의 섬 관광지</div>
+								<div class="item-description">돌과 바람, 오름과 푸른 바다가 함께하는 대한민국 최고의 섬 관광지</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
 				<div class="search-item">
-					<label for="checkin" class="search-label">체크인</label> <input
-						type="date" id="checkin" placeholder="날짜 추가" th:value="${checkin}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+					<label for="checkin" class="search-label">체크인</label>
+					<input
+						type="date"
+						id="checkin"
+						placeholder="날짜 추가"
+						th:value="${checkin}"
+						th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
 				</div>
 				<div class="search-item">
-					<label for="checkout" class="search-label">체크아웃</label> <input
-						type="date" id="checkout" placeholder="날짜 추가" th:value="${checkout}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+					<label for="checkout" class="search-label">체크아웃</label>
+					<input
+						type="date"
+						id="checkout"
+						placeholder="날짜 추가"
+						th:value="${checkout}"
+						th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
 				</div>
 				
 				<div class="search-item" id="guest-search-item">
 					<div style="flex-grow: 1;">
 						<label for="guests" class="search-label">여행자</label> 
-						<input type="text" id="guests" placeholder="게스트 추가" readonly
-							style="cursor: pointer; background-color: transparent;" th:value="${(adults != 0 or children != 0) ? 
-        '성인 ' + adults + '명' + (children != 0 ? ', 어린이 ' + children + '명' : '') : ''}" />
+						<input
+							type="text"
+							id="guests"
+							placeholder="게스트 추가"
+							readonly
+							style="cursor: pointer; background-color: transparent;"
+							th:value="${(adults != 0 or children != 0) ? 
+								'성인 ' + adults + '명' + (children != 0 ? ', 어린이 ' + children + '명' : '') : ''}" />
 					</div>
 
 					<div class="search-button-wrap">
 						<button class="search-button">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
 								fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path
+								<path
 									d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.041.062.083.098.124l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.124-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
-                    </svg>
+							</svg>
 						</button>
 					</div>
 					
@@ -212,75 +213,69 @@
 						필터
 					</button>
 					<div class="filter-popup" id="filterPopup">
-					  <h4>필터</h4>
-					  <label><input type="radio" name="filter" value="price"> 최저가 순</label><br>
-					  <label><input type="radio" name="filter" value="review"> 후기 많은 순</label><br>
-					  <label><input type="radio" name="filter" value="recommend"> 추천 많은 순</label>
+						<h4>필터</h4>
+						<label><input type="radio" name="filter" value="price"> 최저가 순</label><br>
+						<label><input type="radio" name="filter" value="review"> 후기 많은 순</label><br>
+						<label><input type="radio" name="filter" value="recommend"> 추천 많은 순</label>
 					</div>
 				</div>
 				
-				<div class="plus-btn-wrapper" id="plusBtnContainer">
-					<button class="plusBtn" id="plusBtn">+</button>
-					  <div class="hashtag-popup" id="hashtagPopup">
-					    <h4>해시태그 선택</h4>
-					    <div class="hashtag-list" id="hashtagList">
-					      <div class="hashtag-item">방해물 없는 시설</div>
-					      <div class="hashtag-item">냉난방</div>
-					      <div class="hashtag-item">엘리베이터</div>
-					      <div class="hashtag-item">무료주차</div>
-					      <div class="hashtag-item">주방</div>
-					      <div class="hashtag-item">반려동물 동반</div>
-					      <div class="hashtag-item">셀프체크인</div>
-					      <div class="hashtag-item">TV</div>
-					      <div class="hashtag-item">Wifi</div>
-					      </div>
-					  </div>
+				<!-- 해시태그: + 버튼/팝업 없이 바로 토글되는 버튼 형태 -->
+				<div class="hashtag-container">
+					<div class="hashtag-list" id="hashtagList">
+						<div class="hashtag-item">방해물 없는 시설</div>
+						<div class="hashtag-item">냉난방</div>
+						<div class="hashtag-item">엘리베이터</div>
+						<div class="hashtag-item">무료주차</div>
+						<div class="hashtag-item">주방</div>
+						<div class="hashtag-item">반려동물 동반</div>
+						<div class="hashtag-item">셀프체크인</div>
+						<div class="hashtag-item">TV</div>
+						<div class="hashtag-item">Wifi</div>
+					</div>
 				</div>
-				
-				<div class="selected-hashtags" id="selectedHashtags"></div>
 				
 			</div>
 			<hr style="color: #E5E5E5;">
 		</div>
+
 <script th:inline="javascript">
 	document.addEventListener('DOMContentLoaded', function() {
 	    // Controller에서 전달받은 값 (초기화, 값이 없으면 0으로 설정)
-	    const initialAdults = /*[[${adults != null ? adults : 0}]]*/ 0; 
+	    const initialAdults   = /*[[${adults   != null ? adults   : 0}]]*/ 0; 
 	    const initialChildren = /*[[${children != null ? children : 0}]]*/ 0;
 	    
-	    // ⭐⭐ [추가] 컨트롤러에서 전달받은 현재 필터 값 (초기화, 값이 없으면 빈 문자열) ⭐⭐
-	    const currentFilter = /*[[${currentFilter != null ? currentFilter : ''}]]*/ '';
-        // ⭐⭐⭐ [핵심 추가] 컨트롤러에서 전달받은 해시태그 리스트를 JavaScript 배열로 가져옵니다. ⭐⭐⭐
-        // 'new java.util.ArrayList()'는 Thymeleaf에서 null 대신 빈 리스트를 반환하게 하는 안전 장치입니다.
+	    // 컨트롤러에서 전달받은 현재 필터 값 (초기화, 값이 없으면 빈 문자열)
+	    const currentFilter   = /*[[${currentFilter != null ? currentFilter : ''}]]*/ '';
+        // 컨트롤러에서 전달받은 해시태그 리스트 (선택된 상태 유지용)
         const initialHashtags = /*[[${hashtags != null ? hashtags : new java.util.ArrayList()}]]*/ [];
 	    
 	    // ----------------------------------------------------------------------
 	    // 1. 여행지/여행자 관련 요소
 	    // ----------------------------------------------------------------------
 	    const destinationSearchItem = document.getElementById('destination-search-item');
-	    const destinationInput = document.getElementById('destination');
-	    const recommendationList = document.getElementById('recommendation-list');
-	    const recommendationItems = document.querySelectorAll('.recommendation-item');
-	    const searchButton = document.querySelector('.search-button');
+	    const destinationInput      = document.getElementById('destination');
+	    const recommendationList    = document.getElementById('recommendation-list');
+	    const recommendationItems   = document.querySelectorAll('.recommendation-item');
+	    const searchButton          = document.querySelector('.search-button');
 	
 	    const guestSearchItem = document.getElementById('guest-search-item');
-	    const guestInput = document.getElementById('guests');
-	    const guestSettings = document.getElementById('guest-settings');
-	    const adultCountSpan = document.getElementById('adult-count');
-	    const childCountSpan = document.getElementById('child-count');
+	    const guestInput      = document.getElementById('guests');
+	    const guestSettings   = document.getElementById('guest-settings');
+	    const adultCountSpan  = document.getElementById('adult-count');
+	    const childCountSpan  = document.getElementById('child-count');
 	
-	    let adultCount = initialAdults;
-	    let childCount = initialChildren;
+	    let adultCount  = initialAdults;
+	    let childCount  = initialChildren;
 	
 	    function toggleDestinationList(show) {
 	        if (show) {
-	            recommendationList.style.display = 'block';
+	            recommendationList.style.display   = 'block';
 	            recommendationList.style.visibility = 'visible';
 	            destinationSearchItem.classList.add('active');
 	            toggleGuestSettings(false);
-                closeHashTagPopup(); // 여행지 열릴 때 해시태그 팝업 닫기
 	        } else {
-	            recommendationList.style.display = 'none';
+	            recommendationList.style.display   = 'none';
 	            recommendationList.style.visibility = 'hidden';
 	            destinationSearchItem.classList.remove('active');
 	        }
@@ -288,13 +283,12 @@
 	    
 	    function toggleGuestSettings(show) {
 	        if (show) {
-	            guestSettings.style.display = 'block';
+	            guestSettings.style.display   = 'block';
 	            guestSettings.style.visibility = 'visible';
 	            guestSearchItem.classList.add('active');
 	            toggleDestinationList(false);
-                closeHashTagPopup(); // 여행자 열릴 때 해시태그 팝업 닫기
 	        } else {
-	            guestSettings.style.display = 'none';
+	            guestSettings.style.display   = 'none';
 	            guestSettings.style.visibility = 'hidden';
 	            guestSearchItem.classList.remove('active');
 	        }
@@ -303,7 +297,7 @@
 	    function updateGuestCount() {
 	        const total = adultCount + childCount;
 	        if (total === 0) {
-	            guestInput.value = '';
+	            guestInput.value       = '';
 	            guestInput.placeholder = '게스트 추가';
 	        } else if (childCount === 0) {
 	            guestInput.value = `성인 ${adultCount}명`;
@@ -312,33 +306,33 @@
 	        }
 	        adultCountSpan.textContent = adultCount;
 	        childCountSpan.textContent = childCount;
-	        document.querySelector('.decrement-btn[data-type="adult"]').disabled = adultCount === 0;
-	        document.querySelector('.decrement-btn[data-type="child"]').disabled = childCount === 0;
+	        document.querySelector('.decrement-btn[data-type="adult"]').disabled  = adultCount  === 0;
+	        document.querySelector('.decrement-btn[data-type="child"]').disabled  = childCount  === 0;
 	    }
 	
-	    // ⭐⭐⭐ [수정] performSearch 함수를 필터 값을 인수로 받도록 수정 ⭐⭐⭐
-	    function performSearch(newFilter = currentFilter) { // 기본값으로 현재 필터 사용
-	        const keyword = destinationInput.value.trim();
-	        const checkin = document.getElementById('checkin').value;
+	    // 검색 실행 (필터 값 포함)
+	    function performSearch(newFilter = currentFilter) {
+	        const keyword  = destinationInput.value.trim();
+	        const checkin  = document.getElementById('checkin').value;
 	        const checkout = document.getElementById('checkout').value;
 	        
-	        // 선택된 해시태그 가져오기
-	        const selectedTags = Array.from(document.querySelectorAll('.selected-tag'))
-	                                .map(tagEl => tagEl.getAttribute('data-tag'));
+	        // 선택된 해시태그(파란색 active 버튼) 가져오기
+	        const selectedTags = Array.from(document.querySelectorAll('.hashtag-item.active'))
+	                                  .map(item => item.textContent.trim());
 	
 	        const searchParams = new URLSearchParams();
-	        searchParams.append('keyword', keyword);
-	        searchParams.append('adults', adultCount);
+	        searchParams.append('keyword',  keyword);
+	        searchParams.append('adults',   adultCount);
 	        searchParams.append('children', childCount);
 	        
-	        if(checkin) searchParams.append('checkin', checkin);
-	        if(checkout) searchParams.append('checkout', checkout);
+	        if (checkin)  searchParams.append('checkin',  checkin);
+	        if (checkout) searchParams.append('checkout', checkout);
 	        
 	        // 해시태그 배열을 쿼리 파라미터로 추가
-            selectedTags.forEach(tag => searchParams.append('hashtags', tag)); // 키를 중복하여 추가
+            selectedTags.forEach(tag => searchParams.append('hashtags', tag));
             
-            // ⭐⭐ [추가] 필터 값을 쿼리 파라미터로 추가 ⭐⭐
-            if(newFilter) searchParams.append('filter', newFilter);
+            // 필터 값을 쿼리 파라미터로 추가
+            if (newFilter) searchParams.append('filter', newFilter);
 	        
 	        window.location.href = `/search?${searchParams.toString()}`;
 	    }
@@ -352,7 +346,7 @@
 	    document.querySelectorAll('.guest-controls button').forEach(button => {
 	        button.addEventListener('click', function(event) {
 	            event.stopPropagation();
-	            const type = this.getAttribute('data-type');
+	            const type        = this.getAttribute('data-type');
 	            const isIncrement = this.classList.contains('increment-btn');
 	            
 	            if (type === 'adult') {
@@ -397,14 +391,12 @@
 	
 	    searchButton.addEventListener('click', function(event) {
 	        event.preventDefault();
-	        // 검색 버튼 클릭 시 현재 필터 값을 포함하여 검색 실행
 	        performSearch(currentFilter); 
 	    });
 	
 	    destinationInput.addEventListener('keypress', function(event) {
 	        if (event.key === 'Enter') {
 	            event.preventDefault();
-	            // Enter 키 입력 시 현재 필터 값을 포함하여 검색 실행
 	            performSearch(currentFilter);
 	        }
 	    });
@@ -414,83 +406,43 @@
 	    // ----------------------------------------------------------------------
 	    // 2. 필터 관련 요소
 	    // ----------------------------------------------------------------------
-	    const filterBtn = document.querySelector('.filterBtn');
-	    const filterPopup = document.getElementById('filterPopup');
-	    // ⭐⭐ [추가] 필터 라디오 버튼들을 가져옵니다. ⭐⭐
+	    const filterBtn    = document.querySelector('.filterBtn');
+	    const filterPopup  = document.getElementById('filterPopup');
 	    const filterRadios = document.querySelectorAll('input[name="filter"]');
 	
 	    filterBtn.addEventListener('click', function(e) {
 	        e.stopPropagation();
 	        filterPopup.style.display = filterPopup.style.display === 'block' ? 'none' : 'block';
-            closeHashTagPopup(); // 필터 열릴 때 해시태그 팝업 닫기
 	    });
 	
 	    filterPopup.addEventListener('click', function(e) {
 	        e.stopPropagation();
 	    });
 	    
-	    // ⭐⭐⭐ [핵심 추가 로직] 라디오 버튼 변경 감지 및 즉시 검색 실행 ⭐⭐⭐
+	    // 라디오 버튼 변경 감지 및 즉시 검색 실행
 	    filterRadios.forEach(radio => {
-	        // 1. 초기 필터 상태 설정: 페이지 로드 시 현재 필터 값이 있다면 해당 라디오 버튼을 체크합니다.
 	        if (radio.value === currentFilter) {
 	            radio.checked = true;
 	        }
 	        
-	        // 2. change 이벤트 리스너: 라디오 버튼 선택 시 즉시 검색 실행
 	        radio.addEventListener('change', function() {
 	            if (this.checked) {
-	                // 필터 팝업을 닫고
 	                filterPopup.style.display = 'none'; 
-	                // 새로운 필터 값을 포함하여 검색 실행
 	                performSearch(this.value); 
 	            }
 	        });
 	    });
 
 	    // ----------------------------------------------------------------------
-	    // 3. 해시태그 관련 요소 (해시태그 상태 유지 및 검색 로직 수정)
+	    // 3. 해시태그 관련 요소 (버튼 토글 방식)
 	    // ----------------------------------------------------------------------
-	    const plusBtn = document.getElementById('plusBtn');
-	    const hashtagPopup = document.getElementById('hashtagPopup');
 	    const hashtagItems = document.querySelectorAll('.hashtag-item');
-	    const selectedContainer = document.getElementById('selectedHashtags');
-	    
-        function closeHashTagPopup() {
-            hashtagPopup.style.display = 'none';
-        }
         
-        // ⭐⭐⭐ [추가] 선택된 태그를 생성하고 이벤트를 연결하는 공통 함수 ⭐⭐⭐
-        function createSelectedTag(tagText) {
-            const tagEl = document.createElement('div');
-            tagEl.className = 'selected-tag';
-            tagEl.setAttribute('data-tag', tagText);
-            tagEl.innerHTML = `# ${tagText} <span>×</span>`;
-            selectedContainer.appendChild(tagEl);
-
-            // 개별 태그 제거 버튼 이벤트
-            tagEl.querySelector('span').addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                tagEl.remove();
-                // 원본 해시태그 항목의 active 상태 해제
-                document.querySelectorAll('.hashtag-item').forEach(originalItem => {
-                    if (originalItem.textContent.trim() === tagText) {
-                        originalItem.classList.remove('active');
-                    }
-                });
-                // ⭐ 해시태그 제거 시 검색 다시 실행
-                performSearch(currentFilter);
-            });
-        }
-        
-        // ⭐⭐⭐ [핵심 추가 로직] 초기 해시태그 상태 설정 함수 ⭐⭐⭐
+        // 초기 해시태그 상태 설정 (서버에서 넘어온 hashtags 기준으로 active 처리)
         function initializeHashtags() {
             if (initialHashtags && initialHashtags.length > 0) {
                 initialHashtags.forEach(tagText => {
-                    // 1. 선택된 해시태그 컨테이너에 요소 추가
-                    createSelectedTag(tagText);
-                    
-                    // 2. 팝업 내 원본 해시태그 항목을 'active' 상태로 변경
-                    document.querySelectorAll('.hashtag-item').forEach(item => {
+                    hashtagItems.forEach(item => {
                         if (item.textContent.trim() === tagText) {
                             item.classList.add('active');
                         }
@@ -499,37 +451,19 @@
             }
         }
 
-	    // + 버튼 클릭 시 팝업 열기/닫기
-	    plusBtn.addEventListener('click', (e) => {
-	        e.stopPropagation();
-	        toggleDestinationList(false); // 다른 팝업 닫기
-            toggleGuestSettings(false); // 다른 팝업 닫기
-	        hashtagPopup.style.display = hashtagPopup.style.display === 'block' ? 'none' : 'block';
-	    });
-	
-	    // 해시태그 클릭 시 선택/해제 (로직 수정: 선택/해제 후 즉시 검색 실행)
+	    // 해시태그 클릭 시 선택/해제 후 즉시 검색
 	    hashtagItems.forEach(item => {
 	        item.addEventListener('click', () => {
 	            item.classList.toggle('active');
-	            const tagText = item.textContent.trim();
-	            const existingTag = selectedContainer.querySelector(`[data-tag="${tagText}"]`);
-	
-	            if (existingTag) {
-	                existingTag.remove();
-	            } else {
-	                createSelectedTag(tagText); // 공통 함수 사용
-	            }
-	            
-	            // ⭐ 해시태그 변경 시 검색 다시 실행
 	            performSearch(currentFilter);
 	        });
 	    });
 	    
 	    // ----------------------------------------------------------------------
-	    // 4. 외부 클릭 시 모든 팝업 닫기 및 초기화 함수 호출
+	    // 4. 외부 클릭 시 팝업 닫기
 	    // ----------------------------------------------------------------------
 	    document.addEventListener('click', function(event) {
-	        // 필터 팝업 닫기 (기존 로직 유지)
+	        // 필터 팝업 닫기
 	        filterPopup.style.display = 'none';
 
 	        // 여행지/여행자 팝업 닫기
@@ -539,17 +473,9 @@
 	        if (!guestSearchItem.contains(event.target)) {
 	            toggleGuestSettings(false);
 	        }
-
-            // 해시태그 팝업 닫기
-            const isClickInsideHashTagPopup = hashtagPopup.contains(event.target);
-            const isClickOnPlusBtn = plusBtn.contains(event.target);
-
-            if (!isClickInsideHashTagPopup && !isClickOnPlusBtn) {
-                closeHashTagPopup();
-            }
 	    });
         
-        // 초기화 함수 호출: 페이지 로드 시 이전에 선택된 해시태그 상태를 복원
+        // 초기화: 페이지 로드 시 이전에 선택된 해시태그 상태 복원
         initializeHashtags();
 
 	});
