@@ -89,4 +89,28 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
          + "WHERE r.home = :home AND r.direction = :direction "
          + "ORDER BY r.createdAt DESC")
     List<Review> findRecentReviewsWithWriterAndReply(@Param("home") Home home, @Param("direction") ReviewDirection direction, Pageable pageable);
+    
+    /**
+     * 특정 Home ID 목록에 대해 GUEST_TO_HOST 방향의 리뷰 개수를 집계합니다.
+     * @param homeIds 집계할 Home의 idx 목록
+     * @param direction 리뷰 방향 (GUEST_TO_HOST)
+     * @return Map<Home ID, 리뷰 개수>
+     */
+    @Query("SELECT r.home.idx, COUNT(r) "
+         + "FROM Review r "
+         + "WHERE r.home.idx IN :homeIds AND r.direction = :direction "
+         + "GROUP BY r.home.idx")
+    List<Object[]> countReviewsByHomeIdInAndDirection(@Param("homeIds") List<Integer> homeIds, 
+                                                    @Param("direction") ReviewDirection direction);
+    
+    /**
+     * 특정 Home ID 목록에 대해 GUEST_TO_HOST 방향의 평균 별점과 리뷰 개수를 집계합니다.
+     * @param homeIds 집계할 Home의 idx 목록
+     * @return List<Object[]> (Home ID, 평균 평점, 리뷰 개수)
+     */
+    @Query("SELECT r.home.idx, AVG(r.star), COUNT(r) "
+         + "FROM Review r "
+         + "WHERE r.home.idx IN :homeIds AND r.direction = 'GUEST_TO_HOST' "
+         + "GROUP BY r.home.idx")
+    List<Object[]> findAverageRatingAndCountByHomeIdIn(@Param("homeIds") List<Integer> homeIds);
 }

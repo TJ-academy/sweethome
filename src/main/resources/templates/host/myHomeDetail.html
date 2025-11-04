@@ -21,13 +21,13 @@
 </head>
 <body>
 	<div th:insert="~{fragments/header :: menuBar}"></div>
-	<div class="mypage-layout-wrap container-fluid">
+	<div class="mypage-layout-wrap container">
 		<div class="row">
-			<div class="mypage-sidebar-col">
+			<div class="mypage-sidebar-col col-lg-3">
 				<div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
 			</div>
 		
-			<div class="mypage-content-col">
+			<div class="mypage-content-col col-lg-9">
                 <div class="mypage-content-area">
                     <h1 class="h4 mb-3">숙소 상세 정보</h1>
                     

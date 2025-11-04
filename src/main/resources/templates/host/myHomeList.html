@@ -44,13 +44,13 @@
 </head>
 <body>
 	<div th:insert="~{fragments/header :: menuBar}"></div>
-	<div class="mypage-layout-wrap container-fluid">
+	<div class="mypage-layout-wrap container">
 		<div class="row">
-			<div class="mypage-sidebar-col">
+			<div class="mypage-sidebar-col col-lg-3">
 				<div th:insert="~{fragments/sidebarHost :: hostSideBar}"></div>
 			</div>
 		
-			<div class="mypage-content-col">
+			<div class="mypage-content-col col-lg-9">
                 <div class="mypage-content-area">
                     <h1>등록 숙소 목록</h1>
                     

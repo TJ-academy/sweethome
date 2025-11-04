@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.sweethome.home.HomeResponseDto;
 import com.example.sweethome.home.HomeService;
+import com.example.sweethome.review.ReviewRepository;
 import com.example.sweethome.user.User;
 
 import jakarta.servlet.http.HttpSession;

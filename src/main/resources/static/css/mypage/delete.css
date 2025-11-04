@@ -5,7 +5,7 @@
 /* 전체 레이아웃 */
 .mypage-layout-wrap {
   padding: 60px 0;
-  background-color: #f9fafb;
+  /* background-color: #f9fafb; */
   min-height: 80vh;
 }
 
