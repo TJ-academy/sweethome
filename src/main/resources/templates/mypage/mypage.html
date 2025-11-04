@@ -20,13 +20,13 @@
 </head>
 <body>
     <div th:insert="~{fragments/header :: menuBar}"></div>
-    <div class="mypage-layout-wrap container-fluid">
+    <div class="mypage-layout-wrap container">
         <div class="row">
-            <div class="mypage-sidebar-col">
+            <div class="mypage-sidebar-col col-lg-3">
                 <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
             </div>
 
-			<div class="mypage-content-col">
+			<div class="mypage-content-col col-lg-9">
 			  <div class="mypage-content-area">
 			    <h1>마이페이지</h1>
 
@@ -70,6 +70,7 @@
 			    </div>
 			  </div>
 			</div>
+		</div>
     </div>
     
     

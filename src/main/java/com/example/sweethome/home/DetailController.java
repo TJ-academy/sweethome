@@ -3,6 +3,8 @@ package com.example.sweethome.home;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,6 +51,12 @@ public class DetailController {
     /** 상세 페이지: /home/detail/{idx} */
     @GetMapping("/{idx}")
     public String show(@PathVariable("idx") int idx, Model model, HttpSession session, @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value = "checkin", required = false) String checkin, @RequestParam(value = "checkout", required = false) String checkout, @RequestParam(value = "adults", required = false, defaultValue = "0") Integer adults, @RequestParam(value = "children", required = false, defaultValue = "0") Integer children) {
+    	
+    	 // 오늘 날짜 계산 (LocalDate 객체로 전달)
+        LocalDate today = LocalDate.now();
+
+        // 모델에 today 추가 (String이 아닌 LocalDate 타입)
+        model.addAttribute("today", today); 
     	
     	// ******************** 수정된 부분: userProfile 추가 ********************
         Object userProfile = session.getAttribute("userProfile");

@@ -49,7 +49,8 @@
 </head>
 <body>
 	<div th:insert="fragments/header :: menuBar"></div>
-	<div th:insert="fragments/search :: searchSection(
+	<div
+		th:insert="fragments/search :: searchSection(
     keyword=${keyword}, 
     checkin=${checkin}, 
     checkout=${checkout}, 
@@ -87,7 +88,8 @@
 			</button>
 
 			<button class="btn btn-primary" th:if="${userProfile == null}"
-				th:onclick="|window.location.href='/home/like?homeId=${home.idx}'|">로그인 후 좋아요</button>
+				th:onclick="|window.location.href='/home/like?homeId=${home.idx}'|">로그인
+				후 좋아요</button>
 		</div>
 
 
@@ -155,8 +157,7 @@
 						<p th:if="${hostMemberSince != null}"
 							th:text="|호스트 활동 기간: ${hostMemberSince}년|">호스트 활동 기간: 3년</p>
 						<form th:action="@{/chat/room/question}" method="post">
-							<input type="hidden" name="host"
-								th:value="${home.host.email}" />
+							<input type="hidden" name="host" th:value="${home.host.email}" />
 							<button type="submit">문의하기</button>
 						</form>
 					</div>
@@ -172,49 +173,37 @@
 
 				<input type="hidden" id="nights" name="nights" value="0" /> <input
 					type="hidden" id="totalCost" name="totalMoney" value="0" />
-				<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#compareModal">
-					위시리스트와 비교하기
-				</button>
+				<button type="button" class="btn btn-outline-secondary"
+					data-bs-toggle="modal" data-bs-target="#compareModal">
+					위시리스트와 비교하기</button>
 				<div class="price">
 					<span
 						th:text="|${#numbers.formatInteger(home.costBasic, 3, 'COMMA')}원~|">720,000원</span>
 					<span> &nbsp; (1박 기준)</span>
 				</div>
 				<div class="dates">
-					<label for="startDate">체크인</label> 
-					<input type="date"
-					    id="startDate" 
-					    name="startDate"
-					    th:value="${checkin}" 
-					    th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" />
-				    
-					<label for="endDate">체크아웃</label> 
-					<input type="date" 
-					    id="endDate"
-					    name="endDate"
-					    th:value="${checkout}"
-					    th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
+					<label for="startDate">체크인</label> <input type="date"
+						id="startDate" name="startDate" th:value="${checkin}"
+						th:attr="min=${#temporals.format(today,'yyyy-MM-dd')}" /> <label
+						for="endDate">체크아웃</label> <input type="date" id="endDate"
+						name="endDate" th:value="${checkout}"
+						th:attr="min=${#temporals.format(tomorrow,'yyyy-MM-dd')}" />
 				</div>
 				<p th:text="|이 숙소의 최대 인원은 ${home.maxPeople}명 (어린이 제외)입니다.|"
 					style="font-size: 0.9em; margin-bottom: 5px; color: #555;">이
 					숙소의 최대 인원은 10명 (어린이 제외)입니다.</p>
 
 				<select name="adult" id="guests">
-				    <option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
-				        th:value="${guest}" 
-				        th:text="|성인 ${guest}명|"
-				        th:selected="${guest == adults}"> 성인 2명
-				    </option>
-				</select> 
-				
-				<select name="child" id="children" style="margin-top: 10px;">
-				    <option value="0" th:selected="${children == null or children == 0}">어린이 0명</option> 
-				    
-				    <option th:each="child : ${#numbers.sequence(1, 5)}"
-				        th:value="${child}" 
-				        th:text="|어린이 ${child}명|"
-				        th:selected="${child == children}"> 어린이 1명
-				    </option>
+					<option th:each="guest : ${#numbers.sequence(1, home.maxPeople)}"
+						th:value="${guest}" th:text="|성인 ${guest}명|"
+						th:selected="${guest == adults}">성인 2명</option>
+				</select> <select name="child" id="children" style="margin-top: 10px;">
+					<option value="0"
+						th:selected="${children == null or children == 0}">어린이 0명</option>
+
+					<option th:each="child : ${#numbers.sequence(1, 5)}"
+						th:value="${child}" th:text="|어린이 ${child}명|"
+						th:selected="${child == children}">어린이 1명</option>
 				</select>
 				<div id="total-price-box"
 					style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
@@ -248,44 +237,52 @@
 		<div id="map"></div>
 
 		<div class="review-section mt-5">
-			<h2 th:if="${reviewCount > 0}" th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
+			<h2 th:if="${reviewCount > 0}"
+				th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
 			<h2 th:if="${reviewCount == 0}">아직 작성된 후기가 없습니다.</h2>
 
 			<div class="row g-4" th:if="${!#lists.isEmpty(recentReviews)}">
-				<div class="col-md-6" th:each="review : ${recentReviews}" th:if="${review.writer != null}">
+				<div class="col-md-6" th:each="review : ${recentReviews}"
+					th:if="${review.writer != null}">
 					<div class="review-card p-3 border rounded-3 h-100">
 						<div class="d-flex align-items-center mb-2">
-							<img th:src="${review.writer.profileImg != null ? review.writer.profileImg : '/images/host_default.jpg'}"
-								src="/images/host_default.jpg" alt="게스트 이미지" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+							<img
+								th:src="${review.writer.profileImg != null ? review.writer.profileImg : '/images/host_default.jpg'}"
+								src="/images/host_default.jpg" alt="게스트 이미지"
+								class="rounded-circle me-2"
+								style="width: 40px; height: 40px; object-fit: cover;">
 							<div>
 								<p class="fw-bold mb-0" th:text="${review.writer.username}"></p>
-								<small class="text-muted" th:text="${#temporals.format(review.createdAt, 'yyyy년 M월')}"></small>
+								<small class="text-muted"
+									th:text="${#temporals.format(review.createdAt, 'yyyy년 M월')}"></small>
 							</div>
 						</div>
-						
+
 						<p class="small mb-2">
-						  <span style="color: gold;">
-						    <span th:each="i : ${#numbers.sequence(1,5)}"
-						          th:text="${i <= (review?.star ?: 0)} ? '★' : '☆'">☆</span>
-						  </span>
-						  <span th:text="${review?.star ?: 0}">4</span>
+							<span style="color: gold;"> <span
+								th:each="i : ${#numbers.sequence(1,5)}"
+								th:text="${i <= (review?.star ?: 0)} ? '★' : '☆'">☆</span>
+							</span> <span th:text="${review?.star ?: 0}">4</span>
 						</p>
-						
-						<p class="review-text mb-0" style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: pre-line;" 
-							th:text="${review.content}">
-							모든 것이 완벽했고 오션뷰가 정말 좋았습니다. 숙소도 깨끗하고 호스트님도 친절하셔서 다음에도 꼭 재방문할 거예요.
-						</p>
-						
-						<div th:if="${review.reply != null and review.reply.content != null}" class="reply-preview mt-3 small text-muted">
-						    <p class="mb-0 fw-semibold">호스트 답변:</p>
-						    <p class="mb-0 text-truncate" th:text="${review.reply.content}"></p>
+
+						<p class="review-text mb-0"
+							style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: pre-line;"
+							th:text="${review.content}">모든 것이 완벽했고 오션뷰가 정말 좋았습니다. 숙소도
+							깨끗하고 호스트님도 친절하셔서 다음에도 꼭 재방문할 거예요.</p>
+
+						<div
+							th:if="${review.reply != null and review.reply.content != null}"
+							class="reply-preview mt-3 small text-muted">
+							<p class="mb-0 fw-semibold">호스트 답변:</p>
+							<p class="mb-0 text-truncate" th:text="${review.reply.content}"></p>
 						</div>
 
 					</div>
 				</div>
 			</div>
-			
-			<div class="mt-4" th:if="${reviewCount > 4}" style="text-align: right;">
+
+			<div class="mt-4" th:if="${reviewCount > 4}"
+				style="text-align: right;">
 				<button type="button" class="btn btn-outline-dark rounded-pill px-4"
 					data-bs-toggle="modal" data-bs-target="#allReviewsModal"
 					style="border-color: black;">
@@ -293,30 +290,36 @@
 				</button>
 			</div>
 		</div>
-		
-		<div class="modal fade" id="allReviewsModal" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-		    <div class="modal-content">
-		      <div class="modal-header border-0">
-		        <h5 class="modal-title fw-bold" id="allReviewsModalLabel">전체 후기</h5>
-		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-		      </div>
-		      <div class="modal-body pt-0">
-		      	
-		      	<div class="d-flex align-items-center mb-4">
-		      		<h4 class="fw-bold me-2 mb-0" th:text="|★ ${rating}|">★ 4.9</h4>
-		      		<span class="text-muted" th:text="|(${reviewCount}개 후기)|">(12개 후기)</span>
-		      	</div>
-		      	
-		      	<div id="allReviewsContainer" class="row g-4">
-		          <div class="col-12 text-center text-muted">로딩 중...</div>
-		        </div>
-		      </div>
-		      <div class="modal-footer border-0">
-		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-		      </div>
-		    </div>
-		  </div>
+
+		<div class="modal fade" id="allReviewsModal" tabindex="-1"
+			aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+			<div
+				class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class="modal-header border-0">
+						<h5 class="modal-title fw-bold" id="allReviewsModalLabel">전체
+							후기</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="닫기"></button>
+					</div>
+					<div class="modal-body pt-0">
+
+						<div class="d-flex align-items-center mb-4">
+							<h4 class="fw-bold me-2 mb-0" th:text="|★ ${rating}|">★ 4.9</h4>
+							<span class="text-muted" th:text="|(${reviewCount}개 후기)|">(12개
+								후기)</span>
+						</div>
+
+						<div id="allReviewsContainer" class="row g-4">
+							<div class="col-12 text-center text-muted">로딩 중...</div>
+						</div>
+					</div>
+					<div class="modal-footer border-0">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="amenities-section">
@@ -473,10 +476,77 @@
 									.getElementById('totalCost');
 
 							// 2-3. 이벤트 리스너 등록
-							startDateInput.addEventListener('change',
-									calculatePrice);
-							endDateInput.addEventListener('change',
-									calculatePrice);
+							startDateInput.addEventListener('change', function() {
+							    handleStartDateChange();
+							    calculatePrice();  // 유효성 검사 후 가격 계산
+							});
+							endDateInput.addEventListener('change', function() {
+							    handleEndDateChange();
+							    calculatePrice();  // 유효성 검사 후 가격 계산
+							});
+							
+							// Helper function to format Date object to yyyy-MM-dd string (for min attribute setting)
+							function dateToString(date) {
+							    const y = date.getFullYear();
+							    const m = String(date.getMonth() + 1).padStart(2, '0');
+							    const d = String(date.getDate()).padStart(2, '0');
+							    return `${y}-${m}-${d}`;
+							}
+							
+							/**
+							 * 체크인 날짜 변경 시 체크아웃 날짜의 최소값을 설정하고, 필요하면 체크아웃 날짜를 조정합니다.
+							 */
+							function handleStartDateChange() {
+							    const startDateStr = startDateInput.value;
+							    if (!startDateStr) return;
+
+							    const startDate = new Date(startDateStr);
+							    startDate.setHours(0, 0, 0, 0); // 시간 초기화
+
+							    // 1. 체크아웃 input의 최소 날짜를 '체크인 다음 날'로 설정
+							    const nextDay = new Date(startDate);
+							    nextDay.setDate(nextDay.getDate() + 1);
+							    const nextDayStr = dateToString(nextDay);
+							    
+							    // HTML5의 min 속성을 동적으로 업데이트
+							    endDateInput.setAttribute('min', nextDayStr);
+
+							    let endDate = new Date(endDateInput.value);
+							    endDate.setHours(0, 0, 0, 0); // 시간 초기화
+
+							    // 2. 만약 현재 체크아웃 날짜가 체크인 날짜와 같거나 그 이전이라면
+							    if (endDate <= startDate || !endDateInput.value) {
+							        // 체크아웃 날짜를 체크인 다음 날로 자동 설정
+							        endDateInput.value = nextDayStr;
+							    }
+							}
+
+							/**
+							 * 체크아웃 날짜 변경 시 체크인 날짜보다 최소 하루 이상 뒤인지 확인하고, 유효하지 않으면 조정합니다.
+							 */
+							function handleEndDateChange() {
+							    const startDateStr = startDateInput.value;
+							    const endDateStr = endDateInput.value;
+
+							    if (!startDateStr || !endDateStr) return;
+
+							    const startDate = new Date(startDateStr);
+							    const endDate = new Date(endDateStr);
+							    startDate.setHours(0, 0, 0, 0);
+							    endDate.setHours(0, 0, 0, 0);
+
+							    // 체크아웃이 체크인보다 이전이거나 같으면 (유효하지 않은 경우)
+							    if (endDate <= startDate) {
+							        // 체크인 다음 날을 계산
+							        const nextDay = new Date(startDate);
+							        nextDay.setDate(nextDay.getDate() + 1);
+							        const nextDayStr = dateToString(nextDay);
+
+							        // 체크아웃 날짜를 체크인 다음 날로 강제 조정
+							        endDateInput.value = nextDayStr;
+							        alert("체크아웃 날짜는 체크인 날짜보다 최소 하루 이상 뒤여야 합니다. 체크아웃 날짜가 자동으로 조정되었습니다.");
+							    }
+							}
 
 							// 페이지 로드 시 초기 가격 계산 (만약 날짜가 미리 채워져 있다면)
 							calculatePrice();
@@ -760,84 +830,90 @@
             window.location.href = `/compare?ids=${urlIds}`;
         }
 	</script>
-<!-- 비교하기 모달 -->
-<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content compare-modal">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold" id="compareModalLabel">위시리스트에서 선택</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
+	<!-- 비교하기 모달 -->
+	<div class="modal fade" id="compareModal" tabindex="-1"
+		aria-labelledby="compareModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content compare-modal">
+				<div class="modal-header border-0 pb-0">
+					<h5 class="modal-title fw-bold" id="compareModalLabel">위시리스트에서
+						선택</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="닫기"></button>
+				</div>
 
-      <!-- ✅ 현재 숙소 미리보기 영역 -->
-      <div class="current-home-preview">
-        <div id="selectedHomesPreview" class="d-flex flex-wrap justify-content-center gap-3">          <img th:src="${homePhoto.images != null and !#lists.isEmpty(homePhoto.images) ? homePhoto.images[0] : '/images/default_main_image.jpg'}"
-               src="/images/sample_main.jpg"
-               alt="현재 숙소 썸네일"
-               class="current-home-img">
-          <div class="current-home-info">
-            <p class="current-home-title" th:text="${home.title}">숙소 제목</p>
-            <span class="badge bg-primary-subtle text-primary fw-semibold">현재 숙소</span>
-          </div>
-        </div>
-      </div>
+				<!-- ✅ 현재 숙소 미리보기 영역 -->
+				<div class="current-home-preview">
+					<div id="selectedHomesPreview"
+						class="d-flex flex-wrap justify-content-center gap-3">
+						<img
+							th:src="${homePhoto.images != null and !#lists.isEmpty(homePhoto.images) ? homePhoto.images[0] : '/images/default_main_image.jpg'}"
+							src="/images/sample_main.jpg" alt="현재 숙소 썸네일"
+							class="current-home-img">
+						<div class="current-home-info">
+							<p class="current-home-title" th:text="${home.title}">숙소 제목</p>
+							<span class="badge bg-primary-subtle text-primary fw-semibold">현재
+								숙소</span>
+						</div>
+					</div>
+				</div>
 
-      <div class="modal-body pt-0">
+				<div class="modal-body pt-0">
 
-        <!-- ✅ STEP 1: 위시리스트 폴더 목록 -->
-        <div id="wishlistStep1" th:if="${folders != null and !#lists.isEmpty(folders)}">
-          <div class="row g-4">
-            <div class="col-md-4" th:each="folder : ${folders}">
-              <div class="wishlist-card"
-                   th:attr="data-folder-id=${folder.idx}, data-folder-name=${folder.folderName}"
-                   onclick="selectFolder(this)">
-                <div class="wishlist-image-grid">
-                  <img th:each="wish, iterStat : ${folderWishlists[folder.idx]}"
-                       th:if="${iterStat.index < 4 and wish.home != null}"
-                       th:src="@{${wish.home.thumbnail}}"
-                       alt="썸네일"
-                       class="wishlist-thumb" />
-                </div>
-                <div class="wishlist-info mt-2">
-                  <p class="fw-semibold mb-0" th:text="${folder.folderName}">폴더 이름</p>
-                  <small class="text-muted"
-				     th:text="|저장된 항목 ${folderWishlists[folder.idx] != null ? #lists.size(folderWishlists[folder.idx]) : 0}개|">
-				    저장된 항목 3개
-				</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+					<!-- ✅ STEP 1: 위시리스트 폴더 목록 -->
+					<div id="wishlistStep1"
+						th:if="${folders != null and !#lists.isEmpty(folders)}">
+						<div class="row g-4">
+							<div class="col-md-4" th:each="folder : ${folders}">
+								<div class="wishlist-card"
+									th:attr="data-folder-id=${folder.idx}, data-folder-name=${folder.folderName}"
+									onclick="selectFolder(this)">
+									<div class="wishlist-image-grid">
+										<img th:each="wish, iterStat : ${folderWishlists[folder.idx]}"
+											th:if="${iterStat.index < 4 and wish.home != null}"
+											th:src="@{${wish.home.thumbnail}}" alt="썸네일"
+											class="wishlist-thumb" />
+									</div>
+									<div class="wishlist-info mt-2">
+										<p class="fw-semibold mb-0" th:text="${folder.folderName}">폴더
+											이름</p>
+										<small class="text-muted"
+											th:text="|저장된 항목 ${folderWishlists[folder.idx] != null ? #lists.size(folderWishlists[folder.idx]) : 0}개|">
+											저장된 항목 3개 </small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-        <div th:if="${folders == null or #lists.isEmpty(folders)}" class="text-center text-muted">
-          <p>등록된 위시리스트 폴더가 없습니다.</p>
-        </div>
+					<div th:if="${folders == null or #lists.isEmpty(folders)}"
+						class="text-center text-muted">
+						<p>등록된 위시리스트 폴더가 없습니다.</p>
+					</div>
 
-        <!-- ✅ STEP 2: 선택한 폴더의 숙소 목록 -->
-        <div id="wishlistStep2" style="display:none;">
-          <div class="d-flex align-items-center mb-3">
-            <button type="button" class="btn btn-link p-0 me-2" onclick="goBackToFolders()">←</button>
-            <h6 id="selectedFolderName" class="fw-bold mb-0">폴더 이름</h6>
-          </div>
-          <div class="row g-4" id="selectedFolderHomes"></div>
-        </div>
-      </div>
+					<!-- ✅ STEP 2: 선택한 폴더의 숙소 목록 -->
+					<div id="wishlistStep2" style="display: none;">
+						<div class="d-flex align-items-center mb-3">
+							<button type="button" class="btn btn-link p-0 me-2"
+								onclick="goBackToFolders()">←</button>
+							<h6 id="selectedFolderName" class="fw-bold mb-0">폴더 이름</h6>
+						</div>
+						<div class="row g-4" id="selectedFolderHomes"></div>
+					</div>
+				</div>
 
-      <div class="modal-footer border-0 d-flex flex-column align-items-center">
-        <p class="text-muted mb-2 small">
-          현재 숙소를 포함해 최대 3곳까지 비교 가능합니다.
-        </p>
-        <button id="nextOrCompareBtn" type="button"
-                class="btn btn-primary w-50 rounded-pill"
-                onclick="goNextStep()">다음으로</button>
-      </div>
-    </div>
-  </div>
-</div>
+				<div
+					class="modal-footer border-0 d-flex flex-column align-items-center">
+					<p class="text-muted mb-2 small">현재 숙소를 포함해 최대 3곳까지 비교 가능합니다.</p>
+					<button id="nextOrCompareBtn" type="button"
+						class="btn btn-primary w-50 rounded-pill" onclick="goNextStep()">다음으로</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
-<script th:inline="javascript">
+	<script th:inline="javascript">
   // 서버에서 전달된 folderWishlists 데이터를 JS로 안전하게 받기
   const folderWishlists = /*[[${folderWishlists}]]*/ {};
   let selectedFolderId = null;
