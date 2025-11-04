@@ -47,8 +47,17 @@
 				<div class="card shadow-sm">
 					<div class="card-body">
 						<div class="mb-3">
-							<span class="badge text-bg-secondary badge-status"
-								th:text="${reservation.reservationStatus}">REQUESTED</span>
+							<span class="badge badge-status"
+								th:classappend="${
+                                    #strings.equals(reservation.reservationStatus.name(), 'CONFIRMED') ? 'text-bg-primary' :
+                                    #strings.equals(reservation.reservationStatus.name(), 'IN_USE') ? 'text-bg-success' :
+                                    #strings.equals(reservation.reservationStatus.name(), 'COMPLETED') ? 'text-bg-success' :
+                                    #strings.equals(reservation.reservationStatus.name(), 'CANCEL_REQUESTED') ? 'text-bg-warning' :
+                                    #strings.equals(reservation.reservationStatus.name(), 'CANCELLED') ? 'text-bg-danger' :
+                                    #strings.equals(reservation.reservationStatus.name(), 'REJECTED') ? 'text-bg-danger' :
+                                    'text-bg-secondary'
+                                }"
+								th:text="${reservation.reservationStatus.displayName}">REQUESTED</span>
 						</div>
 
 						<div class="kv">

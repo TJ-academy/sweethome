@@ -71,17 +71,16 @@ body {
 						<h2 class="h5 mb-3" th:text="*{reservedHome.title}">숙소 제목</h2>
 
 						<div class="d-flex justify-content-between align-items-center mb-4">
-							<span th:switch="*{reservationStatus}"> <span
-								th:case="REQUESTED" class="badge text-bg-secondary">예약 대기
-									중</span> <span th:case="CONFIRMED" class="badge text-bg-primary">예약
-									확정</span> <span th:case="IN_USE" class="badge text-bg-success">이용
-									중</span> <span th:case="COMPLETED" class="badge text-bg-success">이용
-									완료</span> <span th:case="CANCEL_REQUESTED"
-								class="badge text-bg-warning">취소 요청 중</span> <span
-								th:case="CANCELLED" class="badge text-bg-danger">취소 완료</span> <span
-								th:case="REJECTED" class="badge text-bg-danger">예약 거절</span> <span
-								th:case="*" class="badge text-bg-light"
-								th:text="*{reservationStatus}">기타 상태</span>
+							<span class="badge" 
+							      th:classappend="${
+							      		#strings.equals(reservation.reservationStatus.name(), 'CONFIRMED') ? 'text-bg-primary' :
+							      		#strings.equals(reservation.reservationStatus.name(), 'IN_USE') ? 'text-bg-success' :
+							      		#strings.equals(reservation.reservationStatus.name(), 'COMPLETED') ? 'text-bg-success' :
+							      		#strings.equals(reservation.reservationStatus.name(), 'REQUESTED') ? 'text-bg-secondary' :
+							      		#strings.equals(reservation.reservationStatus.name(), 'CANCEL_REQUESTED') ? 'text-bg-warning' :
+							      		'text-bg-danger'}" 
+							      th:text="*{reservationStatus.displayName}">
+							    예약 상태
 							</span>
 
 							<div
