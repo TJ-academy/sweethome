@@ -1,5 +1,6 @@
 package com.example.sweethome.home;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,5 +73,49 @@ public interface HomeRepository extends JpaRepository<Home, Integer> {
             @Param("elevator") Boolean elevator
     );
 
+ // ✅ [수정 및 통합] 날짜 필터링을 포함한 최적화된 검색 쿼리
+    // 💡 쿼리 이름을 searchAllFilters로 변경하여 모든 조건을 처리함을 명확히 함
+    @Query("""
+        SELECT h 
+        FROM Home h 
+        JOIN h.hashtag tag
+        WHERE LOWER(h.location) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        AND h.maxPeople >= :maxPeople
+        
+        AND (:wifi IS NULL OR tag.wifi = true)
+        AND (:tv IS NULL OR tag.tv = true)
+        AND (:kitchen IS NULL OR tag.kitchen = true)
+        AND (:freePark IS NULL OR tag.freePark = true)
+        AND (:selfCheckin IS NULL OR tag.selfCheckin = true)
+        AND (:coldWarm IS NULL OR tag.coldWarm = true)
+        AND (:petFriendly IS NULL OR tag.petFriendly = true)
+        AND (:barrierFree IS NULL OR tag.barrierFree = true)
+        AND (:elevator IS NULL OR tag.elevator = true)
+        
+        AND h.idx NOT IN (
+            SELECT r.reservedHome.idx 
+            FROM Reservation r 
+            WHERE 
+                r.reservationStatus IN ('CONFIRMED', 'IN_USE', 'REQUESTED') AND
+                (r.endDate > :checkinDate AND r.startDate < :checkoutDate)
+        )
+        """)
+    List<Home> searchAllFilters(
+            @Param("keyword") String keyword,
+            @Param("maxPeople") int maxPeople,
+            // 💡 [추가] 날짜 파라미터
+            @Param("checkinDate") LocalDate checkinDate, 
+            @Param("checkoutDate") LocalDate checkoutDate,
+            // 기존 해시태그 파라미터 유지
+            @Param("wifi") Boolean wifi,
+            @Param("tv") Boolean tv,
+            @Param("kitchen") Boolean kitchen,
+            @Param("freePark") Boolean freePark,
+            @Param("selfCheckin") Boolean selfCheckin,
+            @Param("coldWarm") Boolean coldWarm,
+            @Param("petFriendly") Boolean petFriendly,
+            @Param("barrierFree") Boolean barrierFree,
+            @Param("elevator") Boolean elevator
+    );
 }
 

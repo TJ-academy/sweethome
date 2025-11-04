@@ -144,6 +144,8 @@ public class HomeService {
         Boolean barrierFree = checkHashtag.apply("방해물 없는 시설");
         Boolean elevator = checkHashtag.apply("엘리베이터");
         
+        
+        /*
         // 💡 [추가] checkin/checkout 날짜 기반 필터링을 Service 레이어에서 처리해야 합니다.
         // 현재 Repository 쿼리에는 이 로직이 없습니다.
         
@@ -154,6 +156,39 @@ public class HomeService {
                 selfCheckin, coldWarm, petFriendly,
                 barrierFree, elevator
         );
+        */
+        
+     // 2. 💡 [수정] 날짜 파라미터 준비: LocalDate로 변환
+        LocalDate checkInDate = (checkin != null && !checkin.isEmpty()) ? LocalDate.parse(checkin) : null;
+        LocalDate checkOutDate = (checkout != null && !checkout.isEmpty()) ? LocalDate.parse(checkout) : null;
+        
+        // 체크인 날짜가 체크아웃 날짜보다 크거나 같은 경우, 날짜 필터를 무시 (null 처리)
+        if (checkInDate != null && checkOutDate != null && !checkOutDate.isAfter(checkInDate)) {
+             checkInDate = null;
+             checkOutDate = null;
+        }
+
+        List<Home> homes;
+        
+        // 3. 🚀 [핵심 수정] 날짜 유무에 따라 쿼리 분기 처리
+        if (checkInDate != null && checkOutDate != null) {
+            // ✅ 날짜가 모두 유효한 경우: 예약 필터링 포함 쿼리 호출 (searchAllFilters)
+            homes = homeRepository.searchAllFilters( 
+                    keyword, maxPeople,
+                    checkInDate, checkOutDate, // 날짜 파라미터 전달
+                    wifi, tv, kitchen, freePark,
+                    selfCheckin, coldWarm, petFriendly,
+                    barrierFree, elevator
+            );
+        } else {
+            // ✅ 날짜가 없는 경우: 기존 해시태그 쿼리 호출 (searchHomesByHashtagFilters)
+            homes = homeRepository.searchHomesByHashtagFilters(
+                    keyword, maxPeople,
+                    wifi, tv, kitchen, freePark,
+                    selfCheckin, coldWarm, petFriendly,
+                    barrierFree, elevator
+            );
+        }
 
         if (homes.isEmpty()) return List.of();
 
@@ -162,8 +197,8 @@ public class HomeService {
         // ----------------------------------------------------
         
         // 날짜 문자열을 LocalDate로 변환
-        LocalDate checkInDate = (checkin != null && !checkin.isEmpty()) ? LocalDate.parse(checkin) : null;
-        LocalDate checkOutDate = (checkout != null && !checkout.isEmpty()) ? LocalDate.parse(checkout) : null;
+        //LocalDate checkInDate = (checkin != null && !checkin.isEmpty()) ? LocalDate.parse(checkin) : null;
+        //LocalDate checkOutDate = (checkout != null && !checkout.isEmpty()) ? LocalDate.parse(checkout) : null;
                 
         // ✅ 좋아요 수 계산
         List<Integer> homeIds = homes.stream().map(Home::getIdx).collect(Collectors.toList());
