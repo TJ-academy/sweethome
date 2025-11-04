@@ -93,4 +93,13 @@ public class Reservation {
     
     private String memoForCheckIn;
     private String memoForCheckOut;
+    
+    /*------결제 관련 필드---------------------*/
+	// 아임포트 주문 번호 (서버에서 생성, 고유값)
+    @Column(unique = true, length = 40)
+    private String merchantUid; 
+
+    // 아임포트 결제 고유 번호 (결제 성공 시 아임포트에서 부여)
+    @Column(length = 40)
+    private String impUid;
 }

@@ -2,6 +2,7 @@ package com.example.sweethome.reservation;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -141,4 +142,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findActiveCheckOutsByHostAndDate(@Param("host") User host,
                                                        @Param("date") LocalDate date);
 
+    Optional<Reservation> findByMerchantUid(String merchantUid);
 }
