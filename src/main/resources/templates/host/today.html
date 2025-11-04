@@ -46,10 +46,16 @@
             <div class="board-date">오늘 날짜: <span th:text="${todayDate}">2025-10-24</span></div>
           </div>
 
-          <div class="chip-wrap home-filter-wrap">
-            <button class="chip active" data-home-idx="all">전체 숙소</button>
-            <button class="chip" th:each="home : ${myHomes}" th:text="${home.title}" th:attr="data-home-idx=${home.idx}"></button>
-          </div>
+		<div class="chip-wrap home-filter-wrap">
+		  <button class="chip active" data-home-idx="all">전체 숙소</button>
+		
+		  <button class="chip"
+		          th:each="home : ${myHomes}"
+		          th:attr="data-home-idx=${home.idx}"
+		          th:style="'--bg:url(' + ${home.thumbnail} + ');'">
+		      <span th:text="${home.title}"></span>
+		  </button>
+		</div>
 
           <div class="chip-wrap status-filter-wrap" id="filter-today" th:classappend="${currentTab != 'today' ? 'hidden' : ''}">
               <button class="chip status-chip active" data-status="all">전체 오늘 일정</button>
