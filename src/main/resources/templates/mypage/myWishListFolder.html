@@ -20,15 +20,15 @@
   <div th:insert="~{fragments/header :: menuBar}"></div>
 
   <!-- 전체 레이아웃 -->
-  <div class="mypage-layout-wrap container-fluid">
+  <div class="mypage-layout-wrap container">
     <div class="row">
       <!-- 왼쪽 사이드바 -->
-      <div class="mypage-sidebar-col">
+      <div class="mypage-sidebar-col col-lg-3">
         <div th:insert="~{fragments/sidebar :: guestSideBar}"></div>
       </div>
 
       <!-- 오른쪽 콘텐츠 -->
-      <div class="mypage-content-col">
+      <div class="mypage-content-col col-lg-9">
         <div class="mypage-content-area">
           <h1>내 위시리스트 폴더</h1>
 

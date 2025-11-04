@@ -49,7 +49,11 @@ public class ReservationController {
             // 필요한 경우 nights도 추가
             @RequestParam("nights") int nights,
             
-            Model model) {
+            Model model, HttpSession session) {
+		
+		Object userProfile = session.getAttribute("userProfile");
+        model.addAttribute("userProfile", userProfile); // userProfile이 null일 수 있습니다.
+        
 
 		// 1. reservedHomeId로 Home 객체 조회
         Home home = homeRepository.findById(reservedHomeId)
@@ -127,7 +131,12 @@ public class ReservationController {
     }
 	
 	@GetMapping("/reservationSuccess")
-	public String reservationSuccess() {
+	public String reservationSuccess(Model model, HttpSession session) {
+		
+		Object userProfile = session.getAttribute("userProfile");
+        model.addAttribute("userProfile", userProfile); // userProfile이 null일 수 있습니다.
+        
+
 		return "home/reservationFinish";
 	}
 }
