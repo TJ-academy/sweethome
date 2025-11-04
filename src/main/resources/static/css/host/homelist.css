@@ -1,0 +1,222 @@
+@charset "UTF-8";
+
+body {
+  background-color: #f8fbff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #222;
+}
+
+/* 제목 + +버튼 같은 줄 */
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 15px;
+}
+
+.mypage-content-area h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* + 버튼 */
+.add-home-btn {
+    background-color: #4DB2FF !important;
+    border-color: #4DB2FF !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+.add-home-btn:hover {
+    background-color: #3da1f0 !important;
+}
+
+/* 보기 전환 버튼 아래 중앙 */
+.view-toggle {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+.view-toggle .btn {
+    border-radius: 6px;
+    margin: 0 4px;
+    transition: all 0.2s ease;
+    border-color: #ccc;          /* ✅ 기본 회색 테두리 */
+    color: #555;                 /* ✅ 기본 글자색 */
+    background-color: #fff;      /* ✅ 기본 배경색 */
+}
+.view-toggle .btn:hover {
+    background-color: #f5f5f5;   /* ✅ 살짝 hover 느낌 */
+}
+.view-toggle .btn.active {
+    background-color: #4DB2FF;   /* ✅ 선택된 버튼 파란색 */
+    color: #fff;
+    border-color: #4DB2FF;
+}
+
+/* ===== 숙소 목록 ===== */
+.home-list {
+    width: 100%;
+    margin-top: 0; /* ✅ 기존 10px 제거 */
+}
+
+/* 카드형 (grid-view) */
+.home-list.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+.home-list.grid-view .home-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    height: 100%;
+}
+.home-list.grid-view .home-card:hover {
+    box-shadow: 0 6px 18px rgba(77, 178, 255, 0.25);
+    transform: translateY(-5px);
+    border-color: #4DB2FF;
+}
+.home-list.grid-view .home-thumb {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+    transition: transform 0.3s ease;
+}
+.home-list.grid-view .home-card:hover .home-thumb {
+    transform: scale(1.03);
+}
+.home-list.grid-view .home-info {
+    padding: 12px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* ✅ 위쪽 정렬 */
+}
+/* 지역명 */
+.home-list.grid-view .home-meta:first-child {
+    margin-bottom: 4px;
+    color: #777 !important; /* ✅ 회색 텍스트 */
+    font-weight: 500;       /* (선택) 살짝 진하게 하면 가독성 좋아짐 */
+}
+
+/* 제목 */
+.home-list.grid-view .home-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #333;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;      /* ✅ 최대 두 줄 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.8em;          /* ✅ 제목 한 줄이어도 두 줄 높이 확보 */
+}
+
+/* 숙소 타입, 인원 정보 */
+.home-list.grid-view .home-meta:nth-of-type(2) {
+    font-size: 0.9rem;
+    color: #777 !important;
+    margin-bottom: 6px;
+}
+
+/* 가격 */
+.home-list.grid-view .home-price {
+    font-weight: 700;
+    color: #4DB2FF;
+    font-size: 0.95rem;
+    margin-top: auto;           /* ✅ 항상 맨 아래 고정 */
+}
+/* 목록형 (list-view) */
+.home-list.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.home-list.list-view .home-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    background-color: #fff;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.home-list.list-view .home-card:hover {
+    background-color: #f9fcff;
+    box-shadow: 0 4px 10px rgba(77, 178, 255, 0.15);
+    transform: translateY(-2px);
+    border-color: #4DB2FF;
+}
+.home-list.list-view .home-thumb {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 18px;
+    border: 1px solid #ddd;
+    flex-shrink: 0;
+}
+.home-list.list-view .home-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.home-list.list-view .home-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #333;
+    margin-bottom: 6px;
+}
+.home-list.list-view .home-meta {
+    font-size: 0.92rem;
+    color: #777;
+    margin-bottom: 3px;
+}
+.home-list.list-view .home-price {
+    font-weight: 700;
+    color: #4DB2FF;
+    font-size: 1rem;
+    margin-top: 6px;
+}
+
+.alert.alert-info {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: none !important; /* ✅ 실제 데이터 있을 때 공간 차지 방지 */
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .mypage-content-area {
+        align-items: flex-start;
+    }
+    .view-toggle {
+        margin-top: 10px;
+    }
+    .home-list.grid-view {
+        grid-template-columns: 1fr;
+    }
+}
