@@ -278,15 +278,19 @@
         emptyMessageRow.classList.toggle('hidden', visibleCount > 0);
     }
     
-    // 3. 숙소 필터 이벤트 리스너 (공통)
-    document.querySelectorAll('.home-filter-wrap .chip').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            document.querySelectorAll('.home-filter-wrap .chip').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            activeHomeIdx = e.target.getAttribute('data-home-idx');
-            updateReservationList();
-        });
-    });
+	// 3. 숙소 필터 이벤트 리스너 (공통)
+	document.querySelectorAll('.home-filter-wrap .chip').forEach(chip => {
+	  chip.addEventListener('click', (e) => {
+	    const targetChip = e.target.closest('.chip'); // ✅ 내부 span 클릭 방지
+	    if (!targetChip) return;
+	
+	    document.querySelectorAll('.home-filter-wrap .chip').forEach(c => c.classList.remove('active'));
+	    targetChip.classList.add('active');
+	
+	    activeHomeIdx = targetChip.getAttribute('data-home-idx');
+	    updateReservationList();
+	  });
+	});
 
     // 4. 내부 필터 이벤트 리스너 (탭별)
     document.querySelectorAll('.status-chip, .period-chip, .request-chip').forEach(chip => {
