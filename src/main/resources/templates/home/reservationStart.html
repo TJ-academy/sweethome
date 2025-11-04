@@ -5,6 +5,7 @@
   <title>예약 요청</title>
   <link rel="stylesheet" th:href="@{/css/home/reservationstart.css}">
   <link rel="stylesheet" th:href="@{/css/fragments/fragments.css}">
+  <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -41,7 +42,7 @@
         <div class="step-box">
           <p>2. 결제 수단 추가</p>
           <input type="text" id="bank" name="bank" placeholder="은행명 (계좌이체 시 필수)">
-          <input type="number" id="account" name="account" placeholder="계좌번호 (계좌이체 시 필수)">
+          <input type="text" id="account" name="account" placeholder="계좌번호 (계좌이체 시 필수)">
         </div>
 
 
@@ -75,9 +76,166 @@
     </div>
 
   </div>
-
-
   <script>
+  document.addEventListener("DOMContentLoaded", function () {
+	    const form = document.querySelector("form");
+	    const payNow = document.getElementById("now");
+	    const payLater = document.getElementById("later");
+	    const bankInput = document.getElementById("bank");
+	    const accountInput = document.getElementById("account");
+	    const messageBox = document.getElementById("host-message");
+
+	    // ✅ 은행/계좌 입력 필드를 담는 부모 div
+	    const paymentInfoBox = bankInput.parentElement;
+
+	    // ✅ 초기에는 숨김 (기본 결제수단은 카카오페이이므로)
+	    paymentInfoBox.style.display = "none";
+
+	    // ✅ 라디오 버튼 변경 시 표시/숨김 제어
+	    payNow.addEventListener("change", togglePaymentFields);
+	    payLater.addEventListener("change", togglePaymentFields);
+
+	    function togglePaymentFields() {
+	      if (payLater.checked) {
+	        paymentInfoBox.style.display = "block"; // 계좌이체 선택 시 표시
+	      } else {
+	        paymentInfoBox.style.display = "none"; // 카카오페이 선택 시 숨김
+	        bankInput.value = "";
+	        accountInput.value = "";
+	      }
+	    }
+
+	    // ✅ 기존 submit 이벤트 로직 유지
+	    form.addEventListener("submit", async function (e) {
+	      let isValid = true;
+	      let alertMsg = "";
+
+	      const payType = payNow.checked ? "KAKAOPAY" : payLater.checked ? "TRANSFER" : "";
+	      if (!payType) {
+	        isValid = false;
+	        alertMsg = "결제 시기를 선택해주세요.";
+	      }
+
+	      // 계좌이체 선택 시 은행/계좌 필수 입력
+	      if (payType === "TRANSFER") {
+	        if (bankInput.value.trim() === "" || accountInput.value.trim() === "") {
+	          isValid = false;
+	          alertMsg = "계좌이체를 선택하셨습니다.\n은행명과 계좌번호를 입력해주세요.";
+	        }
+	      }
+
+	      if (messageBox.value.trim() === "") {
+	        isValid = false;
+	        alertMsg = "호스트에게 보낼 메시지를 작성해주세요.";
+	      }
+
+	      if (!isValid) {
+	        e.preventDefault();
+	        alert(alertMsg);
+	        return;
+	      }
+
+	      // 기존 결제 분기 로직 유지
+	      const getHiddenValue = (name) => document.querySelector(`input[name="${name}"]`).value;
+
+	      if (payType === "TRANSFER") {
+	        // 그냥 submit
+	      } else if (payType === "KAKAOPAY") {
+	        e.preventDefault();
+
+	        const formData = {
+	          reservedHomeId: parseInt(getHiddenValue("reservedHomeId"), 10),
+	          adult: parseInt(getHiddenValue("adult"), 10),
+	          child: parseInt(getHiddenValue("child"), 10),
+	          startDate: getHiddenValue("startDate"),
+	          endDate: getHiddenValue("endDate"),
+	          totalMoney: parseInt(getHiddenValue("totalMoney"), 10),
+	          payby: payType,
+	          bank: bankInput.value.trim(),
+	          account: accountInput.value.trim(),
+	          message: messageBox.value.trim()
+	        };
+
+	        startKakaoPayFlow(formData);
+	      }
+	    });
+
+	    // 이하 카카오페이 관련 함수 그대로 유지
+	    async function startKakaoPayFlow(formData) {
+	      try {
+	        const res = await fetch("/home/startKakaoPayReservation", {
+	          method: "POST",
+	          headers: { "Content-Type": "application/json" },
+	          body: JSON.stringify(formData)
+	        });
+
+	        if (!res.ok) {
+	          const errorData = await res.json();
+	          throw new Error("예약 요청 실패: " + (errorData.error || res.statusText));
+	        }
+
+	        const data = await res.json();
+
+	        if (data.status === "KAKAOPAY_READY") {
+	          requestPay(data);
+	        } else {
+	          alert("예약 준비에 실패했습니다.");
+	        }
+	      } catch (error) {
+	        console.error('Reservation/Payment Error:', error);
+	        alert("예약 요청 중 오류가 발생했습니다: " + error.message);
+	      }
+	    }
+
+	    function requestPay(paymentData) {
+	      const IMP = window.IMP;
+	      IMP.init('imp58115315');
+
+	      IMP.request_pay({
+	        pg: 'kakaopay.TC0ONETIME',
+	        pay_method: 'card',
+	        merchant_uid: paymentData.merchantUid,
+	        name: paymentData.homeName,
+	        amount: paymentData.amount,
+	        buyer_email: paymentData.buyerEmail,
+	        buyer_name: paymentData.buyerName,
+	      }, function (rsp) {
+	        if (rsp.success) {
+	          fetchVerification(rsp);
+	        } else {
+	          alert("결제에 실패했습니다. 에러 내용: " + rsp.error_msg);
+	        }
+	      });
+	    }
+
+	    async function fetchVerification(rsp) {
+	      try {
+	        const verifyRes = await fetch("/payment/verify", {
+	          method: "POST",
+	          headers: { "Content-Type": "application/json" },
+	          body: JSON.stringify({
+	            imp_uid: rsp.imp_uid,
+	            merchant_uid: rsp.merchant_uid,
+	          }),
+	        });
+
+	        const verifyData = await verifyRes.json();
+
+	        if (verifyRes.ok && verifyData.status === "success") {
+	          alert("결제 성공! 예약이 확정되었습니다.");
+	          window.location.href = "/home/reservationSuccess";
+	        } else {
+	          alert("결제는 성공했으나, 검증에 실패했습니다. 관리자에게 문의하세요.");
+	        }
+	      } catch (error) {
+	        console.error('Verification Error:', error);
+	        alert("결제 검증 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+	      }
+	    }
+	  });
+
+    
+    /*
     document.addEventListener("DOMContentLoaded", function () {
       const form = document.querySelector("form");
       const payNow = document.getElementById("now");
@@ -115,7 +273,8 @@
         }
       });
     });
-  </script>
+  */
 
+  </script>
 </body>
 </html>
