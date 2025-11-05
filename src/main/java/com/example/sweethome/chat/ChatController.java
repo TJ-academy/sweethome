@@ -79,6 +79,7 @@ public class ChatController {
 		
 		Map<String, Object> map = new HashMap<>();
 		
+		model.addAttribute("userProfile", guest);
 		map.put("roomsList", roomsList);
 		map.put("myEmail", guest.getEmail());
 		map.put("myNickname", guest.getNickname());

@@ -74,11 +74,12 @@ public class ChatService {
 	            .orElse(null);
 
 	        String lastMsgPreview = "-";
+	        
+	        //채팅 상대 프사
+	        String profileImg = otherUser.getUser().getProfileImg();
+	        
 	        //마지막 메시지가 있는 채팅방만 보여주기
 	        if (lastMessage != null) {
-	        	//채팅 상대 프사
-		        String profileImg = otherUser.getUser().getProfileImg();
-		        
 	        	if (lastMessage.getContent() != null && 
 	        			!lastMessage.getContent().isEmpty()) {
 	                String content = lastMessage.getContent();
@@ -96,6 +97,15 @@ public class ChatService {
 	        			lastMsgPreview, 
 	        			lastMessage.getSendedAt(), 
 	        			unreadCount,
+	        			profileImg);
+		        previews.add(preview);
+	        } else if (lastMessage == null) {
+        		lastMsgPreview = "";
+        		ChatRoomPreviewDTO preview = new ChatRoomPreviewDTO(
+	        			roomId, roomName, 
+	        			lastMsgPreview, 
+	        			null, 
+	        			0,
 	        			profileImg);
 		        previews.add(preview);
 	        }
