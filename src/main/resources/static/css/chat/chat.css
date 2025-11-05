@@ -108,6 +108,8 @@ body {
 .meta-right { justify-content: flex-end; }
 .nickname {
   font-weight: 500;
+  font-size: 1rem;   /* ✅ 글씨 크기 고정 */
+  color: #222;       /* (선택) 가독성 높이기 */
 }
 .time {
   margin-left: 6px;
@@ -138,6 +140,7 @@ body {
   background-color: #4DB2FF;
   color: #fff;
   border-radius: 16px 16px 2px 16px;
+  text-align: left; 
 }
 
 /* 왼쪽(상대방 말풍선) */
