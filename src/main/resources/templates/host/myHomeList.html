@@ -68,12 +68,18 @@
                     </button>
                 </div>
             </div>
-			<th:block th:if="${#lists.isEmpty(myHomes)}">
-			    <div class="alert alert-info m-0 p-0">현재 등록된 숙소가 없습니다.</div>
-			</th:block>
+            
+             <!-- 숙소 목록이 없을 경우 메시지 -->
+            <th:block th:if="${#lists.isEmpty(myHomes)}">
+                <div class="alert alert-info m-4 p-4 text-center">
+                    <i class="bi bi-info-circle me-2"></i>
+                    현재 등록된 숙소가 없습니다. 숙소 등록 버튼을 눌러 새로운 숙소를 추가해 보세요!
+                </div>
+            </th:block>
+
 
             <!-- 숙소 목록 -->
-            <div id="homeContainer" class="home-list grid-view">
+            <div id="homeContainer" class="home-list grid-view" th:unless="${#lists.isEmpty(myHomes)}">
                 <a th:each="home : ${myHomes}" 
                    th:href="@{/host/detail/{idx}(idx=${home.idx})}" 
                    style="text-decoration: none; color: inherit;">
@@ -99,6 +105,7 @@
 
         </div>
     </div>
+</div>
 </div>
 
 <!-- 보기 전환 스크립트 -->

@@ -2,6 +2,7 @@ package com.example.sweethome.user;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,12 @@ public class HostController {
 
         // 🌟 로그인된 호스트의 숙소 목록 조회
         List<Home> myHomes = homeRepository.findByHost(user);
-
+        
+        // myHomes가 null인 경우 빈 리스트로 초기화
+        if (myHomes == null) {
+            myHomes = new ArrayList<>(); // 빈 리스트로 설정
+        }
+        
         model.addAttribute("user", user);
         model.addAttribute("myHomes", myHomes); // 🌟 모델에 숙소 리스트 추가
 

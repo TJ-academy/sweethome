@@ -417,7 +417,24 @@ body {
     align-items: center; /* 세로 중앙 정렬 */
     gap: 8px; /* 버튼과 해시태그 간격 */
     /* .main-content 내부에서 중앙 정렬을 원하면 필요에 따라 flex-start 또는 margin-left 조정 */
-    margin-left: 15vw; /* 기존 filterBtn의 마진 위치를 여기서 시작점으로 사용 */
+    
+    /* 중앙 정렬을 위한 핵심 수정 */
+    /* max-width: 850px; */ /* 검색 컨테이너와 동일한 최대 너비 설정 */
+    max-width: 900px; /*줄바꿈 때문에...*/
+    margin: 0 auto; /* 좌우 마진을 auto로 설정하여 중앙 정렬 */
+    padding: 0 10px; /* (선택 사항) 화면이 작아질 때를 대비해 좌우 패딩 추가 */
+    
+    /* margin-left: 15vw; */ /* 기존 filterBtn의 마진 위치를 여기서 시작점으로 사용 */
+    
+    /* ⭐핵심 해결책: 내부 필터와 해시태그를 컨테이너 중앙으로 모음⭐ */
+    justify-content: flex-start; /* 기존 코드가 flex-start이거나 default 였을 것. */
+    justify-content: center; /* ⭐이것으로 중앙 정렬!⭐ */
+}
+
+/* ⭐추가 수정: 전체 메인 콘텐츠 영역의 너비 제한 및 중앙 정렬⭐ */
+.main-content {
+    max-width: 1400px; /* 전체 페이지 내용의 최대 너비 (검색 바 850px보다 충분히 크게) */
+    margin: 0 auto; /* 중앙 정렬 */
 }
 
 /* 선택된 해시태그 표시 */

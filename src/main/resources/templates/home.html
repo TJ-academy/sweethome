@@ -18,6 +18,7 @@
 <body>
 	<div th:insert="fragments/header :: menuBar"></div>
 	<div th:insert="fragments/search :: searchSection"></div>
+	<div th:insert="fragments/filter :: filterSection"></div>
 
 	<div class="container d-flex justify-content-center align-items-center"
 		th:if="${param.keyword == null}">

@@ -222,26 +222,27 @@
 		<div class="bedroom-section">
 			<h2>숙박 장소</h2>
 
-			<div th:if="${rooms != null}" th:each="room, iterStat : ${rooms}">
-				<div th:text="|침실 ${iterStat.count}|">침실 1</div>
-				<div th:text="|${room.bedType} ${room.bedCount}개|">퀸사이즈 침대 1개</div>
-			</div>
-
-			<div th:if="${rooms == null}">
-				<div th:text="|침실 ${home.room}개|">침실 3개</div>
-				<div th:text="${home.address}"></div>
-			</div>
+			<p class="summary-info" style="margin-bottom: 1.5rem;">
+		        <span th:text="|침실 ${home.room}개|">침실 3개</span> 
+		        <span th:text="| · 침대 ${home.bed}개|"> · 침대 5개</span> 
+		        <span th:text="| · 욕실 ${home.bath}개|"> · 욕실 2개</span>
+		    </p>
+		<div th:text="${home.address}"></div>
 		</div>
 
 		<!-- 지도를 표시할 div -->
 		<div id="map"></div>
 
 		<div class="review-section mt-5">
-			<h2 th:if="${reviewCount > 0}"
-				th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
-			<h2 th:if="${reviewCount == 0}">아직 작성된 후기가 없습니다.</h2>
-
-			<div class="row g-4" th:if="${!#lists.isEmpty(recentReviews)}">
+    <h2 th:if="${reviewCount > 0}"
+        th:text="|★ ${rating} · 후기 ${reviewCount}개|">★ 4.9 · 후기 12개</h2>
+    <h2 th:unless="${reviewCount > 0}">후기</h2>
+    
+    <div th:if="${reviewCount == 0}" class="empty-review-message mb-4">
+        <p class="text-muted"><br>아직 작성된 후기가 없습니다.</p>
+    </div>
+    
+    <div class="row g-4" th:if="${!#lists.isEmpty(recentReviews)}">
 				<div class="col-md-6" th:each="review : ${recentReviews}"
 					th:if="${review.writer != null}">
 					<div class="review-card p-3 border rounded-3 h-100">

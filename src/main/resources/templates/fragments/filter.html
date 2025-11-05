@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+
+	<div th:fragment="filterSection">
+		<div class="main-content">
+		
+		<hr style="color: #E5E5E5;">
+			
+			<div class="controls-wrapper">
+			
+				<div class="filter-container">
+					<button class="filterBtn">
+						<img src="/img/icon/filter.png">
+						필터
+					</button>
+					<div class="filter-popup" id="filterPopup">
+						<h4>필터</h4>
+						<label><input type="radio" name="filter" value="price"> 최저가 순</label><br>
+						<label><input type="radio" name="filter" value="review"> 후기 많은 순</label><br>
+						<label><input type="radio" name="filter" value="recommend"> 추천 많은 순</label>
+					</div>
+				</div>
+				
+				<!-- 해시태그: + 버튼/팝업 없이 바로 토글되는 버튼 형태 -->
+				<div class="hashtag-container">
+					<div class="hashtag-list" id="hashtagList">
+						<div class="hashtag-item">방해물 없는 시설</div>
+						<div class="hashtag-item">냉난방</div>
+						<div class="hashtag-item">엘리베이터</div>
+						<div class="hashtag-item">무료주차</div>
+						<div class="hashtag-item">주방</div>
+						<div class="hashtag-item">반려동물 동반</div>
+						<div class="hashtag-item">셀프체크인</div>
+						<div class="hashtag-item">TV</div>
+						<div class="hashtag-item">Wifi</div>
+					</div>
+				</div>
+				
+			</div>
+			<hr style="color: #E5E5E5;">
+		</div>
+</div>
+
+</body>
+</html>
