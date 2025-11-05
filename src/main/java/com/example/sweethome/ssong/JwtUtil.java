@@ -59,7 +59,7 @@ public class JwtUtil {
 					.build()
 					.parseClaimsJws(token);
         } catch (JwtException e) {
-            return null;
+        	throw new RuntimeException("JWT 토큰이 유효하지 않습니다.", e);
         }
     }
 }

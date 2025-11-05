@@ -32,6 +32,7 @@ public class KaKaoApiController {
     		@RequestParam("accessToken") String accessToken,
             HttpServletResponse res) {
         try {
+        	System.out.println("파라메터로 받은 accessToken: " + accessToken);
             // 카카오 토큰으로 유저 정보 가져오기
             KakaoProfile userInfo = kakaoService.getUserInfo(accessToken);
             String email = userInfo.getKakaoAccount().getEmail();

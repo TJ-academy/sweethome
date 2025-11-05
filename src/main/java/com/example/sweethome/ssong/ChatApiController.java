@@ -118,7 +118,9 @@ public class ChatApiController {
         dto.setSendedAt(savedMessage.getSendedAt());
         dto.setSenderNickname(savedMessage.getSender().getNickname());
         
-        messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+        if(dto.getRoomId() != null) {
+            messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+        }
         
         User receiver = userrepo.findByEmail(dto.getReceiverEmail()).get();
         String message = "";
