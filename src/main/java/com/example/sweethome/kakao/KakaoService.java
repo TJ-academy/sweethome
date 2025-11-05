@@ -39,7 +39,7 @@ public class KakaoService {
                 .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
                 .bodyValue("grant_type=authorization_code" +
                            "&client_id=d0c2283e342f9018d35eb38e5f51fc04" +
-                           "&redirect_uri=" + "http://localhost:8080/kakao/callback" + 
+                           "&redirect_uri=" + "http://homesweethome.koyeb.app/kakao/callback" + 
                            "&code=" + code)
                 .retrieve()
                 //TODO : Custom Exception
