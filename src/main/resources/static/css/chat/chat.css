@@ -4,9 +4,10 @@ body {
   margin: 0;
   background-color: #e9eef6;
 }
+
 .container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 70px); /* ✅ 헤더 높이(약 70px)만큼 제외 */
 }
 
 /* ===============================
