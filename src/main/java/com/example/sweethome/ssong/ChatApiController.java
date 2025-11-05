@@ -113,14 +113,23 @@ public class ChatApiController {
 	@MessageMapping("/api/message/send")
     public void handleChatMessage(ChatMessageDto dto) {
         ChatMessage savedMessage = service.saveMessage(dto);
+        System.out.println("✅ 메시지 저장 완료: " + dto.getContent());
         
         dto.setMsgId(savedMessage.getIdx());
         dto.setSendedAt(savedMessage.getSendedAt());
         dto.setSenderNickname(savedMessage.getSender().getNickname());
         
-        if(dto.getRoomId() != null) {
-            messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
-        }
+//        if(dto.getRoomId() != null) {
+//            messagingTemplate.convertAndSend("/topic/chat/" + dto.getRoomId(), dto);
+//        }
+        // 🔹 채팅방 브로드캐스트 대신, 각 유저에게 개별 전송
+        messagingTemplate.convertAndSendToUser(
+            dto.getSenderEmail(), "/queue/messages", dto
+        );
+        messagingTemplate.convertAndSendToUser(
+            dto.getReceiverEmail(), "/queue/messages", dto
+        );
+        
         
         User receiver = userrepo.findByEmail(dto.getReceiverEmail()).get();
         String message = "";
