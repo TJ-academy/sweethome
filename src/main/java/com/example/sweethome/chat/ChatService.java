@@ -64,6 +64,10 @@ public class ChatService {
 	        
 	        //채팅 상대
 			ChatUser otherUser = findChatOtherUser(roomId, user);
+			
+			if(otherUser == null) {
+				continue;
+			}
 	        String roomName = "-";
 	        if (otherUser != null) {
 	            roomName = otherUser.getUser().getNickname();
