@@ -89,39 +89,50 @@ function verifyCode() {
 </head>
 
 <body>
-<div th:insert="fragments/header :: menuBar"></div>
+  <div th:insert="fragments/header :: menuBar"></div>
 
-<div class="find-page">
-  <div class="find-card">
-    <h2 class="find-title">비밀번호 찾기</h2>
+  <main class="reset-page">
+    <section class="reset-card">
+      <h1 class="reset-title">비밀번호 재설정</h1>
 
-    <div class="find-form">
-      <!-- 이메일 입력칸 + 인증 코드 전송 버튼 -->
-      <div class="input-group-row">
-        <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
-        <button type="button" class="btn-side"
-          id="emailBtn"
-          th:disabled="${kakaouser != null}"
-          onclick="sendVerificationCode()">인증 코드 전송</button>
+      <form class="reset-form" action="/user/resetPassword" method="post" oninput="checkMatch()">
+        <!-- 필요 시 CSRF -->
+        <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"> -->
+
+        <!-- 비밀번호 재설정 대상 이메일 -->
+        <input type="hidden" name="email" th:value="${email}"/>
+
+        <div class="reset-input-row">
+          <label for="password" class="reset-label">새 비밀번호</label>
+          <div class="reset-input-with-btn">
+            <input type="password" id="password" name="password" class="reset-input" minlength="8" required placeholder="8자 이상 입력" />
+            <button class="reset-btn-side" type="button" onclick="toggleVisibility('password', this)" aria-pressed="false">보기</button>
+          </div>
+        </div>
+
+        <div class="reset-input-row">
+          <label for="confirmPassword" class="reset-label">비밀번호 확인</label>
+          <div class="reset-input-with-btn">
+            <input type="password" id="confirmPassword" name="confirmPassword" class="reset-input" minlength="8" required placeholder="다시 입력" />
+            <button class="reset-btn-side" type="button" onclick="toggleVisibility('confirmPassword', this)" aria-pressed="false">보기</button>
+          </div>
+        </div>
+
+        <!-- 라이브 검사 메시지 -->
+        <p id="liveMsg" class="reset-result-msg" aria-live="polite"></p>
+
+        <button id="submitBtn" class="reset-submit" type="submit" disabled>비밀번호 재설정</button>
+      </form>
+
+      <!-- 서버 사이드 메시지 -->
+      <p th:if="${error}" th:text="${error}" class="reset-result-msg error bold"></p>
+      <p th:if="${success}" th:text="${success}" class="reset-result-msg ok"></p>
+
+      <div class="reset-links">
+        <a href="/" class="reset-link">홈으로</a>
+        <a href="/user/login" class="reset-link">로그인</a>
       </div>
-
-      <!-- 인증코드 입력칸 + 코드확인 버튼 -->
-      <div class="input-group-row">
-        <input type="text" id="emailCode"
-          placeholder="인증 코드 입력"
-          th:value="${kakaouser != null} ? '인증완료' : ''"
-          th:disabled="${kakaouser != null}">
-        <button type="button" class="btn-side"
-          id="codeBtn"
-          onclick="verifyCode()"
-          th:disabled="${kakaouser != null}">코드 확인</button>
-      </div>
-
-      <!-- 인증 상태 메시지 -->
-      <p id="verificationResult" class="result-msg"></p>
-    </div>
-  </div>
-</div>
-
+    </section>
+  </main>
 </body>
 </html>
