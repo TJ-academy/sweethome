@@ -1,15 +1,15 @@
 package com.example.sweethome.home;
 
-import com.example.sweethome.home.CompareHomeDetail; // DTO 임포트 필요
-import com.example.sweethome.home.HomeService; // HomeService 임포트
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class CompareController {
@@ -32,7 +32,7 @@ public class CompareController {
     @GetMapping("/compare")
     public String compareHomes(
             @RequestParam("ids") String ids,
-            Model model) {
+            Model model, HttpSession session) {
 
         // 1. 쿼리 파라미터 문자열을 Long 타입의 ID 리스트로 변환
         List<Long> homeIdList = Arrays.stream(ids.split(","))
@@ -54,7 +54,10 @@ public class CompareController {
         // 템플릿 코드에 맞게 모델 속성 이름을 'compareHomeDetails'로 변경합니다.
         model.addAttribute("compareHomeDetails", compareHomeDetails); 
         model.addAttribute("allOptionGroups", allOptionGroups); 
-
+        
+        Object userProfile = session.getAttribute("userProfile");
+        model.addAttribute("userProfile", userProfile); // userProfile이 null일 수 있습니다.
+        
         // templates/home/compare.html 템플릿 반환
         return "home/compare";
     }
