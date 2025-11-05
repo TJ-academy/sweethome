@@ -121,61 +121,6 @@ public class UserApiController {
 		.equals(c.getName()))
 				.map(Cookie::getValue).findFirst();
 	}
-	
-//	//이미 있는 닉네임인지 아닌지 확인
-//	@ResponseBody
-//	@PostMapping("/checkNicknameDuplicate")
-//	public String checkNicknameDuplicate(@RequestParam("nickname") String nickname,
-//			HttpSession session) {
-//	    boolean exists = repo.existsByNickname(nickname);
-//
-//	    if (!exists) {
-//	        session.setAttribute("nicknameVerified", true);
-//	        session.setAttribute("verifiedNickname", nickname);  //닉네임 바뀌었는지 추적
-//	        return "ok";
-//	    } else {
-//	        session.setAttribute("nicknameVerified", false);
-//	        return "duplicate";
-//	    }
-//	}
-//	
-//	//비밀번호 찾기 페이지 로딩
-//	@GetMapping("/findPwd")
-//	public String findPwd() {
-//		return "login/findPwd"; 
-//	}
-//	
-//	//비밀번호 재설정 페이지 로딩
-//	@GetMapping("/resetPassword")
-//	public String resetPassword(@RequestParam("email") String email, 
-//			Model model) {
-//		model.addAttribute("email", email);
-//		return "login/resetPassword"; 
-//	}
-//	
-//	//비밀번호 재설정
-//	@PostMapping("/resetPassword")
-//	public String resetPassword(@RequestParam("email") String email,
-//            @RequestParam("password") String password,
-//            @RequestParam("confirmPassword") String confirmPassword,
-//            Model model) {
-//		
-//		if (!password.equals(confirmPassword)) {
-//            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
-//            model.addAttribute("email", email);  // 다시 form에 유지
-//            return "login/resetPassword";
-//        }
-//
-//        // 비밀번호 업데이트 처리
-//        try {
-//            service.updatePassword(email, password);
-//            model.addAttribute("success", "비밀번호가 성공적으로 변경되었습니다.");
-//            return "redirect:/user/login";
-//        } catch (Exception e) {
-//            model.addAttribute("error", "비밀번호 변경 중 오류가 발생했습니다.");
-//            model.addAttribute("email", email);
-//            return "login/resetPassword";
-//        }
-//	}
+
 
 }
