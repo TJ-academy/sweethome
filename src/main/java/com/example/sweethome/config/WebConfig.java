@@ -13,9 +13,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
+        registry.addMapping("/**")
+              .allowedOrigins("http://localhost:*", "http://192.168.0.109:49594")
                 .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
@@ -37,7 +38,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "/user/checkEmailDuplicate", "/user/checkNicknameDuplicate",
                         "/css/**", "/js/**", "/img/**", "/images/**", "/favicon.ico",
                         "/kakao_login_medium_narrow.png",
-                        "/api/home/**"
+                        "/api/**",
+                        
+                     // ✅ Flutter가 쓰는 공개 API
+                        "/api/user/login", "/api/kakao/login", "/api/user/session",
+
+                        // (선택) 예약 조회는 로그인 쿠키만으로 갈 거면 인터셉터 제외해도 OK
+                        // "/api/reservations/**",
+
+                        // ✅ 프리플라이트는 반드시 제외
+                        "/**"
                 );
     }
 }
