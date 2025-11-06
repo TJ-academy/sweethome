@@ -28,21 +28,20 @@ public class UserService {
     
     //로그인 함수
     public boolean loginUser(String email, String rawPwd) {
-    	Optional<User> user = userRepository.findByEmail(email);
-    	
-    	if(user.isEmpty()) return false;
+    	User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) return false;
         
     	String encryptedPassword = encryptPassword(rawPwd);
-        return user.get().getPassword().equals(encryptedPassword);
+        return user.getPassword().equals(encryptedPassword);
     }
     
     //비밀번호 재설정 함수
     public void updatePassword(String email, String newPassword) {
-    	Optional<User> user = userRepository.findByEmail(email);
+    	User user = userRepository.findByEmail(email).orElse(null);
 
         String encryptedPassword = encryptPassword(newPassword);
-        user.get().setPassword(encryptedPassword);
-        userRepository.save(user.get());
+        user.setPassword(encryptedPassword);
+        userRepository.save(user);
     }
 
     //비밀번호 암호화 함수
