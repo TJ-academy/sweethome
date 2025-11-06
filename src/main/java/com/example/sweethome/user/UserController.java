@@ -56,13 +56,13 @@ public class UserController {
             @RequestParam("password") String password,
             HttpSession session,
             Model model) {
-        Optional<User> userOpt = repo.findByEmail(email);
-        if (userOpt.isEmpty() || !service.loginUser(email, password)) {
+        
+        if (!service.loginUser(email, password)) {
             model.addAttribute("error", "이메일 또는 비밀번호가 일치하지 않습니다.");
             return "login/login";
         }
 
-        User user = userOpt.get();
+        User user = repo.findByEmail(email).orElse(null);
         session.setAttribute("userProfile", user);
 
         // 로그인 후 prevPage가 존재하면 해당 페이지로 리다이렉트

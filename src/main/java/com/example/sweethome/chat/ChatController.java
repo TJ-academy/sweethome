@@ -94,33 +94,6 @@ public class ChatController {
 		return "chat/chatList";
     }
 	
-	//예약 후 채팅방 생성 또는 조회 + 자동 메시지 전송
-//    public String createReservationChat(Reservation reservation) {
-//    	User guest = reservation.getBooker();
-//    	User host = reservation.getReservedHome().getHost();
-//
-//        //두사람의 채팅방
-//        ChatRoom room = service.getChatRoom(guest, host, reservation);
-//
-//        //자동 메시지 전송
-//        ChatMessageDto dto = new ChatMessageDto();
-//        dto.setRoomId(room.getId());
-//        dto.setSenderEmail(host.getEmail());
-//        dto.setSenderNickname(host.getEmail());
-//        dto.setReceiverEmail(guest.getEmail());
-//        dto.setContent("예약이 완료되었습니다. 감사합니다!");
-//        
-//        ChatMessage saved = service.saveMessage(dto);
-//        
-//        dto.setMsgId(saved.getIdx());
-//        dto.setSendedAt(saved.getSendedAt());
-//        
-//        //실시간 메시지 전송
-//        messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), dto);
-//
-//        return "ok";
-//    }
-	
 	//한 채팅방에 들어가기
 	@GetMapping("/rooms/{roomId}")
 	@ResponseBody
