@@ -143,4 +143,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
                                                        @Param("date") LocalDate date);
 
     Optional<Reservation> findByMerchantUid(String merchantUid);
+    
+    List<Reservation> findByBookerEmailOrderByReservedDateDesc(String email);
 }
