@@ -22,6 +22,12 @@ public class KakaoService {
 	private String redirectUri;
     private final String KAUTH_TOKEN_URL_HOST;
     private final String KAUTH_USER_URL_HOST;
+    
+    @Value("${kakao.redirect_uri}")
+    private String redirect_uri;
+    
+    @Value("${kakao.logout_redirect_uri}")
+    private String logout_redirect_uri;
 
     @Autowired
     public KakaoService(
@@ -39,7 +45,7 @@ public class KakaoService {
                 .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
                 .bodyValue("grant_type=authorization_code" +
                            "&client_id=d0c2283e342f9018d35eb38e5f51fc04" +
-                           "&redirect_uri=" + "http://homesweethome.koyeb.app/kakao/callback" + 
+                           "&redirect_uri=" + redirect_uri + 
                            "&code=" + code)
                 .retrieve()
                 //TODO : Custom Exception
