@@ -74,6 +74,9 @@ public class MypageController {
             HttpSession session,
             Model model) {
 		User user = (User) session.getAttribute("userProfile");
+		if (user == null) {
+		    throw new RuntimeException("로그인된 사용자를 찾을 수 없습니다.");
+		}
 		if(userService.loginUser(email, password) && 
 				(user.getEmail().equals(email))) {
 			System.out.println("아이디와 비번이 일치합니다.");
